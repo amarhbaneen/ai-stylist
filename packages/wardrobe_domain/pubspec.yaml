@@ -1,0 +1,14 @@
+name: wardrobe_domain
+description: Pure-Dart domain layer for AI Stylist (entities, taxonomy, failures, repository interfaces). Must not depend on Flutter or AI runtimes.
+publish_to: 'none'
+version: 0.1.0
+resolution: workspace
+
+environment:
+  sdk: ^3.14.0
+
+dependencies:
+  meta: ^1.17.0
+
+dev_dependencies:
+  test: ^1.26.0

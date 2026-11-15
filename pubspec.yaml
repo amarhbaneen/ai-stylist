@@ -1,0 +1,46 @@
+name: ai_stylist
+description: "AI Stylist (working name): a local-first, offline wardrobe and outfit app."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.14.0
+
+workspace:
+  - packages/wardrobe_domain
+  - packages/outfit_engine
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # Material moved out of the framework in Flutter 3.47 (flutter.dev publisher).
+  material_ui: ^1.11.0
+  # State management + dependency injection (DECISIONS D-04).
+  flutter_riverpod: ^3.5.0
+  riverpod_annotation: ^4.0.8
+  # Declarative routing with a stateful shell for the 4 tabs.
+  go_router: ^18.1.4
+  # Local SQLite persistence with migrations (DECISIONS D-05).
+  drift: ^2.35.4
+  drift_flutter: ^0.3.1
+  # App-private directories and path handling for the FileStore.
+  path_provider: ^2.1.6
+  path: ^1.9.1
+  # UUID v4 primary keys.
+  uuid: ^4.6.0
+  wardrobe_domain:
+    path: packages/wardrobe_domain
+  outfit_engine:
+    path: packages/outfit_engine
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  build_runner: ^2.17.1
+  drift_dev: ^2.35.3
+  riverpod_generator: ^4.0.10
+  mocktail: ^1.0.5
+
+flutter:
+  uses-material-design: true
