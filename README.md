@@ -12,16 +12,23 @@ Wardrobe photos and data never leave the device.
 
 ## Status
 
-M1 (foundation) is in progress on `feature/m1-foundation`: app shell, Riverpod, routing, theme,
-Drift schema v1, private file storage and tests. The Android build is not yet verified because the
-Android SDK is not installed on the development machine. iOS needs macOS.
+M1 (foundation) is complete on `feature/m1-foundation`: app shell, Riverpod, routing, theme,
+Drift schema v1, private file storage and tests.
+
+- Verified on 2026-11-15: `flutter build apk --debug` succeeds. The app launches on an Android
+  emulator (API 37, x86_64) in airplane mode with no runtime errors.
+- Not verified: iOS (needs macOS) and physical Android devices.
+
+The first Gradle build installs NDK 28.2, SDK platforms 35 and 36, and CMake 3.22.1 automatically.
+That first run failed while those components were being installed, and the next run passed
+unchanged. If a first build fails, re-run it once before investigating.
 
 ## Toolchain
 
 | Tool | Version |
 | --- | --- |
 | Flutter | 3.50.0 stable (Dart 3.14.0) |
-| Android | minSdk 24 (Flutter default), JDK 17 bytecode, via the Android Studio JBR |
+| Android | minSdk 24 (Flutter default), JDK 17 bytecode, via the Android Studio JBR. SDK at `%LOCALAPPDATA%\Android\Sdk` |
 | iOS | 15.0 deployment target. Needs macOS and Xcode |
 
 Flutter and Dart analytics are disabled on the development machine

@@ -10,12 +10,12 @@ Status: **Phase 0 complete, awaiting review.** No application code has been writ
 
 | # | Blocker | Impact | Resolution |
 | --- | --- | --- | --- |
-| B-1 | Flutter SDK not installed | Nothing can be built, analysed or tested | Install Flutter 3.50.0 stable (on D:, not C:, because C: has 20.5 GB free) and add it to PATH |
-| B-2 | Android SDK/toolchain not installed; only JDK 24 present | No Android build | Install Android Studio (bundles a JBR that Flutter uses) and the SDK + platform-tools + an emulator image on D:. Run `flutter doctor --android-licenses` |
+| B-1 ✅ | Flutter SDK not installed. Resolved: Flutter 3.50.0 at D:\dev\flutter | Nothing can be built, analysed or tested | Install Flutter 3.50.0 stable (on D:, not C:, because C: has 20.5 GB free) and add it to PATH |
+| B-2 ✅ | Android SDK/toolchain not installed. Resolved: Android Studio and SDK installed; debug APK builds | No Android build | Install Android Studio (bundles a JBR that Flutter uses) and the SDK + platform-tools + an emulator image on D:. Run `flutter doctor --android-licenses` |
 | B-3 | No macOS / Xcode | No iOS build, signing or test | Needs a Mac, or a macOS CI runner (your decision: CI builds code only and never touches user data) |
 | B-4 | No physical test devices known | Performance budgets (REQUIREMENTS §14) cannot be measured | Need 1 low-, 1 mid-, 1 high-tier Android device and 1 iPhone, or a device lab |
 | B-5 | No licence-clean, mobile-sized fashion classifier exists off the shelf | MVP acceptance #4 cannot be met by Phase 4 without one | Approve D-08: train or distil a Tier-1 model (needs a Python/GPU environment) |
-| B-6 | Session folder is temporary, not a git repo | Work would be lost; no feature branch | Move to a permanent project folder, `git init`, branch `feature/m1-foundation` |
+| B-6 ✅ | Session folder is temporary, not a git repo. Resolved: D:\dev\ai_stylist, pushed to GitHub | Work would be lost; no feature branch | Move to a permanent project folder, `git init`, branch `feature/m1-foundation` |
 | B-7 | Product decisions P-1…P-8 (DECISIONS.md) | P-2 and P-6 are needed for Phase 1–2 | Review and approve |
 
 Independent work (docs, pure-Dart engine design) can continue while B-3, B-4 and B-5 are open.
@@ -95,7 +95,7 @@ locally. The iOS build is documented, and verified only when B-3 is cleared.
 ### M0: Phase 0 — Inspect and plan ✅ (this document)
 Deliverables: IMPLEMENTATION_PLAN.md, DECISIONS.md, COMPATIBILITY_REPORT.md.
 
-### M1: Phase 1 — Foundation (REQ M1)
+### M1: Phase 1 — Foundation (REQ M1) ✅ Android verified 2026-11-15; iOS pending (B-3)
 - Create the app with `flutter create --org <P-1> --platforms android,ios`. Set up the pub
   workspace with the two pure-Dart packages.
 - Lints, `analysis_options.yaml`, CI script (`format`, `analyze`, `test`, `build apk --debug`).
