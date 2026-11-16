@@ -7,10 +7,14 @@ import 'package:ai_stylist/features/clothing_analysis/analysis_providers.dart';
 import 'package:ai_stylist/features/profile/profile_providers.dart';
 import 'package:ai_stylist/features/stylist/stylist_providers.dart';
 import 'package:ai_stylist/features/wardrobe/wardrobe_providers.dart';
+import 'package:ai_stylist/features/weather/data/asset_city_directory.dart';
+import 'package:ai_stylist/features/weather/weather_providers.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:outfit_engine/outfit_engine.dart';
 import 'package:wardrobe_domain/wardrobe_domain.dart';
 
@@ -25,6 +29,7 @@ final class TestApp {
     this.picker,
     this.processor,
     this.analyzer,
+    this.network,
     this.container,
   );
 
@@ -35,6 +40,9 @@ final class TestApp {
 
   /// Scripted on-device analysis (the fake thumbnails are not decodable).
   final FakeClothingAnalyzer analyzer;
+
+  /// Every HTTP request the app makes. Tests never reach the real network.
+  final FakeNetwork network;
   final ProviderContainer container;
 
   /// Real file I/O never completes on the widget tester's fake clock, so the
@@ -50,6 +58,7 @@ final class TestApp {
     final picker = FakeMediaPicker();
     final processor = FakeImageProcessor();
     final analyzer = FakeClothingAnalyzer();
+    final network = FakeNetwork();
     final container = ProviderContainer(
       overrides: [
         appSupportDirectoryProvider.overrideWithValue(tmp),
@@ -63,9 +72,14 @@ final class TestApp {
         // Same engine, run inline: isolates do not advance on the fake clock.
         engineRunnerProvider.overrideWithValue(runEngineInline),
         clothingAnalyzerProvider.overrideWithValue(analyzer),
+        httpClientProvider.overrideWithValue(MockClient(network.handle)),
+        // A tiny list instead of the 700 KB bundled asset.
+        cityDirectoryProvider.overrideWithValue(
+          AssetCityDirectory(() async => testCitiesJson),
+        ),
       ],
     );
-    return TestApp._(tmp, db, picker, processor, analyzer, container);
+    return TestApp._(tmp, db, picker, processor, analyzer, network, container);
   }
 
   Future<void> pump(WidgetTester tester) async {
@@ -183,5 +197,23 @@ Future<void> scrollTo(WidgetTester tester, Finder finder) async {
           )
           .first,
     );
+  }
+}
+
+/// A few cities in the bundled list's row format.
+const testCitiesJson =
+    '[[2643743,"London","London","GB",51.51,-0.13,8961989],'
+    '[293397,"Tel Aviv","Tel Aviv","IL",32.08,34.78,432892]]';
+
+/// Records requests and answers with [respond]; offline by default.
+final class FakeNetwork {
+  final requests = <http.Request>[];
+
+  Future<http.Response> Function(http.Request) respond = (_) async =>
+      throw http.ClientException('offline (test)');
+
+  Future<http.Response> handle(http.Request request) {
+    requests.add(request);
+    return respond(request);
   }
 }

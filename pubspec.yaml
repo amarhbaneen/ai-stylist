@@ -45,6 +45,9 @@ dependencies:
   image: ^4.13.1
   # @immutable on value types outside the domain package.
   meta: ^1.19.0
+  # Only network client (D-12): opt-in live weather and model downloads.
+  # Every request is listed in docs/NETWORK.md.
+  http: ^1.6.0
 
 dev_dependencies:
   flutter_test:
@@ -60,3 +63,6 @@ flutter:
   assets:
     # Bundled model manifest (empty until a licensed fashion model ships).
     - assets/models/
+    # Offline city list for live weather (GeoNames, CC BY 4.0;
+    # tools/build_cities.ps1).
+    - assets/cities/

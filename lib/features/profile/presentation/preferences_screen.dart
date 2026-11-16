@@ -4,6 +4,7 @@ import 'package:wardrobe_domain/wardrobe_domain.dart';
 
 import '../../../shared/taxonomy_labels.dart';
 import '../../favorites/presentation/learned_preferences_section.dart';
+import '../../weather/presentation/live_weather_settings_section.dart';
 import '../profile_providers.dart';
 import 'preferences_form.dart';
 
@@ -104,6 +105,7 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
               onChanged: (p) => setState(() => _draft = p),
             ),
             const LearnedPreferencesSection(),
+            const LiveWeatherSettingsSection(),
           ],
         ),
         AsyncError() => const Center(

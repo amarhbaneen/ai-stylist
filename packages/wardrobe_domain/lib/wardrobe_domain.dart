@@ -19,3 +19,4 @@ export 'src/wardrobe/clothing_item.dart';
 export 'src/wardrobe/wardrobe_filter.dart';
 export 'src/wardrobe/wardrobe_repository.dart';
 export 'src/wardrobe/wardrobe_use_cases.dart';
+export 'src/weather/weather.dart';

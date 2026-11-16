@@ -1,4 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Used only for opt-in live weather and optional model downloads, both
+         after an explicit user action (docs/NETWORK.md). The core app makes
+         no network requests. -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:label="AI Stylist"
         android:name="${applicationName}"
