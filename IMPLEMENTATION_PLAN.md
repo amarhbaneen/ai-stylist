@@ -141,7 +141,7 @@ model, schema validation, thresholds, golden images.
 Segmentation (FR-05) only after the classifier works, and only if a licence-clean model is
 verified. Otherwise defer.
 
-### M5: Phase 5 — Outfit engine (REQ M4)
+### M5: Phase 5 — Outfit engine (REQ M4) ✅ Android verified 2026-11-16 (Home daily suggestion still a placeholder; see README)
 `packages/outfit_engine` with templates (§4), hard filters, the six scorers, weight
 normalisation, weather omission, dedup, recent-history exclusion, 0–3 results, missing-category
 explanation. Stylist UI: occasion, style, weather, count → results → outfit details.

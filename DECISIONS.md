@@ -228,6 +228,65 @@ are constants, to be tuned against the golden set.
 *Why rules over a model:* the result is explainable, needs no licence or download, behaves the
 same on every device, and meets REQUIREMENTS §8 step 1.
 
+## D-27 Outfit engine design details. Accepted (M5)
+These refine D-10:
+- **Templates:** two structural templates, *separates* (top + bottom + shoes, optional layer)
+  and *one-piece* (dress or jumpsuit + shoes, optional layer).
+  - Business and formal are not separate structures; their formality window is applied as a
+    hard constraint on each item.
+  - Below 12 °C the layer becomes required (FR-06's cold-weather template).
+- **Hard constraints:** ACTIVE only; the category matches the slot; formality within the
+  occasion window (casual 1–3, smart casual 2–4, business 3–5, formal 4–5, custom = chosen ±1);
+  items explicitly tagged only for other seasons are excluded when weather is given; heavy items
+  are excluded at 28 °C or above. **Unknown attributes never exclude an item.**
+- **Bounded search:** each slot keeps its 10 best items by item-level occasion, preference,
+  variety and weather fit. The search therefore stays at roughly 12k candidates whatever the
+  wardrobe size. Measured: 500 items in 428–444 ms on the dev PC in JIT mode. On devices it runs
+  on a background isolate.
+- **Signature:** sorted item IDs joined by `+`. Plain rather than hashed, because it is
+  deterministic, readable and needs no crypto dependency.
+- **Selection:** greedy, with a 0.04 penalty per item shared with an already chosen outfit, so
+  the three results differ. Signatures from the last 7 days are skipped; they are reused only
+  when nothing else is valid, and then labelled "Suggested recently".
+- **Never padded:** 0–3 results. With 0, a per-category explanation is returned (no items / not
+  formal enough / not suitable for the weather).
+
+## D-28 Colour harmony uses the painter's (RYB) wheel. Accepted (M5)
+Family positions on the RYB wheel:
+- Analogous: within 60° (score 0.8).
+- Complementary: 150–210° apart (0.75).
+- Anything else between: a mild clash (0.45).
+- Neutrals (black, white, grey, beige, brown, navy): 1.0 with anything.
+- Same family: 0.85 (monochrome).
+- Multicolour: 1.0 with neutrals, 0.55 with other colours.
+- Unknown colour: 0.65.
+- More than two competing chromatic colours: a further −0.15 each.
+
+*Why RYB:* fashion harmony rules are written on this wheel. CIELAB, which is used for colour
+*naming* (D-25), places orange and blue only 133° apart. The first implementation used CIELAB,
+and a unit test caught the mismatch.
+
+## D-29 Style is inferred from item attributes. Accepted (M5)
+Garments carry no style tag. The style component combines three parts:
+- formality coherence (spread of formality levels).
+- pattern mixing (more than one patterned piece is penalised).
+- when a style is requested (or preferred in the profile), an affinity read from formality,
+  pattern, colour and type. For example, minimal favours solid neutrals, and sporty favours
+  sneakers or low formality.
+
+The rules are simple and explainable, and can be replaced once AI tags exist.
+
+## D-30 Generation pipeline and persistence. Accepted (M5)
+`GenerateOutfits` (pure Dart) runs these steps:
+1. Load ACTIVE items, explicit preferences and 7 days of history.
+2. Run the engine through an injected runner. The app uses `Isolate.run`; tests run it inline.
+3. Re-check that every returned ID is an ACTIVE item.
+4. Store the results.
+
+Shown outfits are stored in `outfits` / `outfit_items`, with the template, scores, weights and
+reasons as JSON. This is the history used for variety now, and for favourites and feedback in M6.
+Nothing is stored when no outfit is possible.
+
 ## D-26 Spikes live in `spikes/`, outside the product build. Accepted (M3)
 Each spike is a standalone Flutter app with its own pubspec (exact version pins) and is excluded
 from the root analyzer. Downloaded model binaries are git-ignored and fetched by a script that

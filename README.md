@@ -32,22 +32,28 @@ There were no permission prompts and no runtime errors. iOS (needs macOS) and ph
 devices are not yet verified, and the camera path has only been exercised in tests, not on a
 device.
 
-- **M3 (AI compatibility spike):** in progress on `feature/m3-ai-spike`.
+- **M3 (AI compatibility spike):** partly done; merged into `main`.
   - LiteRT (`flutter_litert` 4.1.1) runs `.tflite` models in a background isolate on the Android
     emulator, with zero network egress, and the APK is 16 KB page-size compliant.
   - Tier-0 colour extraction is in `lib/ai/color/`.
   - Still open: iOS, real-device numbers, and the fashion model.
   - See [docs/spikes/M3_AI_RUNTIME_REPORT.md](docs/spikes/M3_AI_RUNTIME_REPORT.md) and
     [docs/MODELS.md](docs/MODELS.md).
+- **M5 (outfit engine):** complete for Android, on `feature/m5-outfit-engine`.
+  - `packages/outfit_engine` is pure Dart: templates, hard constraints, six scorers, ranking,
+    variety and explanations.
+  - The Stylist tab offers occasion, optional style, optional manual weather and the number of
+    ideas (1–3).
+  - Results show reasons, and an outfit details screen shows the score breakdown and weights.
+  - Outfits are stored as history, so recent combinations are avoided.
+  - Verified on the emulator in airplane mode, with the engine on a real background isolate:
+    the missing-items explanation, a complete outfit, details, and history-aware repeats.
+  - Not done yet: the Home "daily suggestion" (still a placeholder) and real-device timings.
 
 The first Gradle build installs NDK 28.2, SDK platforms 35 and 36, and CMake 3.22.1
 automatically. If a first build fails while those are being installed, re-run it once.
 `android/gradle.properties` disables Kotlin incremental compilation, because the project (D:) and
 the pub cache (C:) are on different drives.
-
-The first Gradle build installs NDK 28.2, SDK platforms 35 and 36, and CMake 3.22.1 automatically.
-That first run failed while those components were being installed, and the next run passed
-unchanged. If a first build fails, re-run it once before investigating.
 
 ## Toolchain
 
@@ -76,7 +82,8 @@ lib/
     onboarding/        first-launch privacy + optional preferences
     profile/           style preferences (data: Drift repository)
     wardrobe/          import, grid, filters, details, editor (data: Drift repository)
-    home/ stylist/ favorites/   placeholders until M4-M5
+    stylist/           outfit generation UI, outfit details (data: Drift outfit repository)
+    home/ favorites/   placeholders until M5 follow-up / M6
   shared/              taxonomy labels, chip selectors, stored-image widget
 packages/
   wardrobe_domain/     pure Dart: Result, typed failures, clock, IDs, taxonomy (draft)
