@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../features/clothing_analysis/presentation/model_manager_screen.dart';
 import '../features/favorites/presentation/favorites_screen.dart';
 import '../features/home/presentation/home_screen.dart';
 import '../features/onboarding/presentation/onboarding_screen.dart';
@@ -38,6 +39,11 @@ GoRouter buildRouter({required bool onboardingComplete}) => GoRouter(
                   path: 'preferences',
                   parentNavigatorKey: _rootKey,
                   builder: (context, state) => const PreferencesScreen(),
+                ),
+                GoRoute(
+                  path: 'models',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) => const ModelManagerScreen(),
                 ),
               ],
             ),
