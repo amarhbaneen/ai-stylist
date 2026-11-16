@@ -32,6 +32,14 @@ There were no permission prompts and no runtime errors. iOS (needs macOS) and ph
 devices are not yet verified, and the camera path has only been exercised in tests, not on a
 device.
 
+- **M3 (AI compatibility spike):** in progress on `feature/m3-ai-spike`.
+  - LiteRT (`flutter_litert` 4.1.1) runs `.tflite` models in a background isolate on the Android
+    emulator, with zero network egress, and the APK is 16 KB page-size compliant.
+  - Tier-0 colour extraction is in `lib/ai/color/`.
+  - Still open: iOS, real-device numbers, and the fashion model.
+  - See [docs/spikes/M3_AI_RUNTIME_REPORT.md](docs/spikes/M3_AI_RUNTIME_REPORT.md) and
+    [docs/MODELS.md](docs/MODELS.md).
+
 The first Gradle build installs NDK 28.2, SDK platforms 35 and 36, and CMake 3.22.1
 automatically. If a first build fails while those are being installed, re-run it once.
 `android/gradle.properties` disables Kotlin incremental compilation, because the project (D:) and

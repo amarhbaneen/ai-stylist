@@ -70,6 +70,10 @@ Everything sits behind the `InferenceRuntime` adapter, so we can swap to `tflite
 Android and iOS, and acceptable latency.
 *Product-owner question:* do you want to keep the MediaPipe/ML Kit exclusion? Yes is
 recommended.
+*M3 status (2026-11-16):* the Android part of the gate passed on an x86_64 emulator, in both
+release and debug builds: the model loaded and ran in a background isolate, there was zero
+network egress with INTERNET granted, and the APK is 16 KB page-size compliant. iOS and
+real-device latency are still open. See `docs/spikes/M3_AI_RUNTIME_REPORT.md`.
 
 ## D-08 Fashion model strategy: tiered. Proposed (needs licensing approval)
 - Tier 0: deterministic Dart colour extraction and manual entry. Always available.
@@ -207,6 +211,27 @@ After startup, a background task removes files under `images/` that no `clothing
 references. These are left behind by a crash between the file write and the database commit, or
 by a failed file delete. A failure is only logged, and the clean-up runs again at the next
 launch.
+
+## D-25 Tier-0 colour extraction algorithm. Accepted (M3)
+Colour extraction is deterministic, pure Dart, and runs on an isolate (`lib/ai/color/`):
+1. Downscale the thumbnail to 64 px.
+2. Remove a uniform background using the border colour, with a ΔE76 threshold of 14.
+3. Weight pixels towards the centre.
+4. Cluster in CIELAB with seeded k-means (k = 5).
+5. Name each cluster with L\*/C\*/h° rules, not nearest-swatch matching, so navy/blue,
+   burgundy/red and beige/brown separate by lightness.
+
+The output is the primary colour, secondary colours (share ≥ 15%) and a confidence (the primary's
+share). It is reported as "multicolour" when no family reaches 35% and three or more are
+significant. It is a suggestion only, and the user confirms it in the review form (M4). Thresholds
+are constants, to be tuned against the golden set.
+*Why rules over a model:* the result is explainable, needs no licence or download, behaves the
+same on every device, and meets REQUIREMENTS §8 step 1.
+
+## D-26 Spikes live in `spikes/`, outside the product build. Accepted (M3)
+Each spike is a standalone Flutter app with its own pubspec (exact version pins) and is excluded
+from the root analyzer. Downloaded model binaries are git-ignored and fetched by a script that
+verifies their SHA-256, so the repository never redistributes third-party weights by accident.
 
 ---
 

@@ -121,7 +121,7 @@ the iOS build steps are documented.
 **Accept when:** a user can add, edit, archive and delete items fully offline, and the data
 survives an app restart (integration test).
 
-### M3: Phase 3 — AI compatibility spike (isolated `spikes/ai_runtime/` app)
+### M3: Phase 3 — AI compatibility spike (isolated `spikes/ai_runtime/` app) ◐ Android runtime verified 2026-11-16; iOS, devices and fashion model open (see `docs/spikes/M3_AI_RUNTIME_REPORT.md`)
 - Run `flutter_litert` with a reference model on Android arm64, Android emulator, iOS device
   and iOS simulator.
 - Network-egress capture with INTERNET granted. 16 KB page-size check. iOS release symbol check.
