@@ -39,11 +39,13 @@ abstract final class AddClothingFlow {
     WidgetRef ref,
     String path,
   ) async {
-    final importer = ref.read(importClothingPhotoProvider);
+    // Start the import exactly once. Creating it inside `builder` would start
+    // a new import every time the dialog rebuilds.
+    final task = ref.read(importClothingPhotoProvider).call(path);
     final result = await showDialog<Result<ClothingItem>>(
       context: context,
       barrierDismissible: false,
-      builder: (context) => _ImportProgress(task: importer(path)),
+      builder: (context) => _ImportProgress(task: task),
     );
     if (result == null || !context.mounted) return;
     switch (result) {
