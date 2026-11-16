@@ -149,7 +149,7 @@ explanation. Stylist UI: occasion, style, weather, count → results → outfit 
 result references only ACTIVE IDs and that no result violates a hard constraint; and
 generation for 500 items completes in under the budget measured in M3.
 
-### M6: Phase 6 — Feedback and personalisation (REQ M5)
+### M6: Phase 6 — Feedback and personalisation (REQ M5) ✅ Android verified 2026-11-16
 Like, dislike, reason, favourite/unfavourite, history, `PreferenceLearner` (D-11), reset.
 **Accept when:** tests show that a like raises, and a dislike lowers, the rank of matching
 candidates by a bounded, predictable amount; and that reset restores the baseline ranking

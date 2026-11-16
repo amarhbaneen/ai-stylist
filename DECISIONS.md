@@ -117,6 +117,7 @@ addition to the §11 list). Each like or dislike nudges bounded affinities: per 
 colour family, per style tag, per category pair. The step is ±0.05, clamped to [-0.30, +0.30].
 Updates are deterministic and order-dependent only on the feedback timestamp. A reset deletes
 only learned rows. Explicit preferences are never rewritten.
+*Refined in D-31 (M6):* style-tag keys were replaced by item-pair keys, and reasons were added.
 
 ## D-12 Networking: `http` only, user-initiated only. Accepted
 No `dio`, no `connectivity_plus`. A single `NetworkGateway` interface is used by the weather
@@ -286,6 +287,46 @@ The rules are simple and explainable, and can be replaced once AI tags exist.
 Shown outfits are stored in `outfits` / `outfit_items`, with the template, scores, weights and
 reasons as JSON. This is the history used for variety now, and for favourites and feedback in M6.
 Nothing is stored when no outfit is possible.
+
+## D-31 Learning from feedback (refines D-11). Accepted (M6)
+- **Keys and steps.** A like gives `item:<id>` +0.05, `color:<CODE>` +0.03 per distinct main
+  colour, and `pair:<idA>+<idB>` +0.05 for each pair of garments worn together. Every weight is
+  clamped to ±0.30 after each step.
+  - D-11 also mentioned style tags. Garments have none, so pairings take that role ("these go
+    well together").
+- **Dislike reasons change what is learned**, so the user's intent is respected:
+
+  | Reason | Effect |
+  | --- | --- |
+  | No reason, "Not my style" or "Something else" | Mirrors a like (negative) |
+  | "Colours don't work" | Colours −0.03, the pairing −0.05, each garment only −0.01 |
+  | "Too formal", "Too casual" or "Wrong for the weather" | The pairing −0.05, garments −0.01, colours unchanged |
+  | "Wore it recently" | **No effect.** It isn't a judgement on taste |
+
+- **The latest opinion per outfit wins.** Events are append-only, and changing a like into a
+  dislike does not double-count. A "cleared" event removes the opinion.
+- **Recomputed from the log, never nudged in place.** After each event the weights are rebuilt
+  from all feedback since the last reset, in (createdAt, id) order. They are deterministic and
+  self-healing.
+- **Strict ordering.** The repository gives every new event for an outfit a timestamp later than
+  that outfit's previous event. Without this, two events in the same millisecond tied and fell
+  back to random UUID order. A widget test caught this as a flaky like→undo failure.
+- **Reset.** Learned rows are deleted and `personalization_reset_at` is recorded, so learning
+  ignores older feedback. History, favourites and explicit preferences are kept.
+- **Kept separate.** Favourites never train the model. Learned weights only ever change the
+  preference component (15% of the total), so one like moves an outfit's score by a predictable
+  0.13 × 0.176 ≈ 0.023 without weather. A unit test asserts this exactly.
+
+## D-32 Favourites and history UI. Accepted (M6)
+- Every outfit card and the details screen have like, dislike and save buttons. Tapping the
+  active rating clears it.
+- Dislike opens an optional reason sheet. Dismissing the sheet records nothing; "Skip" records a
+  dislike without a reason.
+- The Favorites tab has two views: **Saved** (hearted outfits) and **History** (every stored
+  suggestion, newest first, capped at 200 in the view).
+- The preferences screen shows "Learned from your feedback" below the explicit choices: liked and
+  skipped colours, counts of adjusted garments and pairings, and "Reset learning". The explicit
+  reset button is labelled "Reset choices" to keep the two apart.
 
 ## D-26 Spikes live in `spikes/`, outside the product build. Accepted (M3)
 Each spike is a standalone Flutter app with its own pubspec (exact version pins) and is excluded

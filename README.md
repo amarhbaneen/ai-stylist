@@ -39,7 +39,16 @@ device.
   - Still open: iOS, real-device numbers, and the fashion model.
   - See [docs/spikes/M3_AI_RUNTIME_REPORT.md](docs/spikes/M3_AI_RUNTIME_REPORT.md) and
     [docs/MODELS.md](docs/MODELS.md).
-- **M5 (outfit engine):** complete for Android, on `feature/m5-outfit-engine`.
+- **M6 (feedback and personalisation):** complete for Android, on `feature/m6-feedback`.
+  - Like, dislike (with optional reasons and a note) and save on every outfit.
+  - The Favorites tab has Saved and History views.
+  - Learning is bounded and deterministic: per garment, per colour and per pairing, rebuilt
+    from the feedback log since the last reset.
+  - Learned preferences appear separately in Style preferences, with "Reset learning".
+  - Tests show a like changes the next ranking by an exact, predictable amount, and a reset
+    restores the baseline.
+  - Verified on the emulator offline: like, save, the Saved view, and the learned section.
+- **M5 (outfit engine):** complete for Android; merged into `main`.
   - `packages/outfit_engine` is pure Dart: templates, hard constraints, six scorers, ranking,
     variety and explanations.
   - The Stylist tab offers occasion, optional style, optional manual weather and the number of
@@ -83,7 +92,9 @@ lib/
     profile/           style preferences (data: Drift repository)
     wardrobe/          import, grid, filters, details, editor (data: Drift repository)
     stylist/           outfit generation UI, outfit details (data: Drift outfit repository)
-    home/ favorites/   placeholders until M5 follow-up / M6
+    favorites/         feedback bar, Saved/History, learned-preferences section
+                       (data: Drift feedback + personalization repositories)
+    home/              placeholder (daily suggestion not built yet)
   shared/              taxonomy labels, chip selectors, stored-image widget
 packages/
   wardrobe_domain/     pure Dart: Result, typed failures, clock, IDs, taxonomy (draft)
