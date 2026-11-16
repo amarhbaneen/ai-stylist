@@ -40,6 +40,11 @@ dependencies:
   # Native downscale + EXIF orientation for working copies and thumbnails;
   # pure-Dart decoding of 12 MP photos is too slow (DECISIONS D-06).
   flutter_image_compress: ^2.5.1
+  # Pure-Dart decoding of the 320 px thumbnail for Tier-0 colour extraction
+  # (runs on an isolate; full-size photos are never decoded in Dart).
+  image: ^4.13.1
+  # @immutable on value types outside the domain package.
+  meta: ^1.19.0
 
 dev_dependencies:
   flutter_test:
