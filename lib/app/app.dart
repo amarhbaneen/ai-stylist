@@ -1,19 +1,23 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../core/theme/app_theme.dart';
+import '../features/profile/profile_providers.dart';
 import 'router.dart';
 
 /// Root widget. Expects a `ProviderScope` above it (see bootstrap).
-class AiStylistApp extends StatefulWidget {
+class AiStylistApp extends ConsumerStatefulWidget {
   const AiStylistApp({super.key});
 
   @override
-  State<AiStylistApp> createState() => _AiStylistAppState();
+  ConsumerState<AiStylistApp> createState() => _AiStylistAppState();
 }
 
-class _AiStylistAppState extends State<AiStylistApp> {
-  late final GoRouter _router = buildRouter();
+class _AiStylistAppState extends ConsumerState<AiStylistApp> {
+  late final GoRouter _router = buildRouter(
+    onboardingComplete: ref.read(onboardingCompleteAtLaunchProvider),
+  );
 
   @override
   void dispose() {

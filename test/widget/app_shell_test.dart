@@ -1,34 +1,13 @@
-import 'dart:io';
-
 import 'package:ai_stylist/app/app.dart';
-import 'package:ai_stylist/core/database/app_database.dart';
-import 'package:ai_stylist/core/providers.dart';
-import 'package:drift/native.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../support/test_app.dart';
+
 void main() {
-  late AppDatabase db;
-
-  setUp(() => db = AppDatabase(NativeDatabase.memory()));
-  tearDown(() => db.close());
-
-  Future<void> pumpApp(WidgetTester tester) async {
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          appSupportDirectoryProvider.overrideWithValue(Directory.systemTemp),
-          appDatabaseProvider.overrideWithValue(db),
-        ],
-        child: const AiStylistApp(),
-      ),
-    );
-    await tester.pumpAndSettle();
-  }
-
   testWidgets('starts on Home with four primary destinations', (tester) async {
-    await pumpApp(tester);
+    final app = await TestApp.create(tester);
+    await app.pump(tester);
 
     expect(find.byType(NavigationBar), findsOneWidget);
     for (final label in ['Home', 'Wardrobe', 'Stylist', 'Favorites']) {
@@ -41,22 +20,22 @@ void main() {
       );
     }
     expect(find.text('No suggestion yet'), findsOneWidget);
+    await app.dispose(tester);
   });
 
   testWidgets('switches tabs and shows each empty state', (tester) async {
-    await pumpApp(tester);
+    final app = await TestApp.create(tester);
+    await app.pump(tester);
 
-    await tester.tap(find.byIcon(Icons.checkroom_outlined));
-    await tester.pumpAndSettle();
+    await tapAndSettle(tester, find.byIcon(Icons.checkroom_outlined).last);
     expect(find.text('Your wardrobe is empty'), findsOneWidget);
 
-    await tester.tap(find.byIcon(Icons.auto_awesome_outlined));
-    await tester.pumpAndSettle();
+    await tapAndSettle(tester, find.byIcon(Icons.auto_awesome_outlined));
     expect(find.text('Nothing to style yet'), findsOneWidget);
 
-    await tester.tap(find.byIcon(Icons.favorite_border));
-    await tester.pumpAndSettle();
+    await tapAndSettle(tester, find.byIcon(Icons.favorite_border));
     expect(find.text('No favorites yet'), findsOneWidget);
+    await app.dispose(tester);
   });
 
   testWidgets('startup error screen explains the problem', (tester) async {

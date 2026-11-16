@@ -1,0 +1,132 @@
+import 'dart:io';
+
+import 'package:ai_stylist/app/app.dart';
+import 'package:ai_stylist/core/database/app_database.dart';
+import 'package:ai_stylist/core/providers.dart';
+import 'package:ai_stylist/features/profile/profile_providers.dart';
+import 'package:ai_stylist/features/wardrobe/wardrobe_providers.dart';
+import 'package:drift/native.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import 'fakes.dart';
+
+/// A fully wired app over an in-memory database and a temp folder, with a
+/// scripted photo picker and image processor.
+final class TestApp {
+  TestApp._(this.tmp, this.db, this.picker, this.processor, this.container);
+
+  final Directory tmp;
+  final AppDatabase db;
+  final FakeMediaPicker picker;
+  final FakeImageProcessor processor;
+  final ProviderContainer container;
+
+  /// Real file I/O never completes on the widget tester's fake clock, so the
+  /// temp folder is created inside [WidgetTester.runAsync].
+  static Future<TestApp> create(
+    WidgetTester tester, {
+    bool onboardingComplete = true,
+  }) async {
+    final tmp = (await tester.runAsync(
+      () => Directory.systemTemp.createTemp('ai_stylist_widget'),
+    ))!;
+    final db = AppDatabase(NativeDatabase.memory());
+    final picker = FakeMediaPicker();
+    final processor = FakeImageProcessor();
+    final container = ProviderContainer(
+      overrides: [
+        appSupportDirectoryProvider.overrideWithValue(tmp),
+        appDatabaseProvider.overrideWithValue(db),
+        mediaPickerProvider.overrideWithValue(picker),
+        imageProcessorProvider.overrideWithValue(processor),
+        clockProvider.overrideWithValue(FixedClock()),
+        onboardingCompleteAtLaunchProvider.overrideWithValue(
+          onboardingComplete,
+        ),
+      ],
+    );
+    return TestApp._(tmp, db, picker, processor, container);
+  }
+
+  Future<void> pump(WidgetTester tester) async {
+    // A typical phone (360 x 800 logical pixels) rather than the 800 x 600
+    // default, so layouts are tested at a realistic size.
+    tester.view
+      ..physicalSize = const Size(1080, 2400)
+      ..devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const AiStylistApp(),
+      ),
+    );
+    await settle(tester);
+  }
+
+  /// Unmounts the app so stream subscriptions close, then frees resources.
+  Future<void> dispose(WidgetTester tester) async {
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.runAsync(() async {
+      container.dispose();
+      await db.close();
+      await tmp.delete(recursive: true);
+    });
+  }
+}
+
+/// Lets real asynchronous work (file I/O, isolates, SQLite) finish between
+/// frames. `pumpAndSettle` alone cannot, because widget tests run on a fake
+/// clock and spinners never settle.
+Future<void> settle(WidgetTester tester, {int rounds = 8}) async {
+  for (var i = 0; i < rounds; i++) {
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 20)),
+    );
+    await tester.pump(const Duration(milliseconds: 50));
+  }
+}
+
+/// Keeps letting real async work run until [finder] matches (for imports,
+/// which hash on an isolate and copy files), failing after [timeout].
+Future<void> pumpUntil(
+  WidgetTester tester,
+  Finder finder, {
+  Duration timeout = const Duration(seconds: 10),
+}) async {
+  final watch = Stopwatch()..start();
+  while (watch.elapsed < timeout) {
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 30)),
+    );
+    await tester.pump(const Duration(milliseconds: 50));
+    if (finder.evaluate().isNotEmpty) return;
+  }
+  fail('Timed out waiting for $finder');
+}
+
+/// Scrolls the nearest vertical list until [finder] is built, taps it and
+/// settles. Lazily built lists do not create off-screen chips until scrolled.
+Future<void> tapAndSettle(WidgetTester tester, Finder finder) async {
+  if (finder.evaluate().isEmpty) {
+    // The topmost route's vertical list is the last ListView in the tree.
+    await tester.scrollUntilVisible(
+      finder,
+      200,
+      scrollable: find
+          .descendant(
+            of: find.byType(ListView).last,
+            matching: find.byType(Scrollable),
+          )
+          .first,
+    );
+  }
+  // Centre it: at the very top edge of a list, under the app bar, a tap can
+  // miss the chip.
+  await Scrollable.ensureVisible(tester.element(finder), alignment: 0.5);
+  await tester.pump();
+  await tester.tap(finder);
+  await settle(tester);
+}

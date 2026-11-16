@@ -1,5 +1,7 @@
+import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../../app/routes.dart';
 import '../../../shared/widgets/empty_state.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -8,7 +10,16 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Home')),
+      appBar: AppBar(
+        title: const Text('Home'),
+        actions: [
+          IconButton(
+            tooltip: 'Style preferences',
+            icon: const Icon(Icons.tune),
+            onPressed: () => context.push(AppRoutes.preferences),
+          ),
+        ],
+      ),
       body: const EmptyState(
         icon: Icons.wb_sunny_outlined,
         title: 'No suggestion yet',

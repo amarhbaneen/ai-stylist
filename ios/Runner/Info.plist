@@ -7,7 +7,11 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Ai Stylist</string>
+	<string>AI Stylist</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Take photos of your clothes to add them to your wardrobe. Photos stay on this device.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Choose photos of your clothes to add to your wardrobe. Photos stay on this device.</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

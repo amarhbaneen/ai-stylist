@@ -3,26 +3,71 @@ import 'package:material_ui/material_ui.dart';
 
 import '../features/favorites/presentation/favorites_screen.dart';
 import '../features/home/presentation/home_screen.dart';
+import '../features/onboarding/presentation/onboarding_screen.dart';
+import '../features/profile/presentation/preferences_screen.dart';
 import '../features/stylist/presentation/stylist_screen.dart';
+import '../features/wardrobe/presentation/item_details_screen.dart';
+import '../features/wardrobe/presentation/item_editor_screen.dart';
 import '../features/wardrobe/presentation/wardrobe_screen.dart';
+import 'routes.dart';
 
-/// Route paths for the primary navigation (REQUIREMENTS §13).
-abstract final class AppRoutes {
-  static const home = '/home';
-  static const wardrobe = '/wardrobe';
-  static const stylist = '/stylist';
-  static const favorites = '/favorites';
-}
+export 'routes.dart';
 
-GoRouter buildRouter() => GoRouter(
-  initialLocation: AppRoutes.home,
+final _rootKey = GlobalKey<NavigatorState>(debugLabel: 'root');
+
+GoRouter buildRouter({required bool onboardingComplete}) => GoRouter(
+  navigatorKey: _rootKey,
+  initialLocation: onboardingComplete ? AppRoutes.home : AppRoutes.onboarding,
   routes: [
+    GoRoute(
+      path: AppRoutes.onboarding,
+      builder: (context, state) => const OnboardingScreen(),
+    ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) =>
           AppShell(navigationShell: navigationShell),
       branches: [
-        _branch(AppRoutes.home, const HomeScreen()),
-        _branch(AppRoutes.wardrobe, const WardrobeScreen()),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: AppRoutes.home,
+              builder: (context, state) => const HomeScreen(),
+              routes: [
+                GoRoute(
+                  path: 'preferences',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) => const PreferencesScreen(),
+                ),
+              ],
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: AppRoutes.wardrobe,
+              builder: (context, state) => const WardrobeScreen(),
+              routes: [
+                GoRoute(
+                  path: 'item/:id',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) =>
+                      ItemDetailsScreen(itemId: state.pathParameters['id']!),
+                  routes: [
+                    GoRoute(
+                      path: 'edit',
+                      parentNavigatorKey: _rootKey,
+                      builder: (context, state) => ItemEditorScreen(
+                        itemId: state.pathParameters['id']!,
+                        confirm: state.uri.queryParameters['confirm'] == '1',
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        ),
         _branch(AppRoutes.stylist, const StylistScreen()),
         _branch(AppRoutes.favorites, const FavoritesScreen()),
       ],
