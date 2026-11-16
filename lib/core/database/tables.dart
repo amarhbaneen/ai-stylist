@@ -11,6 +11,7 @@
 import 'package:drift/drift.dart';
 
 /// Single local profile with optional explicit preferences (FR-01).
+@DataClassName('UserProfileRow')
 class UserProfile extends Table {
   TextColumn get id => text()();
 
@@ -35,6 +36,7 @@ class UserProfile extends Table {
 @TableIndex(name: 'idx_clothing_items_status', columns: {#status})
 @TableIndex(name: 'idx_clothing_items_category', columns: {#category})
 @TableIndex(name: 'idx_clothing_items_sha256', columns: {#contentSha256})
+@DataClassName('ClothingItemRow')
 class ClothingItems extends Table {
   TextColumn get id => text()();
   TextColumn get category => text()();
@@ -75,6 +77,7 @@ class ClothingItems extends Table {
 }
 
 /// Primary and secondary colours of an item.
+@DataClassName('ClothingItemColorRow')
 class ClothingItemColors extends Table {
   TextColumn get itemId =>
       text().references(ClothingItems, #id, onDelete: KeyAction.cascade)();
@@ -87,6 +90,7 @@ class ClothingItemColors extends Table {
   Set<Column> get primaryKey => {itemId, color, role};
 }
 
+@DataClassName('ClothingItemSeasonRow')
 class ClothingItemSeasons extends Table {
   TextColumn get itemId =>
       text().references(ClothingItems, #id, onDelete: KeyAction.cascade)();
@@ -99,6 +103,7 @@ class ClothingItemSeasons extends Table {
 }
 
 @TableIndex(name: 'idx_clothing_images_item', columns: {#itemId})
+@DataClassName('ClothingImageRow')
 class ClothingImages extends Table {
   TextColumn get id => text()();
   TextColumn get itemId =>
@@ -121,6 +126,7 @@ class ClothingImages extends Table {
 
 /// AI-proposed or user-confirmed attribute values with provenance (FR-04).
 @TableIndex(name: 'idx_clothing_attributes_item', columns: {#itemId})
+@DataClassName('ClothingAttributeRow')
 class ClothingAttributes extends Table {
   TextColumn get id => text()();
   TextColumn get itemId =>
@@ -142,6 +148,7 @@ class ClothingAttributes extends Table {
 
 @TableIndex(name: 'idx_outfits_signature', columns: {#signature})
 @TableIndex(name: 'idx_outfits_created', columns: {#createdAt})
+@DataClassName('OutfitRow')
 class Outfits extends Table {
   TextColumn get id => text()();
 
@@ -160,6 +167,7 @@ class Outfits extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+@DataClassName('OutfitItemRow')
 class OutfitItems extends Table {
   TextColumn get outfitId =>
       text().references(Outfits, #id, onDelete: KeyAction.cascade)();
@@ -175,6 +183,7 @@ class OutfitItems extends Table {
 }
 
 @TableIndex(name: 'idx_outfit_feedback_outfit', columns: {#outfitId})
+@DataClassName('OutfitFeedbackRow')
 class OutfitFeedback extends Table {
   TextColumn get id => text()();
   TextColumn get outfitId =>
@@ -191,6 +200,7 @@ class OutfitFeedback extends Table {
 }
 
 /// Learned (not explicit) preference weights, bounded and resettable (D-11).
+@DataClassName('LearnedPreferenceRow')
 class LearnedPreferences extends Table {
   /// For example `color:navy` or `style:minimal`.
   TextColumn get key => text()();
@@ -201,6 +211,7 @@ class LearnedPreferences extends Table {
   Set<Column> get primaryKey => {key};
 }
 
+@DataClassName('ModelInstallationRow')
 class ModelInstallations extends Table {
   TextColumn get modelId => text()();
   TextColumn get version => text()();
@@ -217,6 +228,7 @@ class ModelInstallations extends Table {
   Set<Column> get primaryKey => {modelId, version};
 }
 
+@DataClassName('AppSettingRow')
 class AppSettings extends Table {
   TextColumn get key => text()();
   TextColumn get value => text()();

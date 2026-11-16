@@ -4,7 +4,7 @@ part of 'app_database.dart';
 
 // ignore_for_file: type=lint
 class $UserProfileTable extends UserProfile
-    with TableInfo<$UserProfileTable, UserProfileData> {
+    with TableInfo<$UserProfileTable, UserProfileRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -115,7 +115,7 @@ class $UserProfileTable extends UserProfile
   static const String $name = 'user_profile';
   @override
   VerificationContext validateIntegrity(
-    Insertable<UserProfileData> instance, {
+    Insertable<UserProfileRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -192,9 +192,9 @@ class $UserProfileTable extends UserProfile
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  UserProfileData map(Map<String, dynamic> data, {String? tablePrefix}) {
+  UserProfileRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return UserProfileData(
+    return UserProfileRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
@@ -236,7 +236,7 @@ class $UserProfileTable extends UserProfile
   }
 }
 
-class UserProfileData extends DataClass implements Insertable<UserProfileData> {
+class UserProfileRow extends DataClass implements Insertable<UserProfileRow> {
   final String id;
 
   /// JSON array of style codes.
@@ -251,7 +251,7 @@ class UserProfileData extends DataClass implements Insertable<UserProfileData> {
   final int? formalityPreference;
   final int createdAt;
   final int updatedAt;
-  const UserProfileData({
+  const UserProfileRow({
     required this.id,
     required this.preferredStyles,
     required this.favoredColors,
@@ -296,12 +296,12 @@ class UserProfileData extends DataClass implements Insertable<UserProfileData> {
     );
   }
 
-  factory UserProfileData.fromJson(
+  factory UserProfileRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return UserProfileData(
+    return UserProfileRow(
       id: serializer.fromJson<String>(json['id']),
       preferredStyles: serializer.fromJson<String>(json['preferredStyles']),
       favoredColors: serializer.fromJson<String>(json['favoredColors']),
@@ -329,7 +329,7 @@ class UserProfileData extends DataClass implements Insertable<UserProfileData> {
     };
   }
 
-  UserProfileData copyWith({
+  UserProfileRow copyWith({
     String? id,
     String? preferredStyles,
     String? favoredColors,
@@ -338,7 +338,7 @@ class UserProfileData extends DataClass implements Insertable<UserProfileData> {
     Value<int?> formalityPreference = const Value.absent(),
     int? createdAt,
     int? updatedAt,
-  }) => UserProfileData(
+  }) => UserProfileRow(
     id: id ?? this.id,
     preferredStyles: preferredStyles ?? this.preferredStyles,
     favoredColors: favoredColors ?? this.favoredColors,
@@ -352,8 +352,8 @@ class UserProfileData extends DataClass implements Insertable<UserProfileData> {
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
   );
-  UserProfileData copyWithCompanion(UserProfileCompanion data) {
-    return UserProfileData(
+  UserProfileRow copyWithCompanion(UserProfileCompanion data) {
+    return UserProfileRow(
       id: data.id.present ? data.id.value : this.id,
       preferredStyles: data.preferredStyles.present
           ? data.preferredStyles.value
@@ -377,7 +377,7 @@ class UserProfileData extends DataClass implements Insertable<UserProfileData> {
 
   @override
   String toString() {
-    return (StringBuffer('UserProfileData(')
+    return (StringBuffer('UserProfileRow(')
           ..write('id: $id, ')
           ..write('preferredStyles: $preferredStyles, ')
           ..write('favoredColors: $favoredColors, ')
@@ -404,7 +404,7 @@ class UserProfileData extends DataClass implements Insertable<UserProfileData> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is UserProfileData &&
+      (other is UserProfileRow &&
           other.id == this.id &&
           other.preferredStyles == this.preferredStyles &&
           other.favoredColors == this.favoredColors &&
@@ -415,7 +415,7 @@ class UserProfileData extends DataClass implements Insertable<UserProfileData> {
           other.updatedAt == this.updatedAt);
 }
 
-class UserProfileCompanion extends UpdateCompanion<UserProfileData> {
+class UserProfileCompanion extends UpdateCompanion<UserProfileRow> {
   final Value<String> id;
   final Value<String> preferredStyles;
   final Value<String> favoredColors;
@@ -449,7 +449,7 @@ class UserProfileCompanion extends UpdateCompanion<UserProfileData> {
   }) : id = Value(id),
        createdAt = Value(createdAt),
        updatedAt = Value(updatedAt);
-  static Insertable<UserProfileData> custom({
+  static Insertable<UserProfileRow> custom({
     Expression<String>? id,
     Expression<String>? preferredStyles,
     Expression<String>? favoredColors,
@@ -549,7 +549,7 @@ class UserProfileCompanion extends UpdateCompanion<UserProfileData> {
 }
 
 class $ClothingItemsTable extends ClothingItems
-    with TableInfo<$ClothingItemsTable, ClothingItem> {
+    with TableInfo<$ClothingItemsTable, ClothingItemRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -747,7 +747,7 @@ class $ClothingItemsTable extends ClothingItems
   static const String $name = 'clothing_items';
   @override
   VerificationContext validateIntegrity(
-    Insertable<ClothingItem> instance, {
+    Insertable<ClothingItemRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -873,9 +873,9 @@ class $ClothingItemsTable extends ClothingItems
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  ClothingItem map(Map<String, dynamic> data, {String? tablePrefix}) {
+  ClothingItemRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return ClothingItem(
+    return ClothingItemRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
@@ -949,7 +949,7 @@ class $ClothingItemsTable extends ClothingItems
   }
 }
 
-class ClothingItem extends DataClass implements Insertable<ClothingItem> {
+class ClothingItemRow extends DataClass implements Insertable<ClothingItemRow> {
   final String id;
   final String category;
   final String? subcategory;
@@ -977,7 +977,7 @@ class ClothingItem extends DataClass implements Insertable<ClothingItem> {
   final int? deletedAt;
   final int createdAt;
   final int updatedAt;
-  const ClothingItem({
+  const ClothingItemRow({
     required this.id,
     required this.category,
     this.subcategory,
@@ -1080,12 +1080,12 @@ class ClothingItem extends DataClass implements Insertable<ClothingItem> {
     );
   }
 
-  factory ClothingItem.fromJson(
+  factory ClothingItemRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return ClothingItem(
+    return ClothingItemRow(
       id: serializer.fromJson<String>(json['id']),
       category: serializer.fromJson<String>(json['category']),
       subcategory: serializer.fromJson<String?>(json['subcategory']),
@@ -1127,7 +1127,7 @@ class ClothingItem extends DataClass implements Insertable<ClothingItem> {
     };
   }
 
-  ClothingItem copyWith({
+  ClothingItemRow copyWith({
     String? id,
     String? category,
     Value<String?> subcategory = const Value.absent(),
@@ -1144,7 +1144,7 @@ class ClothingItem extends DataClass implements Insertable<ClothingItem> {
     Value<int?> deletedAt = const Value.absent(),
     int? createdAt,
     int? updatedAt,
-  }) => ClothingItem(
+  }) => ClothingItemRow(
     id: id ?? this.id,
     category: category ?? this.category,
     subcategory: subcategory.present ? subcategory.value : this.subcategory,
@@ -1164,8 +1164,8 @@ class ClothingItem extends DataClass implements Insertable<ClothingItem> {
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
   );
-  ClothingItem copyWithCompanion(ClothingItemsCompanion data) {
-    return ClothingItem(
+  ClothingItemRow copyWithCompanion(ClothingItemsCompanion data) {
+    return ClothingItemRow(
       id: data.id.present ? data.id.value : this.id,
       category: data.category.present ? data.category.value : this.category,
       subcategory: data.subcategory.present
@@ -1195,7 +1195,7 @@ class ClothingItem extends DataClass implements Insertable<ClothingItem> {
 
   @override
   String toString() {
-    return (StringBuffer('ClothingItem(')
+    return (StringBuffer('ClothingItemRow(')
           ..write('id: $id, ')
           ..write('category: $category, ')
           ..write('subcategory: $subcategory, ')
@@ -1238,7 +1238,7 @@ class ClothingItem extends DataClass implements Insertable<ClothingItem> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is ClothingItem &&
+      (other is ClothingItemRow &&
           other.id == this.id &&
           other.category == this.category &&
           other.subcategory == this.subcategory &&
@@ -1257,7 +1257,7 @@ class ClothingItem extends DataClass implements Insertable<ClothingItem> {
           other.updatedAt == this.updatedAt);
 }
 
-class ClothingItemsCompanion extends UpdateCompanion<ClothingItem> {
+class ClothingItemsCompanion extends UpdateCompanion<ClothingItemRow> {
   final Value<String> id;
   final Value<String> category;
   final Value<String?> subcategory;
@@ -1317,7 +1317,7 @@ class ClothingItemsCompanion extends UpdateCompanion<ClothingItem> {
        status = Value(status),
        createdAt = Value(createdAt),
        updatedAt = Value(updatedAt);
-  static Insertable<ClothingItem> custom({
+  static Insertable<ClothingItemRow> custom({
     Expression<String>? id,
     Expression<String>? category,
     Expression<String>? subcategory,
@@ -1480,7 +1480,7 @@ class ClothingItemsCompanion extends UpdateCompanion<ClothingItem> {
 }
 
 class $ClothingItemColorsTable extends ClothingItemColors
-    with TableInfo<$ClothingItemColorsTable, ClothingItemColor> {
+    with TableInfo<$ClothingItemColorsTable, ClothingItemColorRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -1524,7 +1524,7 @@ class $ClothingItemColorsTable extends ClothingItemColors
   static const String $name = 'clothing_item_colors';
   @override
   VerificationContext validateIntegrity(
-    Insertable<ClothingItemColor> instance, {
+    Insertable<ClothingItemColorRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -1559,9 +1559,9 @@ class $ClothingItemColorsTable extends ClothingItemColors
   @override
   Set<GeneratedColumn> get $primaryKey => {itemId, color, role};
   @override
-  ClothingItemColor map(Map<String, dynamic> data, {String? tablePrefix}) {
+  ClothingItemColorRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return ClothingItemColor(
+    return ClothingItemColorRow(
       itemId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}item_id'],
@@ -1583,14 +1583,14 @@ class $ClothingItemColorsTable extends ClothingItemColors
   }
 }
 
-class ClothingItemColor extends DataClass
-    implements Insertable<ClothingItemColor> {
+class ClothingItemColorRow extends DataClass
+    implements Insertable<ClothingItemColorRow> {
   final String itemId;
   final String color;
 
   /// PRIMARY or SECONDARY.
   final String role;
-  const ClothingItemColor({
+  const ClothingItemColorRow({
     required this.itemId,
     required this.color,
     required this.role,
@@ -1612,12 +1612,12 @@ class ClothingItemColor extends DataClass
     );
   }
 
-  factory ClothingItemColor.fromJson(
+  factory ClothingItemColorRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return ClothingItemColor(
+    return ClothingItemColorRow(
       itemId: serializer.fromJson<String>(json['itemId']),
       color: serializer.fromJson<String>(json['color']),
       role: serializer.fromJson<String>(json['role']),
@@ -1633,14 +1633,17 @@ class ClothingItemColor extends DataClass
     };
   }
 
-  ClothingItemColor copyWith({String? itemId, String? color, String? role}) =>
-      ClothingItemColor(
-        itemId: itemId ?? this.itemId,
-        color: color ?? this.color,
-        role: role ?? this.role,
-      );
-  ClothingItemColor copyWithCompanion(ClothingItemColorsCompanion data) {
-    return ClothingItemColor(
+  ClothingItemColorRow copyWith({
+    String? itemId,
+    String? color,
+    String? role,
+  }) => ClothingItemColorRow(
+    itemId: itemId ?? this.itemId,
+    color: color ?? this.color,
+    role: role ?? this.role,
+  );
+  ClothingItemColorRow copyWithCompanion(ClothingItemColorsCompanion data) {
+    return ClothingItemColorRow(
       itemId: data.itemId.present ? data.itemId.value : this.itemId,
       color: data.color.present ? data.color.value : this.color,
       role: data.role.present ? data.role.value : this.role,
@@ -1649,7 +1652,7 @@ class ClothingItemColor extends DataClass
 
   @override
   String toString() {
-    return (StringBuffer('ClothingItemColor(')
+    return (StringBuffer('ClothingItemColorRow(')
           ..write('itemId: $itemId, ')
           ..write('color: $color, ')
           ..write('role: $role')
@@ -1662,13 +1665,14 @@ class ClothingItemColor extends DataClass
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is ClothingItemColor &&
+      (other is ClothingItemColorRow &&
           other.itemId == this.itemId &&
           other.color == this.color &&
           other.role == this.role);
 }
 
-class ClothingItemColorsCompanion extends UpdateCompanion<ClothingItemColor> {
+class ClothingItemColorsCompanion
+    extends UpdateCompanion<ClothingItemColorRow> {
   final Value<String> itemId;
   final Value<String> color;
   final Value<String> role;
@@ -1687,7 +1691,7 @@ class ClothingItemColorsCompanion extends UpdateCompanion<ClothingItemColor> {
   }) : itemId = Value(itemId),
        color = Value(color),
        role = Value(role);
-  static Insertable<ClothingItemColor> custom({
+  static Insertable<ClothingItemColorRow> custom({
     Expression<String>? itemId,
     Expression<String>? color,
     Expression<String>? role,
@@ -1746,7 +1750,7 @@ class ClothingItemColorsCompanion extends UpdateCompanion<ClothingItemColor> {
 }
 
 class $ClothingItemSeasonsTable extends ClothingItemSeasons
-    with TableInfo<$ClothingItemSeasonsTable, ClothingItemSeason> {
+    with TableInfo<$ClothingItemSeasonsTable, ClothingItemSeasonRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -1781,7 +1785,7 @@ class $ClothingItemSeasonsTable extends ClothingItemSeasons
   static const String $name = 'clothing_item_seasons';
   @override
   VerificationContext validateIntegrity(
-    Insertable<ClothingItemSeason> instance, {
+    Insertable<ClothingItemSeasonRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -1808,9 +1812,9 @@ class $ClothingItemSeasonsTable extends ClothingItemSeasons
   @override
   Set<GeneratedColumn> get $primaryKey => {itemId, season};
   @override
-  ClothingItemSeason map(Map<String, dynamic> data, {String? tablePrefix}) {
+  ClothingItemSeasonRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return ClothingItemSeason(
+    return ClothingItemSeasonRow(
       itemId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}item_id'],
@@ -1828,13 +1832,13 @@ class $ClothingItemSeasonsTable extends ClothingItemSeasons
   }
 }
 
-class ClothingItemSeason extends DataClass
-    implements Insertable<ClothingItemSeason> {
+class ClothingItemSeasonRow extends DataClass
+    implements Insertable<ClothingItemSeasonRow> {
   final String itemId;
 
   /// Season code.
   final String season;
-  const ClothingItemSeason({required this.itemId, required this.season});
+  const ClothingItemSeasonRow({required this.itemId, required this.season});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1850,12 +1854,12 @@ class ClothingItemSeason extends DataClass
     );
   }
 
-  factory ClothingItemSeason.fromJson(
+  factory ClothingItemSeasonRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return ClothingItemSeason(
+    return ClothingItemSeasonRow(
       itemId: serializer.fromJson<String>(json['itemId']),
       season: serializer.fromJson<String>(json['season']),
     );
@@ -1869,13 +1873,13 @@ class ClothingItemSeason extends DataClass
     };
   }
 
-  ClothingItemSeason copyWith({String? itemId, String? season}) =>
-      ClothingItemSeason(
+  ClothingItemSeasonRow copyWith({String? itemId, String? season}) =>
+      ClothingItemSeasonRow(
         itemId: itemId ?? this.itemId,
         season: season ?? this.season,
       );
-  ClothingItemSeason copyWithCompanion(ClothingItemSeasonsCompanion data) {
-    return ClothingItemSeason(
+  ClothingItemSeasonRow copyWithCompanion(ClothingItemSeasonsCompanion data) {
+    return ClothingItemSeasonRow(
       itemId: data.itemId.present ? data.itemId.value : this.itemId,
       season: data.season.present ? data.season.value : this.season,
     );
@@ -1883,7 +1887,7 @@ class ClothingItemSeason extends DataClass
 
   @override
   String toString() {
-    return (StringBuffer('ClothingItemSeason(')
+    return (StringBuffer('ClothingItemSeasonRow(')
           ..write('itemId: $itemId, ')
           ..write('season: $season')
           ..write(')'))
@@ -1895,12 +1899,13 @@ class ClothingItemSeason extends DataClass
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is ClothingItemSeason &&
+      (other is ClothingItemSeasonRow &&
           other.itemId == this.itemId &&
           other.season == this.season);
 }
 
-class ClothingItemSeasonsCompanion extends UpdateCompanion<ClothingItemSeason> {
+class ClothingItemSeasonsCompanion
+    extends UpdateCompanion<ClothingItemSeasonRow> {
   final Value<String> itemId;
   final Value<String> season;
   final Value<int> rowid;
@@ -1915,7 +1920,7 @@ class ClothingItemSeasonsCompanion extends UpdateCompanion<ClothingItemSeason> {
     this.rowid = const Value.absent(),
   }) : itemId = Value(itemId),
        season = Value(season);
-  static Insertable<ClothingItemSeason> custom({
+  static Insertable<ClothingItemSeasonRow> custom({
     Expression<String>? itemId,
     Expression<String>? season,
     Expression<int>? rowid,
@@ -1966,7 +1971,7 @@ class ClothingItemSeasonsCompanion extends UpdateCompanion<ClothingItemSeason> {
 }
 
 class $ClothingImagesTable extends ClothingImages
-    with TableInfo<$ClothingImagesTable, ClothingImage> {
+    with TableInfo<$ClothingImagesTable, ClothingImageRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -2070,7 +2075,7 @@ class $ClothingImagesTable extends ClothingImages
   static const String $name = 'clothing_images';
   @override
   VerificationContext validateIntegrity(
-    Insertable<ClothingImage> instance, {
+    Insertable<ClothingImageRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -2139,9 +2144,9 @@ class $ClothingImagesTable extends ClothingImages
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  ClothingImage map(Map<String, dynamic> data, {String? tablePrefix}) {
+  ClothingImageRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return ClothingImage(
+    return ClothingImageRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
@@ -2183,7 +2188,8 @@ class $ClothingImagesTable extends ClothingImages
   }
 }
 
-class ClothingImage extends DataClass implements Insertable<ClothingImage> {
+class ClothingImageRow extends DataClass
+    implements Insertable<ClothingImageRow> {
   final String id;
   final String itemId;
 
@@ -2196,7 +2202,7 @@ class ClothingImage extends DataClass implements Insertable<ClothingImage> {
   final int? height;
   final int? byteSize;
   final int createdAt;
-  const ClothingImage({
+  const ClothingImageRow({
     required this.id,
     required this.itemId,
     required this.kind,
@@ -2245,12 +2251,12 @@ class ClothingImage extends DataClass implements Insertable<ClothingImage> {
     );
   }
 
-  factory ClothingImage.fromJson(
+  factory ClothingImageRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return ClothingImage(
+    return ClothingImageRow(
       id: serializer.fromJson<String>(json['id']),
       itemId: serializer.fromJson<String>(json['itemId']),
       kind: serializer.fromJson<String>(json['kind']),
@@ -2276,7 +2282,7 @@ class ClothingImage extends DataClass implements Insertable<ClothingImage> {
     };
   }
 
-  ClothingImage copyWith({
+  ClothingImageRow copyWith({
     String? id,
     String? itemId,
     String? kind,
@@ -2285,7 +2291,7 @@ class ClothingImage extends DataClass implements Insertable<ClothingImage> {
     Value<int?> height = const Value.absent(),
     Value<int?> byteSize = const Value.absent(),
     int? createdAt,
-  }) => ClothingImage(
+  }) => ClothingImageRow(
     id: id ?? this.id,
     itemId: itemId ?? this.itemId,
     kind: kind ?? this.kind,
@@ -2295,8 +2301,8 @@ class ClothingImage extends DataClass implements Insertable<ClothingImage> {
     byteSize: byteSize.present ? byteSize.value : this.byteSize,
     createdAt: createdAt ?? this.createdAt,
   );
-  ClothingImage copyWithCompanion(ClothingImagesCompanion data) {
-    return ClothingImage(
+  ClothingImageRow copyWithCompanion(ClothingImagesCompanion data) {
+    return ClothingImageRow(
       id: data.id.present ? data.id.value : this.id,
       itemId: data.itemId.present ? data.itemId.value : this.itemId,
       kind: data.kind.present ? data.kind.value : this.kind,
@@ -2312,7 +2318,7 @@ class ClothingImage extends DataClass implements Insertable<ClothingImage> {
 
   @override
   String toString() {
-    return (StringBuffer('ClothingImage(')
+    return (StringBuffer('ClothingImageRow(')
           ..write('id: $id, ')
           ..write('itemId: $itemId, ')
           ..write('kind: $kind, ')
@@ -2339,7 +2345,7 @@ class ClothingImage extends DataClass implements Insertable<ClothingImage> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is ClothingImage &&
+      (other is ClothingImageRow &&
           other.id == this.id &&
           other.itemId == this.itemId &&
           other.kind == this.kind &&
@@ -2350,7 +2356,7 @@ class ClothingImage extends DataClass implements Insertable<ClothingImage> {
           other.createdAt == this.createdAt);
 }
 
-class ClothingImagesCompanion extends UpdateCompanion<ClothingImage> {
+class ClothingImagesCompanion extends UpdateCompanion<ClothingImageRow> {
   final Value<String> id;
   final Value<String> itemId;
   final Value<String> kind;
@@ -2386,7 +2392,7 @@ class ClothingImagesCompanion extends UpdateCompanion<ClothingImage> {
        kind = Value(kind),
        relativePath = Value(relativePath),
        createdAt = Value(createdAt);
-  static Insertable<ClothingImage> custom({
+  static Insertable<ClothingImageRow> custom({
     Expression<String>? id,
     Expression<String>? itemId,
     Expression<String>? kind,
@@ -2485,7 +2491,7 @@ class ClothingImagesCompanion extends UpdateCompanion<ClothingImage> {
 }
 
 class $ClothingAttributesTable extends ClothingAttributes
-    with TableInfo<$ClothingAttributesTable, ClothingAttribute> {
+    with TableInfo<$ClothingAttributesTable, ClothingAttributeRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -2611,7 +2617,7 @@ class $ClothingAttributesTable extends ClothingAttributes
   static const String $name = 'clothing_attributes';
   @override
   VerificationContext validateIntegrity(
-    Insertable<ClothingAttribute> instance, {
+    Insertable<ClothingAttributeRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -2687,9 +2693,9 @@ class $ClothingAttributesTable extends ClothingAttributes
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  ClothingAttribute map(Map<String, dynamic> data, {String? tablePrefix}) {
+  ClothingAttributeRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return ClothingAttribute(
+    return ClothingAttributeRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
@@ -2735,8 +2741,8 @@ class $ClothingAttributesTable extends ClothingAttributes
   }
 }
 
-class ClothingAttribute extends DataClass
-    implements Insertable<ClothingAttribute> {
+class ClothingAttributeRow extends DataClass
+    implements Insertable<ClothingAttributeRow> {
   final String id;
   final String itemId;
   final String attribute;
@@ -2746,7 +2752,7 @@ class ClothingAttribute extends DataClass
   final String? modelVersion;
   final int? analyzedAt;
   final bool userConfirmed;
-  const ClothingAttribute({
+  const ClothingAttributeRow({
     required this.id,
     required this.itemId,
     required this.attribute,
@@ -2802,12 +2808,12 @@ class ClothingAttribute extends DataClass
     );
   }
 
-  factory ClothingAttribute.fromJson(
+  factory ClothingAttributeRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return ClothingAttribute(
+    return ClothingAttributeRow(
       id: serializer.fromJson<String>(json['id']),
       itemId: serializer.fromJson<String>(json['itemId']),
       attribute: serializer.fromJson<String>(json['attribute']),
@@ -2835,7 +2841,7 @@ class ClothingAttribute extends DataClass
     };
   }
 
-  ClothingAttribute copyWith({
+  ClothingAttributeRow copyWith({
     String? id,
     String? itemId,
     String? attribute,
@@ -2845,7 +2851,7 @@ class ClothingAttribute extends DataClass
     Value<String?> modelVersion = const Value.absent(),
     Value<int?> analyzedAt = const Value.absent(),
     bool? userConfirmed,
-  }) => ClothingAttribute(
+  }) => ClothingAttributeRow(
     id: id ?? this.id,
     itemId: itemId ?? this.itemId,
     attribute: attribute ?? this.attribute,
@@ -2856,8 +2862,8 @@ class ClothingAttribute extends DataClass
     analyzedAt: analyzedAt.present ? analyzedAt.value : this.analyzedAt,
     userConfirmed: userConfirmed ?? this.userConfirmed,
   );
-  ClothingAttribute copyWithCompanion(ClothingAttributesCompanion data) {
-    return ClothingAttribute(
+  ClothingAttributeRow copyWithCompanion(ClothingAttributesCompanion data) {
+    return ClothingAttributeRow(
       id: data.id.present ? data.id.value : this.id,
       itemId: data.itemId.present ? data.itemId.value : this.itemId,
       attribute: data.attribute.present ? data.attribute.value : this.attribute,
@@ -2880,7 +2886,7 @@ class ClothingAttribute extends DataClass
 
   @override
   String toString() {
-    return (StringBuffer('ClothingAttribute(')
+    return (StringBuffer('ClothingAttributeRow(')
           ..write('id: $id, ')
           ..write('itemId: $itemId, ')
           ..write('attribute: $attribute, ')
@@ -2909,7 +2915,7 @@ class ClothingAttribute extends DataClass
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is ClothingAttribute &&
+      (other is ClothingAttributeRow &&
           other.id == this.id &&
           other.itemId == this.itemId &&
           other.attribute == this.attribute &&
@@ -2921,7 +2927,8 @@ class ClothingAttribute extends DataClass
           other.userConfirmed == this.userConfirmed);
 }
 
-class ClothingAttributesCompanion extends UpdateCompanion<ClothingAttribute> {
+class ClothingAttributesCompanion
+    extends UpdateCompanion<ClothingAttributeRow> {
   final Value<String> id;
   final Value<String> itemId;
   final Value<String> attribute;
@@ -2959,7 +2966,7 @@ class ClothingAttributesCompanion extends UpdateCompanion<ClothingAttribute> {
        itemId = Value(itemId),
        attribute = Value(attribute),
        value = Value(value);
-  static Insertable<ClothingAttribute> custom({
+  static Insertable<ClothingAttributeRow> custom({
     Expression<String>? id,
     Expression<String>? itemId,
     Expression<String>? attribute,
@@ -3065,7 +3072,7 @@ class ClothingAttributesCompanion extends UpdateCompanion<ClothingAttribute> {
   }
 }
 
-class $OutfitsTable extends Outfits with TableInfo<$OutfitsTable, Outfit> {
+class $OutfitsTable extends Outfits with TableInfo<$OutfitsTable, OutfitRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -3205,7 +3212,7 @@ class $OutfitsTable extends Outfits with TableInfo<$OutfitsTable, Outfit> {
   static const String $name = 'outfits';
   @override
   VerificationContext validateIntegrity(
-    Insertable<Outfit> instance, {
+    Insertable<OutfitRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -3303,9 +3310,9 @@ class $OutfitsTable extends Outfits with TableInfo<$OutfitsTable, Outfit> {
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  Outfit map(Map<String, dynamic> data, {String? tablePrefix}) {
+  OutfitRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Outfit(
+    return OutfitRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
@@ -3355,7 +3362,7 @@ class $OutfitsTable extends Outfits with TableInfo<$OutfitsTable, Outfit> {
   }
 }
 
-class Outfit extends DataClass implements Insertable<Outfit> {
+class OutfitRow extends DataClass implements Insertable<OutfitRow> {
   final String id;
 
   /// Stable hash of the sorted item IDs, used for de-duplication.
@@ -3368,7 +3375,7 @@ class Outfit extends DataClass implements Insertable<Outfit> {
   final bool weatherConsidered;
   final bool isFavorite;
   final int createdAt;
-  const Outfit({
+  const OutfitRow({
     required this.id,
     required this.signature,
     required this.occasion,
@@ -3411,12 +3418,12 @@ class Outfit extends DataClass implements Insertable<Outfit> {
     );
   }
 
-  factory Outfit.fromJson(
+  factory OutfitRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Outfit(
+    return OutfitRow(
       id: serializer.fromJson<String>(json['id']),
       signature: serializer.fromJson<String>(json['signature']),
       occasion: serializer.fromJson<String>(json['occasion']),
@@ -3446,7 +3453,7 @@ class Outfit extends DataClass implements Insertable<Outfit> {
     };
   }
 
-  Outfit copyWith({
+  OutfitRow copyWith({
     String? id,
     String? signature,
     String? occasion,
@@ -3457,7 +3464,7 @@ class Outfit extends DataClass implements Insertable<Outfit> {
     bool? weatherConsidered,
     bool? isFavorite,
     int? createdAt,
-  }) => Outfit(
+  }) => OutfitRow(
     id: id ?? this.id,
     signature: signature ?? this.signature,
     occasion: occasion ?? this.occasion,
@@ -3469,8 +3476,8 @@ class Outfit extends DataClass implements Insertable<Outfit> {
     isFavorite: isFavorite ?? this.isFavorite,
     createdAt: createdAt ?? this.createdAt,
   );
-  Outfit copyWithCompanion(OutfitsCompanion data) {
-    return Outfit(
+  OutfitRow copyWithCompanion(OutfitsCompanion data) {
+    return OutfitRow(
       id: data.id.present ? data.id.value : this.id,
       signature: data.signature.present ? data.signature.value : this.signature,
       occasion: data.occasion.present ? data.occasion.value : this.occasion,
@@ -3498,7 +3505,7 @@ class Outfit extends DataClass implements Insertable<Outfit> {
 
   @override
   String toString() {
-    return (StringBuffer('Outfit(')
+    return (StringBuffer('OutfitRow(')
           ..write('id: $id, ')
           ..write('signature: $signature, ')
           ..write('occasion: $occasion, ')
@@ -3529,7 +3536,7 @@ class Outfit extends DataClass implements Insertable<Outfit> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Outfit &&
+      (other is OutfitRow &&
           other.id == this.id &&
           other.signature == this.signature &&
           other.occasion == this.occasion &&
@@ -3542,7 +3549,7 @@ class Outfit extends DataClass implements Insertable<Outfit> {
           other.createdAt == this.createdAt);
 }
 
-class OutfitsCompanion extends UpdateCompanion<Outfit> {
+class OutfitsCompanion extends UpdateCompanion<OutfitRow> {
   final Value<String> id;
   final Value<String> signature;
   final Value<String> occasion;
@@ -3588,7 +3595,7 @@ class OutfitsCompanion extends UpdateCompanion<Outfit> {
        reasonsJson = Value(reasonsJson),
        weatherConsidered = Value(weatherConsidered),
        createdAt = Value(createdAt);
-  static Insertable<Outfit> custom({
+  static Insertable<OutfitRow> custom({
     Expression<String>? id,
     Expression<String>? signature,
     Expression<String>? occasion,
@@ -3703,7 +3710,7 @@ class OutfitsCompanion extends UpdateCompanion<Outfit> {
 }
 
 class $OutfitItemsTable extends OutfitItems
-    with TableInfo<$OutfitItemsTable, OutfitItem> {
+    with TableInfo<$OutfitItemsTable, OutfitItemRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -3752,7 +3759,7 @@ class $OutfitItemsTable extends OutfitItems
   static const String $name = 'outfit_items';
   @override
   VerificationContext validateIntegrity(
-    Insertable<OutfitItem> instance, {
+    Insertable<OutfitItemRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -3787,9 +3794,9 @@ class $OutfitItemsTable extends OutfitItems
   @override
   Set<GeneratedColumn> get $primaryKey => {outfitId, itemId};
   @override
-  OutfitItem map(Map<String, dynamic> data, {String? tablePrefix}) {
+  OutfitItemRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return OutfitItem(
+    return OutfitItemRow(
       outfitId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}outfit_id'],
@@ -3811,14 +3818,14 @@ class $OutfitItemsTable extends OutfitItems
   }
 }
 
-class OutfitItem extends DataClass implements Insertable<OutfitItem> {
+class OutfitItemRow extends DataClass implements Insertable<OutfitItemRow> {
   final String outfitId;
 
   /// RESTRICT keeps outfit history intact; deleting a referenced garment
   /// becomes a tombstone (ClothingItems.deletedAt) instead.
   final String itemId;
   final String slot;
-  const OutfitItem({
+  const OutfitItemRow({
     required this.outfitId,
     required this.itemId,
     required this.slot,
@@ -3840,12 +3847,12 @@ class OutfitItem extends DataClass implements Insertable<OutfitItem> {
     );
   }
 
-  factory OutfitItem.fromJson(
+  factory OutfitItemRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return OutfitItem(
+    return OutfitItemRow(
       outfitId: serializer.fromJson<String>(json['outfitId']),
       itemId: serializer.fromJson<String>(json['itemId']),
       slot: serializer.fromJson<String>(json['slot']),
@@ -3861,14 +3868,14 @@ class OutfitItem extends DataClass implements Insertable<OutfitItem> {
     };
   }
 
-  OutfitItem copyWith({String? outfitId, String? itemId, String? slot}) =>
-      OutfitItem(
+  OutfitItemRow copyWith({String? outfitId, String? itemId, String? slot}) =>
+      OutfitItemRow(
         outfitId: outfitId ?? this.outfitId,
         itemId: itemId ?? this.itemId,
         slot: slot ?? this.slot,
       );
-  OutfitItem copyWithCompanion(OutfitItemsCompanion data) {
-    return OutfitItem(
+  OutfitItemRow copyWithCompanion(OutfitItemsCompanion data) {
+    return OutfitItemRow(
       outfitId: data.outfitId.present ? data.outfitId.value : this.outfitId,
       itemId: data.itemId.present ? data.itemId.value : this.itemId,
       slot: data.slot.present ? data.slot.value : this.slot,
@@ -3877,7 +3884,7 @@ class OutfitItem extends DataClass implements Insertable<OutfitItem> {
 
   @override
   String toString() {
-    return (StringBuffer('OutfitItem(')
+    return (StringBuffer('OutfitItemRow(')
           ..write('outfitId: $outfitId, ')
           ..write('itemId: $itemId, ')
           ..write('slot: $slot')
@@ -3890,13 +3897,13 @@ class OutfitItem extends DataClass implements Insertable<OutfitItem> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is OutfitItem &&
+      (other is OutfitItemRow &&
           other.outfitId == this.outfitId &&
           other.itemId == this.itemId &&
           other.slot == this.slot);
 }
 
-class OutfitItemsCompanion extends UpdateCompanion<OutfitItem> {
+class OutfitItemsCompanion extends UpdateCompanion<OutfitItemRow> {
   final Value<String> outfitId;
   final Value<String> itemId;
   final Value<String> slot;
@@ -3915,7 +3922,7 @@ class OutfitItemsCompanion extends UpdateCompanion<OutfitItem> {
   }) : outfitId = Value(outfitId),
        itemId = Value(itemId),
        slot = Value(slot);
-  static Insertable<OutfitItem> custom({
+  static Insertable<OutfitItemRow> custom({
     Expression<String>? outfitId,
     Expression<String>? itemId,
     Expression<String>? slot,
@@ -3974,7 +3981,7 @@ class OutfitItemsCompanion extends UpdateCompanion<OutfitItem> {
 }
 
 class $OutfitFeedbackTable extends OutfitFeedback
-    with TableInfo<$OutfitFeedbackTable, OutfitFeedbackData> {
+    with TableInfo<$OutfitFeedbackTable, OutfitFeedbackRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -4060,7 +4067,7 @@ class $OutfitFeedbackTable extends OutfitFeedback
   static const String $name = 'outfit_feedback';
   @override
   VerificationContext validateIntegrity(
-    Insertable<OutfitFeedbackData> instance, {
+    Insertable<OutfitFeedbackRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -4112,9 +4119,9 @@ class $OutfitFeedbackTable extends OutfitFeedback
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  OutfitFeedbackData map(Map<String, dynamic> data, {String? tablePrefix}) {
+  OutfitFeedbackRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return OutfitFeedbackData(
+    return OutfitFeedbackRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
@@ -4148,8 +4155,8 @@ class $OutfitFeedbackTable extends OutfitFeedback
   }
 }
 
-class OutfitFeedbackData extends DataClass
-    implements Insertable<OutfitFeedbackData> {
+class OutfitFeedbackRow extends DataClass
+    implements Insertable<OutfitFeedbackRow> {
   final String id;
   final String outfitId;
 
@@ -4158,7 +4165,7 @@ class OutfitFeedbackData extends DataClass
   final String? reasonCode;
   final String? reasonText;
   final int createdAt;
-  const OutfitFeedbackData({
+  const OutfitFeedbackRow({
     required this.id,
     required this.outfitId,
     required this.kind,
@@ -4197,12 +4204,12 @@ class OutfitFeedbackData extends DataClass
     );
   }
 
-  factory OutfitFeedbackData.fromJson(
+  factory OutfitFeedbackRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return OutfitFeedbackData(
+    return OutfitFeedbackRow(
       id: serializer.fromJson<String>(json['id']),
       outfitId: serializer.fromJson<String>(json['outfitId']),
       kind: serializer.fromJson<String>(json['kind']),
@@ -4224,14 +4231,14 @@ class OutfitFeedbackData extends DataClass
     };
   }
 
-  OutfitFeedbackData copyWith({
+  OutfitFeedbackRow copyWith({
     String? id,
     String? outfitId,
     String? kind,
     Value<String?> reasonCode = const Value.absent(),
     Value<String?> reasonText = const Value.absent(),
     int? createdAt,
-  }) => OutfitFeedbackData(
+  }) => OutfitFeedbackRow(
     id: id ?? this.id,
     outfitId: outfitId ?? this.outfitId,
     kind: kind ?? this.kind,
@@ -4239,8 +4246,8 @@ class OutfitFeedbackData extends DataClass
     reasonText: reasonText.present ? reasonText.value : this.reasonText,
     createdAt: createdAt ?? this.createdAt,
   );
-  OutfitFeedbackData copyWithCompanion(OutfitFeedbackCompanion data) {
-    return OutfitFeedbackData(
+  OutfitFeedbackRow copyWithCompanion(OutfitFeedbackCompanion data) {
+    return OutfitFeedbackRow(
       id: data.id.present ? data.id.value : this.id,
       outfitId: data.outfitId.present ? data.outfitId.value : this.outfitId,
       kind: data.kind.present ? data.kind.value : this.kind,
@@ -4256,7 +4263,7 @@ class OutfitFeedbackData extends DataClass
 
   @override
   String toString() {
-    return (StringBuffer('OutfitFeedbackData(')
+    return (StringBuffer('OutfitFeedbackRow(')
           ..write('id: $id, ')
           ..write('outfitId: $outfitId, ')
           ..write('kind: $kind, ')
@@ -4273,7 +4280,7 @@ class OutfitFeedbackData extends DataClass
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is OutfitFeedbackData &&
+      (other is OutfitFeedbackRow &&
           other.id == this.id &&
           other.outfitId == this.outfitId &&
           other.kind == this.kind &&
@@ -4282,7 +4289,7 @@ class OutfitFeedbackData extends DataClass
           other.createdAt == this.createdAt);
 }
 
-class OutfitFeedbackCompanion extends UpdateCompanion<OutfitFeedbackData> {
+class OutfitFeedbackCompanion extends UpdateCompanion<OutfitFeedbackRow> {
   final Value<String> id;
   final Value<String> outfitId;
   final Value<String> kind;
@@ -4311,7 +4318,7 @@ class OutfitFeedbackCompanion extends UpdateCompanion<OutfitFeedbackData> {
        outfitId = Value(outfitId),
        kind = Value(kind),
        createdAt = Value(createdAt);
-  static Insertable<OutfitFeedbackData> custom({
+  static Insertable<OutfitFeedbackRow> custom({
     Expression<String>? id,
     Expression<String>? outfitId,
     Expression<String>? kind,
@@ -4394,7 +4401,7 @@ class OutfitFeedbackCompanion extends UpdateCompanion<OutfitFeedbackData> {
 }
 
 class $LearnedPreferencesTable extends LearnedPreferences
-    with TableInfo<$LearnedPreferencesTable, LearnedPreference> {
+    with TableInfo<$LearnedPreferencesTable, LearnedPreferenceRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -4438,7 +4445,7 @@ class $LearnedPreferencesTable extends LearnedPreferences
   static const String $name = 'learned_preferences';
   @override
   VerificationContext validateIntegrity(
-    Insertable<LearnedPreference> instance, {
+    Insertable<LearnedPreferenceRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -4473,9 +4480,9 @@ class $LearnedPreferencesTable extends LearnedPreferences
   @override
   Set<GeneratedColumn> get $primaryKey => {key};
   @override
-  LearnedPreference map(Map<String, dynamic> data, {String? tablePrefix}) {
+  LearnedPreferenceRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return LearnedPreference(
+    return LearnedPreferenceRow(
       key: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}key'],
@@ -4497,13 +4504,13 @@ class $LearnedPreferencesTable extends LearnedPreferences
   }
 }
 
-class LearnedPreference extends DataClass
-    implements Insertable<LearnedPreference> {
+class LearnedPreferenceRow extends DataClass
+    implements Insertable<LearnedPreferenceRow> {
   /// For example `color:navy` or `style:minimal`.
   final String key;
   final double weight;
   final int updatedAt;
-  const LearnedPreference({
+  const LearnedPreferenceRow({
     required this.key,
     required this.weight,
     required this.updatedAt,
@@ -4525,12 +4532,12 @@ class LearnedPreference extends DataClass
     );
   }
 
-  factory LearnedPreference.fromJson(
+  factory LearnedPreferenceRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return LearnedPreference(
+    return LearnedPreferenceRow(
       key: serializer.fromJson<String>(json['key']),
       weight: serializer.fromJson<double>(json['weight']),
       updatedAt: serializer.fromJson<int>(json['updatedAt']),
@@ -4546,14 +4553,17 @@ class LearnedPreference extends DataClass
     };
   }
 
-  LearnedPreference copyWith({String? key, double? weight, int? updatedAt}) =>
-      LearnedPreference(
-        key: key ?? this.key,
-        weight: weight ?? this.weight,
-        updatedAt: updatedAt ?? this.updatedAt,
-      );
-  LearnedPreference copyWithCompanion(LearnedPreferencesCompanion data) {
-    return LearnedPreference(
+  LearnedPreferenceRow copyWith({
+    String? key,
+    double? weight,
+    int? updatedAt,
+  }) => LearnedPreferenceRow(
+    key: key ?? this.key,
+    weight: weight ?? this.weight,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  LearnedPreferenceRow copyWithCompanion(LearnedPreferencesCompanion data) {
+    return LearnedPreferenceRow(
       key: data.key.present ? data.key.value : this.key,
       weight: data.weight.present ? data.weight.value : this.weight,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -4562,7 +4572,7 @@ class LearnedPreference extends DataClass
 
   @override
   String toString() {
-    return (StringBuffer('LearnedPreference(')
+    return (StringBuffer('LearnedPreferenceRow(')
           ..write('key: $key, ')
           ..write('weight: $weight, ')
           ..write('updatedAt: $updatedAt')
@@ -4575,13 +4585,14 @@ class LearnedPreference extends DataClass
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is LearnedPreference &&
+      (other is LearnedPreferenceRow &&
           other.key == this.key &&
           other.weight == this.weight &&
           other.updatedAt == this.updatedAt);
 }
 
-class LearnedPreferencesCompanion extends UpdateCompanion<LearnedPreference> {
+class LearnedPreferencesCompanion
+    extends UpdateCompanion<LearnedPreferenceRow> {
   final Value<String> key;
   final Value<double> weight;
   final Value<int> updatedAt;
@@ -4600,7 +4611,7 @@ class LearnedPreferencesCompanion extends UpdateCompanion<LearnedPreference> {
   }) : key = Value(key),
        weight = Value(weight),
        updatedAt = Value(updatedAt);
-  static Insertable<LearnedPreference> custom({
+  static Insertable<LearnedPreferenceRow> custom({
     Expression<String>? key,
     Expression<double>? weight,
     Expression<int>? updatedAt,
@@ -4659,7 +4670,7 @@ class LearnedPreferencesCompanion extends UpdateCompanion<LearnedPreference> {
 }
 
 class $ModelInstallationsTable extends ModelInstallations
-    with TableInfo<$ModelInstallationsTable, ModelInstallation> {
+    with TableInfo<$ModelInstallationsTable, ModelInstallationRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -4766,7 +4777,7 @@ class $ModelInstallationsTable extends ModelInstallations
   static const String $name = 'model_installations';
   @override
   VerificationContext validateIntegrity(
-    Insertable<ModelInstallation> instance, {
+    Insertable<ModelInstallationRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -4845,9 +4856,9 @@ class $ModelInstallationsTable extends ModelInstallations
   @override
   Set<GeneratedColumn> get $primaryKey => {modelId, version};
   @override
-  ModelInstallation map(Map<String, dynamic> data, {String? tablePrefix}) {
+  ModelInstallationRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return ModelInstallation(
+    return ModelInstallationRow(
       modelId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}model_id'],
@@ -4889,8 +4900,8 @@ class $ModelInstallationsTable extends ModelInstallations
   }
 }
 
-class ModelInstallation extends DataClass
-    implements Insertable<ModelInstallation> {
+class ModelInstallationRow extends DataClass
+    implements Insertable<ModelInstallationRow> {
   final String modelId;
   final String version;
   final String relativePath;
@@ -4901,7 +4912,7 @@ class ModelInstallation extends DataClass
   /// INSTALLED, STAGED or FAILED.
   final String state;
   final int? installedAt;
-  const ModelInstallation({
+  const ModelInstallationRow({
     required this.modelId,
     required this.version,
     required this.relativePath,
@@ -4942,12 +4953,12 @@ class ModelInstallation extends DataClass
     );
   }
 
-  factory ModelInstallation.fromJson(
+  factory ModelInstallationRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return ModelInstallation(
+    return ModelInstallationRow(
       modelId: serializer.fromJson<String>(json['modelId']),
       version: serializer.fromJson<String>(json['version']),
       relativePath: serializer.fromJson<String>(json['relativePath']),
@@ -4973,7 +4984,7 @@ class ModelInstallation extends DataClass
     };
   }
 
-  ModelInstallation copyWith({
+  ModelInstallationRow copyWith({
     String? modelId,
     String? version,
     String? relativePath,
@@ -4982,7 +4993,7 @@ class ModelInstallation extends DataClass
     String? license,
     String? state,
     Value<int?> installedAt = const Value.absent(),
-  }) => ModelInstallation(
+  }) => ModelInstallationRow(
     modelId: modelId ?? this.modelId,
     version: version ?? this.version,
     relativePath: relativePath ?? this.relativePath,
@@ -4992,8 +5003,8 @@ class ModelInstallation extends DataClass
     state: state ?? this.state,
     installedAt: installedAt.present ? installedAt.value : this.installedAt,
   );
-  ModelInstallation copyWithCompanion(ModelInstallationsCompanion data) {
-    return ModelInstallation(
+  ModelInstallationRow copyWithCompanion(ModelInstallationsCompanion data) {
+    return ModelInstallationRow(
       modelId: data.modelId.present ? data.modelId.value : this.modelId,
       version: data.version.present ? data.version.value : this.version,
       relativePath: data.relativePath.present
@@ -5011,7 +5022,7 @@ class ModelInstallation extends DataClass
 
   @override
   String toString() {
-    return (StringBuffer('ModelInstallation(')
+    return (StringBuffer('ModelInstallationRow(')
           ..write('modelId: $modelId, ')
           ..write('version: $version, ')
           ..write('relativePath: $relativePath, ')
@@ -5038,7 +5049,7 @@ class ModelInstallation extends DataClass
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is ModelInstallation &&
+      (other is ModelInstallationRow &&
           other.modelId == this.modelId &&
           other.version == this.version &&
           other.relativePath == this.relativePath &&
@@ -5049,7 +5060,8 @@ class ModelInstallation extends DataClass
           other.installedAt == this.installedAt);
 }
 
-class ModelInstallationsCompanion extends UpdateCompanion<ModelInstallation> {
+class ModelInstallationsCompanion
+    extends UpdateCompanion<ModelInstallationRow> {
   final Value<String> modelId;
   final Value<String> version;
   final Value<String> relativePath;
@@ -5087,7 +5099,7 @@ class ModelInstallationsCompanion extends UpdateCompanion<ModelInstallation> {
        byteSize = Value(byteSize),
        license = Value(license),
        state = Value(state);
-  static Insertable<ModelInstallation> custom({
+  static Insertable<ModelInstallationRow> custom({
     Expression<String>? modelId,
     Expression<String>? version,
     Expression<String>? relativePath,
@@ -5186,7 +5198,7 @@ class ModelInstallationsCompanion extends UpdateCompanion<ModelInstallation> {
 }
 
 class $AppSettingsTable extends AppSettings
-    with TableInfo<$AppSettingsTable, AppSetting> {
+    with TableInfo<$AppSettingsTable, AppSettingRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -5218,7 +5230,7 @@ class $AppSettingsTable extends AppSettings
   static const String $name = 'app_settings';
   @override
   VerificationContext validateIntegrity(
-    Insertable<AppSetting> instance, {
+    Insertable<AppSettingRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -5245,9 +5257,9 @@ class $AppSettingsTable extends AppSettings
   @override
   Set<GeneratedColumn> get $primaryKey => {key};
   @override
-  AppSetting map(Map<String, dynamic> data, {String? tablePrefix}) {
+  AppSettingRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return AppSetting(
+    return AppSettingRow(
       key: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}key'],
@@ -5265,10 +5277,10 @@ class $AppSettingsTable extends AppSettings
   }
 }
 
-class AppSetting extends DataClass implements Insertable<AppSetting> {
+class AppSettingRow extends DataClass implements Insertable<AppSettingRow> {
   final String key;
   final String value;
-  const AppSetting({required this.key, required this.value});
+  const AppSettingRow({required this.key, required this.value});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -5281,12 +5293,12 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
     return AppSettingsCompanion(key: Value(key), value: Value(value));
   }
 
-  factory AppSetting.fromJson(
+  factory AppSettingRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return AppSetting(
+    return AppSettingRow(
       key: serializer.fromJson<String>(json['key']),
       value: serializer.fromJson<String>(json['value']),
     );
@@ -5300,10 +5312,10 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
     };
   }
 
-  AppSetting copyWith({String? key, String? value}) =>
-      AppSetting(key: key ?? this.key, value: value ?? this.value);
-  AppSetting copyWithCompanion(AppSettingsCompanion data) {
-    return AppSetting(
+  AppSettingRow copyWith({String? key, String? value}) =>
+      AppSettingRow(key: key ?? this.key, value: value ?? this.value);
+  AppSettingRow copyWithCompanion(AppSettingsCompanion data) {
+    return AppSettingRow(
       key: data.key.present ? data.key.value : this.key,
       value: data.value.present ? data.value.value : this.value,
     );
@@ -5311,7 +5323,7 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
 
   @override
   String toString() {
-    return (StringBuffer('AppSetting(')
+    return (StringBuffer('AppSettingRow(')
           ..write('key: $key, ')
           ..write('value: $value')
           ..write(')'))
@@ -5323,12 +5335,12 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is AppSetting &&
+      (other is AppSettingRow &&
           other.key == this.key &&
           other.value == this.value);
 }
 
-class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
+class AppSettingsCompanion extends UpdateCompanion<AppSettingRow> {
   final Value<String> key;
   final Value<String> value;
   final Value<int> rowid;
@@ -5343,7 +5355,7 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
     this.rowid = const Value.absent(),
   }) : key = Value(key),
        value = Value(value);
-  static Insertable<AppSetting> custom({
+  static Insertable<AppSettingRow> custom({
     Expression<String>? key,
     Expression<String>? value,
     Expression<int>? rowid,
@@ -5692,17 +5704,17 @@ class $$UserProfileTableTableManager
         RootTableManager<
           _$AppDatabase,
           $UserProfileTable,
-          UserProfileData,
+          UserProfileRow,
           $$UserProfileTableFilterComposer,
           $$UserProfileTableOrderingComposer,
           $$UserProfileTableAnnotationComposer,
           $$UserProfileTableCreateCompanionBuilder,
           $$UserProfileTableUpdateCompanionBuilder,
           (
-            UserProfileData,
-            BaseReferences<_$AppDatabase, $UserProfileTable, UserProfileData>,
+            UserProfileRow,
+            BaseReferences<_$AppDatabase, $UserProfileTable, UserProfileRow>,
           ),
-          UserProfileData,
+          UserProfileRow,
           PrefetchHooks Function()
         > {
   $$UserProfileTableTableManager(_$AppDatabase db, $UserProfileTable table)
@@ -5763,11 +5775,11 @@ class $$UserProfileTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$UserProfileTable, UserProfileData>(table),
+                  e.readTable<$UserProfileTable, UserProfileRow>(table),
                   BaseReferences<
                     _$AppDatabase,
                     $UserProfileTable,
-                    UserProfileData
+                    UserProfileRow
                   >(db, table, e),
                 ),
               )
@@ -5781,17 +5793,17 @@ typedef $$UserProfileTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $UserProfileTable,
-      UserProfileData,
+      UserProfileRow,
       $$UserProfileTableFilterComposer,
       $$UserProfileTableOrderingComposer,
       $$UserProfileTableAnnotationComposer,
       $$UserProfileTableCreateCompanionBuilder,
       $$UserProfileTableUpdateCompanionBuilder,
       (
-        UserProfileData,
-        BaseReferences<_$AppDatabase, $UserProfileTable, UserProfileData>,
+        UserProfileRow,
+        BaseReferences<_$AppDatabase, $UserProfileTable, UserProfileRow>,
       ),
-      UserProfileData,
+      UserProfileRow,
       PrefetchHooks Function()
     >;
 typedef $$ClothingItemsTableCreateCompanionBuilder =
@@ -5836,14 +5848,18 @@ typedef $$ClothingItemsTableUpdateCompanionBuilder =
     });
 
 final class $$ClothingItemsTableReferences
-    extends BaseReferences<_$AppDatabase, $ClothingItemsTable, ClothingItem> {
+    extends
+        BaseReferences<_$AppDatabase, $ClothingItemsTable, ClothingItemRow> {
   $$ClothingItemsTableReferences(
     super.$_db,
     super.$_table,
     super.$_typedResult,
   );
 
-  static MultiTypedResultKey<$ClothingItemColorsTable, List<ClothingItemColor>>
+  static MultiTypedResultKey<
+    $ClothingItemColorsTable,
+    List<ClothingItemColorRow>
+  >
   _clothingItemColorsRefsTable(_$AppDatabase db) =>
       MultiTypedResultKey.fromTable(
         db.clothingItemColors,
@@ -5866,7 +5882,7 @@ final class $$ClothingItemsTableReferences
 
   static MultiTypedResultKey<
     $ClothingItemSeasonsTable,
-    List<ClothingItemSeason>
+    List<ClothingItemSeasonRow>
   >
   _clothingItemSeasonsRefsTable(_$AppDatabase db) =>
       MultiTypedResultKey.fromTable(
@@ -5888,7 +5904,7 @@ final class $$ClothingItemsTableReferences
     );
   }
 
-  static MultiTypedResultKey<$ClothingImagesTable, List<ClothingImage>>
+  static MultiTypedResultKey<$ClothingImagesTable, List<ClothingImageRow>>
   _clothingImagesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.clothingImages,
     aliasName: 'clothing_items__id__clothing_images__item_id',
@@ -5906,7 +5922,10 @@ final class $$ClothingItemsTableReferences
     );
   }
 
-  static MultiTypedResultKey<$ClothingAttributesTable, List<ClothingAttribute>>
+  static MultiTypedResultKey<
+    $ClothingAttributesTable,
+    List<ClothingAttributeRow>
+  >
   _clothingAttributesRefsTable(_$AppDatabase db) =>
       MultiTypedResultKey.fromTable(
         db.clothingAttributes,
@@ -5927,7 +5946,7 @@ final class $$ClothingItemsTableReferences
     );
   }
 
-  static MultiTypedResultKey<$OutfitItemsTable, List<OutfitItem>>
+  static MultiTypedResultKey<$OutfitItemsTable, List<OutfitItemRow>>
   _outfitItemsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.outfitItems,
     aliasName: 'clothing_items__id__outfit_items__item_id',
@@ -6450,14 +6469,14 @@ class $$ClothingItemsTableTableManager
         RootTableManager<
           _$AppDatabase,
           $ClothingItemsTable,
-          ClothingItem,
+          ClothingItemRow,
           $$ClothingItemsTableFilterComposer,
           $$ClothingItemsTableOrderingComposer,
           $$ClothingItemsTableAnnotationComposer,
           $$ClothingItemsTableCreateCompanionBuilder,
           $$ClothingItemsTableUpdateCompanionBuilder,
-          (ClothingItem, $$ClothingItemsTableReferences),
-          ClothingItem,
+          (ClothingItemRow, $$ClothingItemsTableReferences),
+          ClothingItemRow,
           PrefetchHooks Function({
             bool clothingItemColorsRefs,
             bool clothingItemSeasonsRefs,
@@ -6556,7 +6575,7 @@ class $$ClothingItemsTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$ClothingItemsTable, ClothingItem>(table),
+                  e.readTable<$ClothingItemsTable, ClothingItemRow>(table),
                   $$ClothingItemsTableReferences(db, table, e),
                 ),
               )
@@ -6583,9 +6602,9 @@ class $$ClothingItemsTableTableManager
                     return [
                       if (clothingItemColorsRefs)
                         await $_getPrefetchedDataByColumns<
-                          ClothingItem,
+                          ClothingItemRow,
                           $ClothingItemsTable,
-                          ClothingItemColor,
+                          ClothingItemColorRow,
                           $ClothingItemColorsTable
                         >(
                           currentTable: table,
@@ -6603,9 +6622,9 @@ class $$ClothingItemsTableTableManager
                         ),
                       if (clothingItemSeasonsRefs)
                         await $_getPrefetchedDataByColumns<
-                          ClothingItem,
+                          ClothingItemRow,
                           $ClothingItemsTable,
-                          ClothingItemSeason,
+                          ClothingItemSeasonRow,
                           $ClothingItemSeasonsTable
                         >(
                           currentTable: table,
@@ -6623,9 +6642,9 @@ class $$ClothingItemsTableTableManager
                         ),
                       if (clothingImagesRefs)
                         await $_getPrefetchedDataByColumns<
-                          ClothingItem,
+                          ClothingItemRow,
                           $ClothingItemsTable,
-                          ClothingImage,
+                          ClothingImageRow,
                           $ClothingImagesTable
                         >(
                           currentTable: table,
@@ -6643,9 +6662,9 @@ class $$ClothingItemsTableTableManager
                         ),
                       if (clothingAttributesRefs)
                         await $_getPrefetchedDataByColumns<
-                          ClothingItem,
+                          ClothingItemRow,
                           $ClothingItemsTable,
-                          ClothingAttribute,
+                          ClothingAttributeRow,
                           $ClothingAttributesTable
                         >(
                           currentTable: table,
@@ -6663,9 +6682,9 @@ class $$ClothingItemsTableTableManager
                         ),
                       if (outfitItemsRefs)
                         await $_getPrefetchedDataByColumns<
-                          ClothingItem,
+                          ClothingItemRow,
                           $ClothingItemsTable,
-                          OutfitItem,
+                          OutfitItemRow,
                           $OutfitItemsTable
                         >(
                           currentTable: table,
@@ -6693,14 +6712,14 @@ typedef $$ClothingItemsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $ClothingItemsTable,
-      ClothingItem,
+      ClothingItemRow,
       $$ClothingItemsTableFilterComposer,
       $$ClothingItemsTableOrderingComposer,
       $$ClothingItemsTableAnnotationComposer,
       $$ClothingItemsTableCreateCompanionBuilder,
       $$ClothingItemsTableUpdateCompanionBuilder,
-      (ClothingItem, $$ClothingItemsTableReferences),
-      ClothingItem,
+      (ClothingItemRow, $$ClothingItemsTableReferences),
+      ClothingItemRow,
       PrefetchHooks Function({
         bool clothingItemColorsRefs,
         bool clothingItemSeasonsRefs,
@@ -6729,7 +6748,7 @@ final class $$ClothingItemColorsTableReferences
         BaseReferences<
           _$AppDatabase,
           $ClothingItemColorsTable,
-          ClothingItemColor
+          ClothingItemColorRow
         > {
   $$ClothingItemColorsTableReferences(
     super.$_db,
@@ -6885,14 +6904,14 @@ class $$ClothingItemColorsTableTableManager
         RootTableManager<
           _$AppDatabase,
           $ClothingItemColorsTable,
-          ClothingItemColor,
+          ClothingItemColorRow,
           $$ClothingItemColorsTableFilterComposer,
           $$ClothingItemColorsTableOrderingComposer,
           $$ClothingItemColorsTableAnnotationComposer,
           $$ClothingItemColorsTableCreateCompanionBuilder,
           $$ClothingItemColorsTableUpdateCompanionBuilder,
-          (ClothingItemColor, $$ClothingItemColorsTableReferences),
-          ClothingItemColor,
+          (ClothingItemColorRow, $$ClothingItemColorsTableReferences),
+          ClothingItemColorRow,
           PrefetchHooks Function({bool itemId})
         > {
   $$ClothingItemColorsTableTableManager(
@@ -6938,7 +6957,7 @@ class $$ClothingItemColorsTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$ClothingItemColorsTable, ClothingItemColor>(
+                  e.readTable<$ClothingItemColorsTable, ClothingItemColorRow>(
                     table,
                   ),
                   $$ClothingItemColorsTableReferences(db, table, e),
@@ -6992,14 +7011,14 @@ typedef $$ClothingItemColorsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $ClothingItemColorsTable,
-      ClothingItemColor,
+      ClothingItemColorRow,
       $$ClothingItemColorsTableFilterComposer,
       $$ClothingItemColorsTableOrderingComposer,
       $$ClothingItemColorsTableAnnotationComposer,
       $$ClothingItemColorsTableCreateCompanionBuilder,
       $$ClothingItemColorsTableUpdateCompanionBuilder,
-      (ClothingItemColor, $$ClothingItemColorsTableReferences),
-      ClothingItemColor,
+      (ClothingItemColorRow, $$ClothingItemColorsTableReferences),
+      ClothingItemColorRow,
       PrefetchHooks Function({bool itemId})
     >;
 typedef $$ClothingItemSeasonsTableCreateCompanionBuilder =
@@ -7020,7 +7039,7 @@ final class $$ClothingItemSeasonsTableReferences
         BaseReferences<
           _$AppDatabase,
           $ClothingItemSeasonsTable,
-          ClothingItemSeason
+          ClothingItemSeasonRow
         > {
   $$ClothingItemSeasonsTableReferences(
     super.$_db,
@@ -7163,14 +7182,14 @@ class $$ClothingItemSeasonsTableTableManager
         RootTableManager<
           _$AppDatabase,
           $ClothingItemSeasonsTable,
-          ClothingItemSeason,
+          ClothingItemSeasonRow,
           $$ClothingItemSeasonsTableFilterComposer,
           $$ClothingItemSeasonsTableOrderingComposer,
           $$ClothingItemSeasonsTableAnnotationComposer,
           $$ClothingItemSeasonsTableCreateCompanionBuilder,
           $$ClothingItemSeasonsTableUpdateCompanionBuilder,
-          (ClothingItemSeason, $$ClothingItemSeasonsTableReferences),
-          ClothingItemSeason,
+          (ClothingItemSeasonRow, $$ClothingItemSeasonsTableReferences),
+          ClothingItemSeasonRow,
           PrefetchHooks Function({bool itemId})
         > {
   $$ClothingItemSeasonsTableTableManager(
@@ -7215,7 +7234,7 @@ class $$ClothingItemSeasonsTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$ClothingItemSeasonsTable, ClothingItemSeason>(
+                  e.readTable<$ClothingItemSeasonsTable, ClothingItemSeasonRow>(
                     table,
                   ),
                   $$ClothingItemSeasonsTableReferences(db, table, e),
@@ -7269,14 +7288,14 @@ typedef $$ClothingItemSeasonsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $ClothingItemSeasonsTable,
-      ClothingItemSeason,
+      ClothingItemSeasonRow,
       $$ClothingItemSeasonsTableFilterComposer,
       $$ClothingItemSeasonsTableOrderingComposer,
       $$ClothingItemSeasonsTableAnnotationComposer,
       $$ClothingItemSeasonsTableCreateCompanionBuilder,
       $$ClothingItemSeasonsTableUpdateCompanionBuilder,
-      (ClothingItemSeason, $$ClothingItemSeasonsTableReferences),
-      ClothingItemSeason,
+      (ClothingItemSeasonRow, $$ClothingItemSeasonsTableReferences),
+      ClothingItemSeasonRow,
       PrefetchHooks Function({bool itemId})
     >;
 typedef $$ClothingImagesTableCreateCompanionBuilder =
@@ -7305,7 +7324,8 @@ typedef $$ClothingImagesTableUpdateCompanionBuilder =
     });
 
 final class $$ClothingImagesTableReferences
-    extends BaseReferences<_$AppDatabase, $ClothingImagesTable, ClothingImage> {
+    extends
+        BaseReferences<_$AppDatabase, $ClothingImagesTable, ClothingImageRow> {
   $$ClothingImagesTableReferences(
     super.$_db,
     super.$_table,
@@ -7527,14 +7547,14 @@ class $$ClothingImagesTableTableManager
         RootTableManager<
           _$AppDatabase,
           $ClothingImagesTable,
-          ClothingImage,
+          ClothingImageRow,
           $$ClothingImagesTableFilterComposer,
           $$ClothingImagesTableOrderingComposer,
           $$ClothingImagesTableAnnotationComposer,
           $$ClothingImagesTableCreateCompanionBuilder,
           $$ClothingImagesTableUpdateCompanionBuilder,
-          (ClothingImage, $$ClothingImagesTableReferences),
-          ClothingImage,
+          (ClothingImageRow, $$ClothingImagesTableReferences),
+          ClothingImageRow,
           PrefetchHooks Function({bool itemId})
         > {
   $$ClothingImagesTableTableManager(
@@ -7597,7 +7617,7 @@ class $$ClothingImagesTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$ClothingImagesTable, ClothingImage>(table),
+                  e.readTable<$ClothingImagesTable, ClothingImageRow>(table),
                   $$ClothingImagesTableReferences(db, table, e),
                 ),
               )
@@ -7649,14 +7669,14 @@ typedef $$ClothingImagesTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $ClothingImagesTable,
-      ClothingImage,
+      ClothingImageRow,
       $$ClothingImagesTableFilterComposer,
       $$ClothingImagesTableOrderingComposer,
       $$ClothingImagesTableAnnotationComposer,
       $$ClothingImagesTableCreateCompanionBuilder,
       $$ClothingImagesTableUpdateCompanionBuilder,
-      (ClothingImage, $$ClothingImagesTableReferences),
-      ClothingImage,
+      (ClothingImageRow, $$ClothingImagesTableReferences),
+      ClothingImageRow,
       PrefetchHooks Function({bool itemId})
     >;
 typedef $$ClothingAttributesTableCreateCompanionBuilder =
@@ -7691,7 +7711,7 @@ final class $$ClothingAttributesTableReferences
         BaseReferences<
           _$AppDatabase,
           $ClothingAttributesTable,
-          ClothingAttribute
+          ClothingAttributeRow
         > {
   $$ClothingAttributesTableReferences(
     super.$_db,
@@ -7933,14 +7953,14 @@ class $$ClothingAttributesTableTableManager
         RootTableManager<
           _$AppDatabase,
           $ClothingAttributesTable,
-          ClothingAttribute,
+          ClothingAttributeRow,
           $$ClothingAttributesTableFilterComposer,
           $$ClothingAttributesTableOrderingComposer,
           $$ClothingAttributesTableAnnotationComposer,
           $$ClothingAttributesTableCreateCompanionBuilder,
           $$ClothingAttributesTableUpdateCompanionBuilder,
-          (ClothingAttribute, $$ClothingAttributesTableReferences),
-          ClothingAttribute,
+          (ClothingAttributeRow, $$ClothingAttributesTableReferences),
+          ClothingAttributeRow,
           PrefetchHooks Function({bool itemId})
         > {
   $$ClothingAttributesTableTableManager(
@@ -8010,7 +8030,7 @@ class $$ClothingAttributesTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$ClothingAttributesTable, ClothingAttribute>(
+                  e.readTable<$ClothingAttributesTable, ClothingAttributeRow>(
                     table,
                   ),
                   $$ClothingAttributesTableReferences(db, table, e),
@@ -8064,14 +8084,14 @@ typedef $$ClothingAttributesTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $ClothingAttributesTable,
-      ClothingAttribute,
+      ClothingAttributeRow,
       $$ClothingAttributesTableFilterComposer,
       $$ClothingAttributesTableOrderingComposer,
       $$ClothingAttributesTableAnnotationComposer,
       $$ClothingAttributesTableCreateCompanionBuilder,
       $$ClothingAttributesTableUpdateCompanionBuilder,
-      (ClothingAttribute, $$ClothingAttributesTableReferences),
-      ClothingAttribute,
+      (ClothingAttributeRow, $$ClothingAttributesTableReferences),
+      ClothingAttributeRow,
       PrefetchHooks Function({bool itemId})
     >;
 typedef $$OutfitsTableCreateCompanionBuilder = OutfitsCompanion Function({
@@ -8102,10 +8122,10 @@ typedef $$OutfitsTableUpdateCompanionBuilder = OutfitsCompanion Function({
 });
 
 final class $$OutfitsTableReferences
-    extends BaseReferences<_$AppDatabase, $OutfitsTable, Outfit> {
+    extends BaseReferences<_$AppDatabase, $OutfitsTable, OutfitRow> {
   $$OutfitsTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
-  static MultiTypedResultKey<$OutfitItemsTable, List<OutfitItem>>
+  static MultiTypedResultKey<$OutfitItemsTable, List<OutfitItemRow>>
   _outfitItemsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.outfitItems,
     aliasName: 'outfits__id__outfit_items__outfit_id',
@@ -8123,7 +8143,7 @@ final class $$OutfitsTableReferences
     );
   }
 
-  static MultiTypedResultKey<$OutfitFeedbackTable, List<OutfitFeedbackData>>
+  static MultiTypedResultKey<$OutfitFeedbackTable, List<OutfitFeedbackRow>>
   _outfitFeedbackRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.outfitFeedback,
     aliasName: 'outfits__id__outfit_feedback__outfit_id',
@@ -8419,14 +8439,14 @@ class $$OutfitsTableTableManager
         RootTableManager<
           _$AppDatabase,
           $OutfitsTable,
-          Outfit,
+          OutfitRow,
           $$OutfitsTableFilterComposer,
           $$OutfitsTableOrderingComposer,
           $$OutfitsTableAnnotationComposer,
           $$OutfitsTableCreateCompanionBuilder,
           $$OutfitsTableUpdateCompanionBuilder,
-          (Outfit, $$OutfitsTableReferences),
-          Outfit,
+          (OutfitRow, $$OutfitsTableReferences),
+          OutfitRow,
           PrefetchHooks Function({
             bool outfitItemsRefs,
             bool outfitFeedbackRefs,
@@ -8498,7 +8518,7 @@ class $$OutfitsTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$OutfitsTable, Outfit>(table),
+                  e.readTable<$OutfitsTable, OutfitRow>(table),
                   $$OutfitsTableReferences(db, table, e),
                 ),
               )
@@ -8516,9 +8536,9 @@ class $$OutfitsTableTableManager
                     return [
                       if (outfitItemsRefs)
                         await $_getPrefetchedDataByColumns<
-                          Outfit,
+                          OutfitRow,
                           $OutfitsTable,
-                          OutfitItem,
+                          OutfitItemRow,
                           $OutfitItemsTable
                         >(
                           currentTable: table,
@@ -8536,9 +8556,9 @@ class $$OutfitsTableTableManager
                         ),
                       if (outfitFeedbackRefs)
                         await $_getPrefetchedDataByColumns<
-                          Outfit,
+                          OutfitRow,
                           $OutfitsTable,
-                          OutfitFeedbackData,
+                          OutfitFeedbackRow,
                           $OutfitFeedbackTable
                         >(
                           currentTable: table,
@@ -8566,14 +8586,14 @@ typedef $$OutfitsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $OutfitsTable,
-      Outfit,
+      OutfitRow,
       $$OutfitsTableFilterComposer,
       $$OutfitsTableOrderingComposer,
       $$OutfitsTableAnnotationComposer,
       $$OutfitsTableCreateCompanionBuilder,
       $$OutfitsTableUpdateCompanionBuilder,
-      (Outfit, $$OutfitsTableReferences),
-      Outfit,
+      (OutfitRow, $$OutfitsTableReferences),
+      OutfitRow,
       PrefetchHooks Function({bool outfitItemsRefs, bool outfitFeedbackRefs})
     >;
 typedef $$OutfitItemsTableCreateCompanionBuilder =
@@ -8592,7 +8612,7 @@ typedef $$OutfitItemsTableUpdateCompanionBuilder =
     });
 
 final class $$OutfitItemsTableReferences
-    extends BaseReferences<_$AppDatabase, $OutfitItemsTable, OutfitItem> {
+    extends BaseReferences<_$AppDatabase, $OutfitItemsTable, OutfitItemRow> {
   $$OutfitItemsTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static $OutfitsTable _outfitIdTable(_$AppDatabase db) =>
@@ -8816,14 +8836,14 @@ class $$OutfitItemsTableTableManager
         RootTableManager<
           _$AppDatabase,
           $OutfitItemsTable,
-          OutfitItem,
+          OutfitItemRow,
           $$OutfitItemsTableFilterComposer,
           $$OutfitItemsTableOrderingComposer,
           $$OutfitItemsTableAnnotationComposer,
           $$OutfitItemsTableCreateCompanionBuilder,
           $$OutfitItemsTableUpdateCompanionBuilder,
-          (OutfitItem, $$OutfitItemsTableReferences),
-          OutfitItem,
+          (OutfitItemRow, $$OutfitItemsTableReferences),
+          OutfitItemRow,
           PrefetchHooks Function({bool outfitId, bool itemId})
         > {
   $$OutfitItemsTableTableManager(_$AppDatabase db, $OutfitItemsTable table)
@@ -8864,7 +8884,7 @@ class $$OutfitItemsTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$OutfitItemsTable, OutfitItem>(table),
+                  e.readTable<$OutfitItemsTable, OutfitItemRow>(table),
                   $$OutfitItemsTableReferences(db, table, e),
                 ),
               )
@@ -8927,14 +8947,14 @@ typedef $$OutfitItemsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $OutfitItemsTable,
-      OutfitItem,
+      OutfitItemRow,
       $$OutfitItemsTableFilterComposer,
       $$OutfitItemsTableOrderingComposer,
       $$OutfitItemsTableAnnotationComposer,
       $$OutfitItemsTableCreateCompanionBuilder,
       $$OutfitItemsTableUpdateCompanionBuilder,
-      (OutfitItem, $$OutfitItemsTableReferences),
-      OutfitItem,
+      (OutfitItemRow, $$OutfitItemsTableReferences),
+      OutfitItemRow,
       PrefetchHooks Function({bool outfitId, bool itemId})
     >;
 typedef $$OutfitFeedbackTableCreateCompanionBuilder =
@@ -8960,11 +8980,7 @@ typedef $$OutfitFeedbackTableUpdateCompanionBuilder =
 
 final class $$OutfitFeedbackTableReferences
     extends
-        BaseReferences<
-          _$AppDatabase,
-          $OutfitFeedbackTable,
-          OutfitFeedbackData
-        > {
+        BaseReferences<_$AppDatabase, $OutfitFeedbackTable, OutfitFeedbackRow> {
   $$OutfitFeedbackTableReferences(
     super.$_db,
     super.$_table,
@@ -9162,14 +9178,14 @@ class $$OutfitFeedbackTableTableManager
         RootTableManager<
           _$AppDatabase,
           $OutfitFeedbackTable,
-          OutfitFeedbackData,
+          OutfitFeedbackRow,
           $$OutfitFeedbackTableFilterComposer,
           $$OutfitFeedbackTableOrderingComposer,
           $$OutfitFeedbackTableAnnotationComposer,
           $$OutfitFeedbackTableCreateCompanionBuilder,
           $$OutfitFeedbackTableUpdateCompanionBuilder,
-          (OutfitFeedbackData, $$OutfitFeedbackTableReferences),
-          OutfitFeedbackData,
+          (OutfitFeedbackRow, $$OutfitFeedbackTableReferences),
+          OutfitFeedbackRow,
           PrefetchHooks Function({bool outfitId})
         > {
   $$OutfitFeedbackTableTableManager(
@@ -9224,7 +9240,7 @@ class $$OutfitFeedbackTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$OutfitFeedbackTable, OutfitFeedbackData>(table),
+                  e.readTable<$OutfitFeedbackTable, OutfitFeedbackRow>(table),
                   $$OutfitFeedbackTableReferences(db, table, e),
                 ),
               )
@@ -9276,14 +9292,14 @@ typedef $$OutfitFeedbackTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $OutfitFeedbackTable,
-      OutfitFeedbackData,
+      OutfitFeedbackRow,
       $$OutfitFeedbackTableFilterComposer,
       $$OutfitFeedbackTableOrderingComposer,
       $$OutfitFeedbackTableAnnotationComposer,
       $$OutfitFeedbackTableCreateCompanionBuilder,
       $$OutfitFeedbackTableUpdateCompanionBuilder,
-      (OutfitFeedbackData, $$OutfitFeedbackTableReferences),
-      OutfitFeedbackData,
+      (OutfitFeedbackRow, $$OutfitFeedbackTableReferences),
+      OutfitFeedbackRow,
       PrefetchHooks Function({bool outfitId})
     >;
 typedef $$LearnedPreferencesTableCreateCompanionBuilder =
@@ -9375,21 +9391,21 @@ class $$LearnedPreferencesTableTableManager
         RootTableManager<
           _$AppDatabase,
           $LearnedPreferencesTable,
-          LearnedPreference,
+          LearnedPreferenceRow,
           $$LearnedPreferencesTableFilterComposer,
           $$LearnedPreferencesTableOrderingComposer,
           $$LearnedPreferencesTableAnnotationComposer,
           $$LearnedPreferencesTableCreateCompanionBuilder,
           $$LearnedPreferencesTableUpdateCompanionBuilder,
           (
-            LearnedPreference,
+            LearnedPreferenceRow,
             BaseReferences<
               _$AppDatabase,
               $LearnedPreferencesTable,
-              LearnedPreference
+              LearnedPreferenceRow
             >,
           ),
-          LearnedPreference,
+          LearnedPreferenceRow,
           PrefetchHooks Function()
         > {
   $$LearnedPreferencesTableTableManager(
@@ -9435,13 +9451,13 @@ class $$LearnedPreferencesTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$LearnedPreferencesTable, LearnedPreference>(
+                  e.readTable<$LearnedPreferencesTable, LearnedPreferenceRow>(
                     table,
                   ),
                   BaseReferences<
                     _$AppDatabase,
                     $LearnedPreferencesTable,
-                    LearnedPreference
+                    LearnedPreferenceRow
                   >(db, table, e),
                 ),
               )
@@ -9455,21 +9471,21 @@ typedef $$LearnedPreferencesTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $LearnedPreferencesTable,
-      LearnedPreference,
+      LearnedPreferenceRow,
       $$LearnedPreferencesTableFilterComposer,
       $$LearnedPreferencesTableOrderingComposer,
       $$LearnedPreferencesTableAnnotationComposer,
       $$LearnedPreferencesTableCreateCompanionBuilder,
       $$LearnedPreferencesTableUpdateCompanionBuilder,
       (
-        LearnedPreference,
+        LearnedPreferenceRow,
         BaseReferences<
           _$AppDatabase,
           $LearnedPreferencesTable,
-          LearnedPreference
+          LearnedPreferenceRow
         >,
       ),
-      LearnedPreference,
+      LearnedPreferenceRow,
       PrefetchHooks Function()
     >;
 typedef $$ModelInstallationsTableCreateCompanionBuilder =
@@ -9640,21 +9656,21 @@ class $$ModelInstallationsTableTableManager
         RootTableManager<
           _$AppDatabase,
           $ModelInstallationsTable,
-          ModelInstallation,
+          ModelInstallationRow,
           $$ModelInstallationsTableFilterComposer,
           $$ModelInstallationsTableOrderingComposer,
           $$ModelInstallationsTableAnnotationComposer,
           $$ModelInstallationsTableCreateCompanionBuilder,
           $$ModelInstallationsTableUpdateCompanionBuilder,
           (
-            ModelInstallation,
+            ModelInstallationRow,
             BaseReferences<
               _$AppDatabase,
               $ModelInstallationsTable,
-              ModelInstallation
+              ModelInstallationRow
             >,
           ),
-          ModelInstallation,
+          ModelInstallationRow,
           PrefetchHooks Function()
         > {
   $$ModelInstallationsTableTableManager(
@@ -9720,13 +9736,13 @@ class $$ModelInstallationsTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$ModelInstallationsTable, ModelInstallation>(
+                  e.readTable<$ModelInstallationsTable, ModelInstallationRow>(
                     table,
                   ),
                   BaseReferences<
                     _$AppDatabase,
                     $ModelInstallationsTable,
-                    ModelInstallation
+                    ModelInstallationRow
                   >(db, table, e),
                 ),
               )
@@ -9740,21 +9756,21 @@ typedef $$ModelInstallationsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $ModelInstallationsTable,
-      ModelInstallation,
+      ModelInstallationRow,
       $$ModelInstallationsTableFilterComposer,
       $$ModelInstallationsTableOrderingComposer,
       $$ModelInstallationsTableAnnotationComposer,
       $$ModelInstallationsTableCreateCompanionBuilder,
       $$ModelInstallationsTableUpdateCompanionBuilder,
       (
-        ModelInstallation,
+        ModelInstallationRow,
         BaseReferences<
           _$AppDatabase,
           $ModelInstallationsTable,
-          ModelInstallation
+          ModelInstallationRow
         >,
       ),
-      ModelInstallation,
+      ModelInstallationRow,
       PrefetchHooks Function()
     >;
 typedef $$AppSettingsTableCreateCompanionBuilder =
@@ -9831,17 +9847,17 @@ class $$AppSettingsTableTableManager
         RootTableManager<
           _$AppDatabase,
           $AppSettingsTable,
-          AppSetting,
+          AppSettingRow,
           $$AppSettingsTableFilterComposer,
           $$AppSettingsTableOrderingComposer,
           $$AppSettingsTableAnnotationComposer,
           $$AppSettingsTableCreateCompanionBuilder,
           $$AppSettingsTableUpdateCompanionBuilder,
           (
-            AppSetting,
-            BaseReferences<_$AppDatabase, $AppSettingsTable, AppSetting>,
+            AppSettingRow,
+            BaseReferences<_$AppDatabase, $AppSettingsTable, AppSettingRow>,
           ),
-          AppSetting,
+          AppSettingRow,
           PrefetchHooks Function()
         > {
   $$AppSettingsTableTableManager(_$AppDatabase db, $AppSettingsTable table)
@@ -9873,12 +9889,12 @@ class $$AppSettingsTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$AppSettingsTable, AppSetting>(table),
-                  BaseReferences<_$AppDatabase, $AppSettingsTable, AppSetting>(
-                    db,
-                    table,
-                    e,
-                  ),
+                  e.readTable<$AppSettingsTable, AppSettingRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $AppSettingsTable,
+                    AppSettingRow
+                  >(db, table, e),
                 ),
               )
               .toList(),
@@ -9891,17 +9907,17 @@ typedef $$AppSettingsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $AppSettingsTable,
-      AppSetting,
+      AppSettingRow,
       $$AppSettingsTableFilterComposer,
       $$AppSettingsTableOrderingComposer,
       $$AppSettingsTableAnnotationComposer,
       $$AppSettingsTableCreateCompanionBuilder,
       $$AppSettingsTableUpdateCompanionBuilder,
       (
-        AppSetting,
-        BaseReferences<_$AppDatabase, $AppSettingsTable, AppSetting>,
+        AppSettingRow,
+        BaseReferences<_$AppDatabase, $AppSettingsTable, AppSettingRow>,
       ),
-      AppSetting,
+      AppSettingRow,
       PrefetchHooks Function()
     >;
 
