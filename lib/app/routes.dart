@@ -10,6 +10,8 @@ abstract final class AppRoutes {
 
   static String item(String id) => '/wardrobe/item/$id';
 
+  static String outfit(String id) => '/stylist/outfit/$id';
+
   /// Review/edit form. [confirm] is true for a newly imported draft.
   static String editItem(String id, {bool confirm = false}) =>
       '/wardrobe/item/$id/edit${confirm ? '?confirm=1' : ''}';

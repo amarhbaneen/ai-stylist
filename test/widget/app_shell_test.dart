@@ -31,7 +31,7 @@ void main() {
     expect(find.text('Your wardrobe is empty'), findsOneWidget);
 
     await tapAndSettle(tester, find.byIcon(Icons.auto_awesome_outlined));
-    expect(find.text('Nothing to style yet'), findsOneWidget);
+    expect(find.text('Occasion'), findsOneWidget);
 
     await tapAndSettle(tester, find.byIcon(Icons.favorite_border));
     expect(find.text('No favorites yet'), findsOneWidget);

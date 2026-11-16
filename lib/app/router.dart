@@ -5,6 +5,7 @@ import '../features/favorites/presentation/favorites_screen.dart';
 import '../features/home/presentation/home_screen.dart';
 import '../features/onboarding/presentation/onboarding_screen.dart';
 import '../features/profile/presentation/preferences_screen.dart';
+import '../features/stylist/presentation/outfit_details_screen.dart';
 import '../features/stylist/presentation/stylist_screen.dart';
 import '../features/wardrobe/presentation/item_details_screen.dart';
 import '../features/wardrobe/presentation/item_editor_screen.dart';
@@ -68,7 +69,23 @@ GoRouter buildRouter({required bool onboardingComplete}) => GoRouter(
             ),
           ],
         ),
-        _branch(AppRoutes.stylist, const StylistScreen()),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: AppRoutes.stylist,
+              builder: (context, state) => const StylistScreen(),
+              routes: [
+                GoRoute(
+                  path: 'outfit/:id',
+                  parentNavigatorKey: _rootKey,
+                  builder: (context, state) => OutfitDetailsScreen(
+                    outfitId: state.pathParameters['id']!,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
         _branch(AppRoutes.favorites, const FavoritesScreen()),
       ],
     ),

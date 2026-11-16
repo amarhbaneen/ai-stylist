@@ -4,11 +4,13 @@ import 'package:ai_stylist/app/app.dart';
 import 'package:ai_stylist/core/database/app_database.dart';
 import 'package:ai_stylist/core/providers.dart';
 import 'package:ai_stylist/features/profile/profile_providers.dart';
+import 'package:ai_stylist/features/stylist/stylist_providers.dart';
 import 'package:ai_stylist/features/wardrobe/wardrobe_providers.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:outfit_engine/outfit_engine.dart';
 
 import 'fakes.dart';
 
@@ -45,6 +47,8 @@ final class TestApp {
         onboardingCompleteAtLaunchProvider.overrideWithValue(
           onboardingComplete,
         ),
+        // Same engine, run inline: isolates do not advance on the fake clock.
+        engineRunnerProvider.overrideWithValue(runEngineInline),
       ],
     );
     return TestApp._(tmp, db, picker, processor, container);
