@@ -39,7 +39,17 @@ device.
   - Still open: iOS, real-device numbers, and the fashion model.
   - See [docs/spikes/M3_AI_RUNTIME_REPORT.md](docs/spikes/M3_AI_RUNTIME_REPORT.md) and
     [docs/MODELS.md](docs/MODELS.md).
-- **M6 (feedback and personalisation):** complete for Android, on `feature/m6-feedback`.
+- **M4 (AI-assisted analysis):** partly done, on `feature/m4-ai-analysis`.
+  - When a photo is added, the main colour is detected on-device and pre-filled with its
+    confidence. Medium confidence asks you to confirm; low confidence appears only as tappable
+    hints. Secondary colours are offered as "Also detected" chips.
+  - Suggestions are stored with their source model, version, confidence and time, plus whether
+    you kept each one.
+  - A model registry with SHA-256 checks and an output validator are ready for a fashion model.
+  - Category, type and pattern classification is waiting on a licensed model (see
+    [docs/MODELS.md](docs/MODELS.md)).
+  - Verified on the emulator offline: a new green shirt photo had Green pre-filled.
+- **M6 (feedback and personalisation):** complete for Android; merged into `main`.
   - Like, dislike (with optional reasons and a note) and save on every outfit.
   - The Favorites tab has Saved and History views.
   - Learning is bounded and deterministic: per garment, per colour and per pairing, rebuilt

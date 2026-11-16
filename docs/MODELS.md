@@ -5,7 +5,7 @@ status. REQUIREMENTS FR-09 and §18 require licensing to be approved before any 
 
 | ID | Purpose | Source | Licence | Size | SHA-256 | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| `color-tier0` | Colour families (Tier 0) | Deterministic code in `lib/ai/color/` (no weights) | Project code | – | – | **In product code** (UI wiring in M4) |
+| `color-tier0` (v1.0.0) | Colour families (Tier 0) | Deterministic code in `lib/ai/color/` (no weights) | Project code | – | – | **Shipped** (M4): pre-fills the main colour on the review screen |
 | `efficientnet-lite0-int8` | Runtime test only | Google MediaPipe model storage (see the spike report §5) | Apache-2.0 per Google model cards | 5.18 MB | `bc2ffe19…a34b16` | **Spike only, never shipped** |
 | `efficientnet-lite0-float32` | Runtime test only | Same | Same | 17.72 MB | `6c7ab0a6…c8bde0` | **Spike only, never shipped** |
 | `fashion-tier1` (planned) | Category, type, pattern | To be trained on Fashionpedia (CC BY 4.0), optionally distilled from Marqo-FashionSigLIP | Depends on the training data (P-3) | target ≤ 10 MB | – | **Blocked**: training environment and licence sign-off |

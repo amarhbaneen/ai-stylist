@@ -328,6 +328,43 @@ Nothing is stored when no outfit is possible.
   skipped colours, counts of adjusted garments and pairings, and "Reset learning". The explicit
   reset button is labelled "Reset choices" to keep the two apart.
 
+## D-33 AI-assisted analysis pipeline. Accepted (M4)
+- **Contract (domain).** Each suggested value is a `Suggestion<T>`: the value, a confidence
+  from 0 to 1, alternatives, the source model ID and version, and the analysis time, grouped
+  into a `ClothingAnalysis`. `ClothingAnalyzer` never throws; failures are typed results.
+- **Validation.** `OutputValidator` handles raw model output:
+  - it drops NaN, infinite and negative scores.
+  - it normalises scores only when they sum above 1, so mass on unmapped labels lowers
+    confidence honestly.
+  - it maps labels through the manifest's label table, and never invents values the taxonomy
+    lacks.
+- **Thresholds (D-09).** `ConfidencePolicy` is 0.80 to prefill and 0.50 to ask for
+  confirmation; below that, the value appears only as tappable hints. Suggestions never
+  overwrite a field the user has touched or filled, and secondary colours are offered, never
+  prefilled.
+- **Analyzers.** `CompositeClothingAnalyzer` runs every analyzer with a 15-second timeout.
+  Partial success counts as success. A timeout or a thrown exception becomes a typed failure,
+  using `TimeoutException` rather than `onTimeout`, because a narrower reified future type would
+  make `onTimeout` throw. Today it contains only `ColorTier0Analyzer` (`color-tier0@1.0.0`).
+- **Model registry.** A bundled `assets/models/manifest.json` (schema version 1, currently
+  empty). Entries are parsed strictly. A model is loaded only if its SHA-256 matches; otherwise
+  the result is a typed failure, "unavailable" or "corrupt", never a crash.
+  - **The LiteRT runtime is not added yet.** `flutter_litert` would add about 8 MB per CPU
+    architecture with no model to run. It joins the composite together with the first licensed
+    fashion model (D-08, B-5). The M3 spike is the reference adapter.
+- **Provenance.** Suggestions are stored in `clothing_attributes`, one row per value, with
+  alternatives under `PRIMARY_COLOR_ALT`. They are cached per item, so reopening a draft doesn't
+  re-run analysis. On save, `ConfirmAnalysis` sets `user_confirmed` for each value the user kept.
+- **When it runs.** Only for items still under review. It reads the 320 px thumbnail on a
+  background isolate, and the form shows immediately while analysis runs.
+- **Known limitation, pinned by a test.** White garment areas on a near-white backdrop are
+  removed as background. This needs segmentation (FR-05).
+
+## D-34 No automatic retry for analysis. Accepted (M4)
+Riverpod 3 retries failing providers without limit by default (200 ms backoff up to 6.4 s).
+Re-analysing a photo that can't be decoded won't succeed, so `clothingAnalysisProvider` uses
+`retry: _noRetry`. It fails once, and the screen falls back to manual entry.
+
 ## D-26 Spikes live in `spikes/`, outside the product build. Accepted (M3)
 Each spike is a standalone Flutter app with its own pubspec (exact version pins) and is excluded
 from the root analyzer. Downloaded model binaries are git-ignored and fetched by a script that

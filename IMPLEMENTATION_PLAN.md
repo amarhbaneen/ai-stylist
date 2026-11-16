@@ -133,7 +133,7 @@ survives an app restart (integration test).
 **Accept when:** a written spike report shows a model running on both platforms with
 measured numbers, or documents why not and selects the fallback adapter.
 
-### M4: Phase 4 — AI-assisted analysis (REQ M3)
+### M4: Phase 4 — AI-assisted analysis (REQ M3) ◐ pipeline + colour suggestions verified on Android 2026-11-16; garment classifier blocked on a licensed model (B-5, P-3)
 Preprocessing contract, model registry, `InferenceRuntime` adapter, validator, thresholds,
 review/edit UI with confidence badges, stored model ID/version/timestamp. Model lifecycle:
 lazy load, dispose on memory pressure, never block the UI. Tests: loading/disposal, corrupt
