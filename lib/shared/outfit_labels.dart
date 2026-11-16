@@ -49,6 +49,16 @@ abstract final class OutfitLabels {
     ReasonCode.recentlySuggested => 'Suggested recently',
   };
 
+  static String feedbackReason(FeedbackReason r) => switch (r) {
+    FeedbackReason.notMyStyle => 'Not my style',
+    FeedbackReason.colorsClash => 'Colours don\'t work',
+    FeedbackReason.tooFormal => 'Too formal',
+    FeedbackReason.tooCasual => 'Too casual',
+    FeedbackReason.wrongForWeather => 'Wrong for the weather',
+    FeedbackReason.wornRecently => 'Wore it recently',
+    FeedbackReason.other => 'Something else',
+  };
+
   /// Whether a reason is a caveat (shown with a different icon).
   static bool isCaveat(ReasonCode r) => const {
     ReasonCode.colorClash,

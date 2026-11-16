@@ -3,6 +3,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:wardrobe_domain/wardrobe_domain.dart';
 
 import '../../../shared/taxonomy_labels.dart';
+import '../../favorites/presentation/learned_preferences_section.dart';
 import '../profile_providers.dart';
 import 'preferences_form.dart';
 
@@ -80,9 +81,10 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
       appBar: AppBar(
         title: const Text('Style preferences'),
         actions: [
+          // "choices" distinguishes this from "Reset learning" further down.
           TextButton(
             onPressed: _busy ? null : _reset,
-            child: const Text('Reset'),
+            child: const Text('Reset choices'),
           ),
         ],
       ),
@@ -101,6 +103,7 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
               value: draft ?? value,
               onChanged: (p) => setState(() => _draft = p),
             ),
+            const LearnedPreferencesSection(),
           ],
         ),
         AsyncError() => const Center(

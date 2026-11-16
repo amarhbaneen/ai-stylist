@@ -8,6 +8,7 @@ import '../../../shared/outfit_labels.dart';
 import '../../../shared/taxonomy_labels.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/item_thumbnail.dart';
+import '../../favorites/presentation/feedback_bar.dart';
 import '../../wardrobe/wardrobe_providers.dart';
 import '../stylist_providers.dart';
 import 'outfit_card.dart';
@@ -59,7 +60,7 @@ class _Body extends StatelessWidget {
           '${(outfit.totalScore * 100).round()}% match',
           style: text.titleMedium,
         ),
-        const SizedBox(height: 12),
+        FeedbackBar(outfitId: saved.id),
         for (final piece in outfit.pieces) _PieceTile(piece: piece),
         const SizedBox(height: 16),
         Text('Why this outfit', style: text.titleSmall),

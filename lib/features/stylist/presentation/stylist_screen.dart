@@ -132,7 +132,7 @@ class _Results extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         for (final (i, saved) in outcome.outfits.indexed)
-          OutfitCard(saved: saved, rank: i + 1),
+          OutfitCard(saved: saved, title: 'Idea ${i + 1}'),
         if (outcome.outfits.length < 3)
           Padding(
             padding: const EdgeInsets.only(top: 8),

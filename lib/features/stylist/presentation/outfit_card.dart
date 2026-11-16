@@ -7,14 +7,17 @@ import '../../../app/routes.dart';
 import '../../../shared/outfit_labels.dart';
 import '../../../shared/taxonomy_labels.dart';
 import '../../../shared/widgets/item_thumbnail.dart';
+import '../../favorites/presentation/feedback_bar.dart';
 import '../../wardrobe/wardrobe_providers.dart';
 
-/// Compact summary of one suggested outfit.
+/// Compact summary of one stored outfit, with like/dislike/save controls.
 class OutfitCard extends StatelessWidget {
-  const OutfitCard({required this.saved, required this.rank, super.key});
+  const OutfitCard({required this.saved, required this.title, super.key});
 
   final SavedOutfit saved;
-  final int rank;
+
+  /// "Idea 1" on the Stylist tab; occasion and date in history.
+  final String title;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +37,9 @@ class OutfitCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Text('Idea $rank', style: theme.textTheme.titleMedium),
+                  Expanded(
+                    child: Text(title, style: theme.textTheme.titleMedium),
+                  ),
                   const Spacer(),
                   Text(
                     '${(outfit.totalScore * 100).round()}% match',
@@ -59,6 +64,8 @@ class OutfitCard extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               for (final r in reasons) ReasonLine(reason: r),
+              const Divider(height: 24),
+              FeedbackBar(outfitId: saved.id),
             ],
           ),
         ),

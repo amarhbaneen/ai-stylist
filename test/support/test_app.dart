@@ -11,6 +11,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:outfit_engine/outfit_engine.dart';
+import 'package:wardrobe_domain/wardrobe_domain.dart';
 
 import 'fakes.dart';
 
@@ -70,6 +71,29 @@ final class TestApp {
     await settle(tester);
   }
 
+  /// Adds ACTIVE items (category, colour, name) through the real repository.
+  Future<void> seedItems(
+    WidgetTester tester,
+    List<(GarmentCategory, ColorFamily, String)> items,
+  ) async {
+    await tester.runAsync(() async {
+      final repo = container.read(wardrobeRepositoryProvider);
+      for (final (i, (category, color, name)) in items.indexed) {
+        final photo = await writePhoto(tmp, '$name.jpg', seed: i + 1);
+        final id = (await repo.importImage(photo)).valueOrNull!.id;
+        await repo.saveAttributes(
+          id,
+          ClothingAttributes(
+            category: category,
+            primaryColor: color,
+            displayName: name,
+          ),
+          activate: true,
+        );
+      }
+    });
+  }
+
   /// Unmounts the app so stream subscriptions close, then frees resources.
   Future<void> dispose(WidgetTester tester) async {
     await tester.pumpWidget(const SizedBox.shrink());
@@ -114,6 +138,17 @@ Future<void> pumpUntil(
 /// Scrolls the nearest vertical list until [finder] is built, taps it and
 /// settles. Lazily built lists do not create off-screen chips until scrolled.
 Future<void> tapAndSettle(WidgetTester tester, Finder finder) async {
+  await scrollTo(tester, finder);
+  // Centre it: at the very top edge of a list, under the app bar, a tap can
+  // miss the chip.
+  await Scrollable.ensureVisible(tester.element(finder), alignment: 0.5);
+  await tester.pump();
+  await tester.tap(finder);
+  await settle(tester);
+}
+
+/// Scrolls the topmost route's vertical list until [finder] is built.
+Future<void> scrollTo(WidgetTester tester, Finder finder) async {
   if (finder.evaluate().isEmpty) {
     // The topmost route's vertical list is the last ListView in the tree.
     await tester.scrollUntilVisible(
@@ -127,10 +162,4 @@ Future<void> tapAndSettle(WidgetTester tester, Finder finder) async {
           .first,
     );
   }
-  // Centre it: at the very top edge of a list, under the app bar, a tap can
-  // miss the chip.
-  await Scrollable.ensureVisible(tester.element(finder), alignment: 0.5);
-  await tester.pump();
-  await tester.tap(finder);
-  await settle(tester);
 }
