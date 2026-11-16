@@ -168,9 +168,53 @@ resolves the app-support directory and opens the database. Tests inject a temp d
 in-memory database. If private storage cannot be resolved, a `StartupErrorApp` is shown, and
 details go only to the local log.
 
+## D-21 Image import pipeline. Accepted (M2)
+The import goes through these steps:
+1. Check the extension against an allow-list (jpg, jpeg, png, heic, heif, webp).
+2. Compute the SHA-256 of the file on a background isolate.
+3. Check for a duplicate.
+4. Copy the original byte-for-byte.
+5. Create two native downscales: a 1024 px working copy at JPEG quality 85, and a 320 px
+   thumbnail at quality 80.
+6. Insert the item and image rows in a single transaction.
+
+Any failure deletes the files already written, so nothing is left half-saved.
+- **Originals** keep their EXIF metadata, including any location tags. They stay on the device
+  and are never uploaded.
+- **Working copies and thumbnails** are written without EXIF (`keepExif: false`), and their
+  orientation is fixed in the pixels.
+- **HEIC** decoding uses the platform codecs. Support on older Android devices still needs to
+  be verified on hardware.
+
+## D-22 Drafts are visible, not auto-deleted. Accepted (M2)
+An imported photo stays a DRAFT until the user taps "Add to wardrobe". Drafts appear in the
+wardrobe grid with a "Needs review" badge and open in the review form. They are never eligible
+for outfits. The app never deletes drafts automatically, so a photo is never lost if the app is
+killed mid-review. The user can discard a draft explicitly.
+
+## D-23 Least-privilege picking. Accepted (M2)
+- **Android:** the system Photo Picker and the camera intent are used. The manifest declares no
+  CAMERA or storage permission. Photos lost when Android kills the activity are recovered with
+  `retrieveLostData()` when the Wardrobe tab opens.
+- **iOS:** `requestFullMetadata: false` means the photo-library permission is never requested.
+  App Store policy still requires both `NSCameraUsageDescription` and
+  `NSPhotoLibraryUsageDescription` in `Info.plist`, so both are present.
+- **Errors:** denied access is mapped from the plugin's error codes, which were checked against
+  the plugin sources, to `PermissionDeniedFailure`. The manual flow stays available.
+
+## D-24 Orphan clean-up at launch. Accepted (M2)
+After startup, a background task removes files under `images/` that no `clothing_images` row
+references. These are left behind by a crash between the file write and the database commit, or
+by a failed file delete. A failure is only logged, and the clean-up runs again at the next
+launch.
+
 ---
 
 ## Approval record
+
+**2026-11-16:** the owner chose "start M2", so the draft taxonomy and outfit templates (P-6,
+IMPLEMENTATION_PLAN.md §4) are the working default. The values are stored as stable codes, so
+they can still be extended later.
 
 **2026-11-15:** the product owner approved the Phase 0 plan as written, including D-07 (excluding
 MediaPipe and ML Kit because of their telemetry). D-07 and D-08 still depend on the Phase 3 spike

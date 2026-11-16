@@ -12,12 +12,30 @@ Wardrobe photos and data never leave the device.
 
 ## Status
 
-M1 (foundation) is complete on `feature/m1-foundation`: app shell, Riverpod, routing, theme,
-Drift schema v1, private file storage and tests.
+- **M1 (foundation):** complete. App shell, Riverpod, routing, theme, Drift schema v1, private
+  file storage and tests.
+- **M2 (wardrobe without AI):** complete for Android.
+  - First-launch privacy screen with optional, skippable style preferences.
+  - Editable preferences, with a reset.
+  - Adding clothes by camera or gallery, with the photo copied into private storage.
+  - Duplicate-photo detection.
+  - A manual classification form.
+  - A wardrobe grid with category chips, filters (colour, season, formality, status) and search.
+  - Item details, edit, archive and restore, and delete with confirmation.
 
-- Verified on 2026-11-15: `flutter build apk --debug` succeeds. The app launches on an Android
-  emulator (API 37, x86_64) in airplane mode with no runtime errors.
-- Not verified: iOS (needs macOS) and physical Android devices.
+Verified on 2026-11-16 on an Android emulator (API 37, x86_64) in airplane mode:
+- Onboarding, then adding a synthetic test image through the system Photo Picker.
+- Classifying the item and seeing it in the grid.
+- Force-stopping and relaunching: the item persists.
+
+There were no permission prompts and no runtime errors. iOS (needs macOS) and physical Android
+devices are not yet verified, and the camera path has only been exercised in tests, not on a
+device.
+
+The first Gradle build installs NDK 28.2, SDK platforms 35 and 36, and CMake 3.22.1
+automatically. If a first build fails while those are being installed, re-run it once.
+`android/gradle.properties` disables Kotlin incremental compilation, because the project (D:) and
+the pub cache (C:) are on different drives.
 
 The first Gradle build installs NDK 28.2, SDK platforms 35 and 36, and CMake 3.22.1 automatically.
 That first run failed while those components were being installed, and the next run passed
@@ -42,11 +60,16 @@ lib/
   core/
     database/          Drift tables (schema v1), AppDatabase, connection
     storage/           FileStore: app-private, relative paths, atomic writes
+    media/             photo picker, native image downscaling, SHA-256 hashing
     logging/           local-only logger
     theme/             neutral Material 3 theme
     providers.dart     Riverpod DI (database, file store, clock, IDs)
-  features/<feature>/presentation/
-  shared/widgets/
+  features/
+    onboarding/        first-launch privacy + optional preferences
+    profile/           style preferences (data: Drift repository)
+    wardrobe/          import, grid, filters, details, editor (data: Drift repository)
+    home/ stylist/ favorites/   placeholders until M4-M5
+  shared/              taxonomy labels, chip selectors, stored-image widget
 packages/
   wardrobe_domain/     pure Dart: Result, typed failures, clock, IDs, taxonomy (draft)
   outfit_engine/       pure Dart: recommendation engine (FR-07 weights so far)

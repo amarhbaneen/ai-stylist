@@ -108,7 +108,7 @@ Deliverables: IMPLEMENTATION_PLAN.md, DECISIONS.md, COMPATIBILITY_REPORT.md.
 `flutter analyze` is clean; DB open/close, foreign-key enforcement and FileStore tests pass;
 the iOS build steps are documented.
 
-### M2: Phase 2 — Wardrobe without AI (REQ M2, part of M3)
+### M2: Phase 2 — Wardrobe without AI (REQ M2, part of M3) ✅ Android verified 2026-11-16; iOS pending (B-3)
 - Onboarding and privacy explanation, with optional and skippable preferences (FR-01).
 - Add-clothing flow: camera or gallery → hash/duplicate check → private copy → working copy
   and thumbnail → manual classification form → confirm → ACTIVE.
