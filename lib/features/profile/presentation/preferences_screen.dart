@@ -1,9 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:wardrobe_domain/wardrobe_domain.dart';
 
+import '../../../app/routes.dart';
 import '../../../shared/taxonomy_labels.dart';
 import '../../favorites/presentation/learned_preferences_section.dart';
+import '../../weather/presentation/live_weather_settings_section.dart';
 import '../profile_providers.dart';
 import 'preferences_form.dart';
 
@@ -104,6 +107,16 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
               onChanged: (p) => setState(() => _draft = p),
             ),
             const LearnedPreferencesSection(),
+            const LiveWeatherSettingsSection(),
+            const Divider(height: 40),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.memory_outlined),
+              title: const Text('On-device models'),
+              subtitle: const Text('Optional downloads for clothing analysis'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push(AppRoutes.models),
+            ),
           ],
         ),
         AsyncError() => const Center(

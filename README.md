@@ -58,6 +58,14 @@ device.
   - Tests show a like changes the next ranking by an exact, predictable amount, and a reset
     restores the baseline.
   - Verified on the emulator offline: like, save, the Saved view, and the learned section.
+- **M7 (optional services):** done for Android; verified on the emulator (release build).
+  - Manual weather stays the default. Live weather is opt-in: a consent dialog says exactly
+    what is sent, the city is picked from a bundled offline list, and weather is fetched only
+    when you tap "Get current weather". It fills the same editable controls; failures fall back
+    to manual entry. Consent can be withdrawn in Style preferences.
+  - Optional model downloads: resumable, size- and SHA-256-verified, atomically installed,
+    removable. No downloadable models are listed yet, so the screen says so.
+  - Every request is listed in [docs/NETWORK.md](docs/NETWORK.md).
 - **M5 (outfit engine):** complete for Android; merged into `main`.
   - `packages/outfit_engine` is pure Dart: templates, hard constraints, six scorers, ranking,
     variety and explanations.
@@ -133,6 +141,10 @@ then run `dart run drift_dev make-migrations` to snapshot the schema and generat
 
 ## Privacy
 
-There are no network calls in the app today. The Android release manifest declares no INTERNET
-permission. It will be added only with the optional weather and model-download features
-(Phase 7), each documented in `docs/NETWORK.md`.
+The app works fully offline. It makes network requests only for two optional features, and
+only when you tap a button: live weather (after you opt in) and optional model downloads.
+Photos, wardrobe data, preferences and feedback are never sent. The Android manifest declares
+INTERNET for these two features only. Every request and its fields are listed in
+[docs/NETWORK.md](docs/NETWORK.md).
+
+Attributions: weather data by Open-Meteo.com (CC BY 4.0); city list from GeoNames (CC BY 4.0).

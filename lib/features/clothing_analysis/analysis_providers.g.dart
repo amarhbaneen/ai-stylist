@@ -59,14 +59,67 @@ final class ConfidencePolicyProvider
 
 String _$confidencePolicyHash() => r'ddc8208ae4cf1519ce4f4bd796c8af1c141fc505';
 
-/// Bundled models (none yet). Loading a model always goes through the
-/// SHA-256 check in [ModelRegistry.loadVerified].
+/// Optional model downloads (FR-09). Only runs when the user taps Download.
+
+@ProviderFor(modelDownloadManager)
+final modelDownloadManagerProvider = ModelDownloadManagerProvider._();
+
+/// Optional model downloads (FR-09). Only runs when the user taps Download.
+
+final class ModelDownloadManagerProvider
+    extends
+        $FunctionalProvider<
+          ModelDownloadManager,
+          ModelDownloadManager,
+          ModelDownloadManager
+        >
+    with $Provider<ModelDownloadManager> {
+  /// Optional model downloads (FR-09). Only runs when the user taps Download.
+  ModelDownloadManagerProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'modelDownloadManagerProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$modelDownloadManagerHash();
+
+  @$internal
+  @override
+  $ProviderElement<ModelDownloadManager> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  ModelDownloadManager create(Ref ref) {
+    return modelDownloadManager(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(ModelDownloadManager value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<ModelDownloadManager>(value),
+    );
+  }
+}
+
+String _$modelDownloadManagerHash() =>
+    r'13e302eb359773a0aba03fdfc6b2041fcdf2d6ad';
+
+/// Bundled and optional models (none yet). Loading a model always goes
+/// through the SHA-256 check in [ModelRegistry.loadVerified].
 
 @ProviderFor(modelRegistry)
 final modelRegistryProvider = ModelRegistryProvider._();
 
-/// Bundled models (none yet). Loading a model always goes through the
-/// SHA-256 check in [ModelRegistry.loadVerified].
+/// Bundled and optional models (none yet). Loading a model always goes
+/// through the SHA-256 check in [ModelRegistry.loadVerified].
 
 final class ModelRegistryProvider
     extends
@@ -76,8 +129,8 @@ final class ModelRegistryProvider
           FutureOr<ModelRegistry>
         >
     with $FutureModifier<ModelRegistry>, $FutureProvider<ModelRegistry> {
-  /// Bundled models (none yet). Loading a model always goes through the
-  /// SHA-256 check in [ModelRegistry.loadVerified].
+  /// Bundled and optional models (none yet). Loading a model always goes
+  /// through the SHA-256 check in [ModelRegistry.loadVerified].
   ModelRegistryProvider._()
     : super(
         from: null,
@@ -104,7 +157,7 @@ final class ModelRegistryProvider
   }
 }
 
-String _$modelRegistryHash() => r'2024df5656997f9efd930e09d45cc0a878c8d392';
+String _$modelRegistryHash() => r'00c6421315424e9b3d823292e5d5c8ff13c525e9';
 
 /// All analyzers available on this device. Tier 0 (colour) always; a
 /// garment classifier joins here once a licensed model ships (D-08).

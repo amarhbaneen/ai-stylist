@@ -4,6 +4,7 @@ abstract final class AppRoutes {
   static const onboarding = '/onboarding';
   static const home = '/home';
   static const preferences = '/home/preferences';
+  static const models = '/home/models';
   static const wardrobe = '/wardrobe';
   static const stylist = '/stylist';
   static const favorites = '/favorites';

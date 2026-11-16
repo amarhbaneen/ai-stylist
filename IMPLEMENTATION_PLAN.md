@@ -155,12 +155,14 @@ Like, dislike, reason, favourite/unfavourite, history, `PreferenceLearner` (D-11
 candidates by a bounded, predictable amount; and that reset restores the baseline ranking
 exactly.
 
-### M7: Phase 7 — Optional services (REQ M6)
+### M7: Phase 7 — Optional services (REQ M6) ✅ Android verified 2026-11-16 (no models to download yet)
 Manual weather. Live weather behind consent (provider per D-15). Model manager UI. Downloads
 with the in-app manifest, storage pre-check, `.part` temp file, Range resume, SHA-256
 verification, atomic rename, rollback to the previous version, removal. `docs/NETWORK.md`.
 **Accept when:** every core flow passes with the network disabled, and when downloads are
 interrupted or corrupt.
+*Done:* Open-Meteo (D-35), offline city list (D-36), download manager (D-37), consent UI,
+model manager screen, `docs/NETWORK.md`. *Deviation:* no free-space pre-check (D-37).
 
 ### M8: Phase 8 — Backup, security, release (REQ M7, M8)
 ZIP export/import (schema version, manifest with per-file SHA-256, path normalisation and

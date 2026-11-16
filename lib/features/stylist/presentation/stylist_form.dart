@@ -5,6 +5,7 @@ import 'package:wardrobe_domain/wardrobe_domain.dart';
 import '../../../shared/outfit_labels.dart';
 import '../../../shared/taxonomy_labels.dart';
 import '../../../shared/widgets/chip_selectors.dart';
+import '../../weather/presentation/live_weather_panel.dart';
 
 /// Mutable form state for the Stylist screen.
 final class StylistFormState {
@@ -15,6 +16,16 @@ final class StylistFormState {
   double temperatureC = 18;
   bool rain = false;
   int count = 3;
+
+  /// Last live report used to fill the controls; cleared on manual edits.
+  WeatherReport? liveReport;
+
+  /// Fills the (still editable) manual controls from a live report.
+  void applyReport(WeatherReport report) {
+    temperatureC = report.temperatureC.clamp(-10, 40).roundToDouble();
+    rain = report.isWet;
+    liveReport = report;
+  }
 
   StylistQuery toQuery() => StylistQuery(
     occasion: occasion,
@@ -28,8 +39,8 @@ final class StylistFormState {
 }
 
 /// Occasion, optional style, optional manual weather and result count
-/// (REQUIREMENTS §6.4.1–3). Weather is entered by hand and never needs the
-/// network or location.
+/// (REQUIREMENTS §6.4.1–3). Weather is entered by hand; live weather is an
+/// opt-in helper that only fills the same editable controls.
 class StylistForm extends StatelessWidget {
   const StylistForm({required this.state, required this.onChanged, super.key});
 
@@ -75,11 +86,15 @@ class StylistForm extends StatelessWidget {
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
           title: const Text('Include weather'),
-          subtitle: const Text('Entered by you; no location is used'),
+          subtitle: const Text('Entered by you, or fetched when you ask'),
           value: s.weatherOn,
           onChanged: (v) => _set(() => s.weatherOn = v),
         ),
         if (s.weatherOn) ...[
+          LiveWeatherPanel(
+            report: s.liveReport,
+            onReport: (r) => _set(() => s.applyReport(r)),
+          ),
           Row(
             children: [
               const Icon(Icons.thermostat),
@@ -90,7 +105,11 @@ class StylistForm extends StatelessWidget {
                   divisions: 50,
                   value: s.temperatureC,
                   label: '${s.temperatureC.round()} °C',
-                  onChanged: (v) => _set(() => s.temperatureC = v),
+                  onChanged: (v) => _set(() {
+                    s
+                      ..temperatureC = v
+                      ..liveReport = null;
+                  }),
                 ),
               ),
               SizedBox(
@@ -106,7 +125,11 @@ class StylistForm extends StatelessWidget {
             contentPadding: EdgeInsets.zero,
             title: const Text('Rain or snow'),
             value: s.rain,
-            onChanged: (v) => _set(() => s.rain = v),
+            onChanged: (v) => _set(() {
+              s
+                ..rain = v
+                ..liveReport = null;
+            }),
           ),
         ],
         const FieldLabel('How many ideas'),
