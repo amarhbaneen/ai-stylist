@@ -1,5 +1,6 @@
-// DRAFT taxonomy, pending product approval (DECISIONS P-6,
-// IMPLEMENTATION_PLAN.md §4). Categories are garment-based, never gendered.
+// Garment taxonomy (DECISIONS P-6, IMPLEMENTATION_PLAN.md §4), accepted as
+// the working default when M2 started. Categories are garment-based and never
+// gendered. Codes are persisted: add new values freely, never rename codes.
 import 'coded_enum.dart';
 
 /// Lifecycle status of a wardrobe item.
@@ -117,6 +118,143 @@ enum Formality {
   static Formality? tryFromLevel(int? level) {
     for (final value in values) {
       if (value.level == level) return value;
+    }
+    return null;
+  }
+}
+
+/// How warm a garment is, used later by weather scoring. 1–3; null = unknown.
+enum Warmth {
+  light(1),
+  medium(2),
+  heavy(3);
+
+  const Warmth(this.level);
+
+  final int level;
+
+  static Warmth? tryFromLevel(int? level) {
+    for (final value in values) {
+      if (value.level == level) return value;
+    }
+    return null;
+  }
+}
+
+/// Subcategories, each belonging to exactly one [GarmentCategory].
+enum GarmentSubcategory implements CodedEnum {
+  tShirt('T_SHIRT', GarmentCategory.top),
+  shirt('SHIRT', GarmentCategory.top),
+  blouse('BLOUSE', GarmentCategory.top),
+  polo('POLO', GarmentCategory.top),
+  sweater('SWEATER', GarmentCategory.top),
+  hoodie('HOODIE', GarmentCategory.top),
+  tank('TANK', GarmentCategory.top),
+  otherTop('OTHER_TOP', GarmentCategory.top),
+  jeans('JEANS', GarmentCategory.bottom),
+  trousers('TROUSERS', GarmentCategory.bottom),
+  chinos('CHINOS', GarmentCategory.bottom),
+  shorts('SHORTS', GarmentCategory.bottom),
+  skirt('SKIRT', GarmentCategory.bottom),
+  leggings('LEGGINGS', GarmentCategory.bottom),
+  otherBottom('OTHER_BOTTOM', GarmentCategory.bottom),
+  dress('DRESS', GarmentCategory.onePiece),
+  jumpsuit('JUMPSUIT', GarmentCategory.onePiece),
+  overall('OVERALL', GarmentCategory.onePiece),
+  otherOnePiece('OTHER_ONE_PIECE', GarmentCategory.onePiece),
+  jacket('JACKET', GarmentCategory.outerwear),
+  blazer('BLAZER', GarmentCategory.outerwear),
+  coat('COAT', GarmentCategory.outerwear),
+  cardigan('CARDIGAN', GarmentCategory.outerwear),
+  vest('VEST', GarmentCategory.outerwear),
+  otherOuterwear('OTHER_OUTERWEAR', GarmentCategory.outerwear),
+  sneakers('SNEAKERS', GarmentCategory.footwear),
+  boots('BOOTS', GarmentCategory.footwear),
+  dressShoes('DRESS_SHOES', GarmentCategory.footwear),
+  loafers('LOAFERS', GarmentCategory.footwear),
+  sandals('SANDALS', GarmentCategory.footwear),
+  heels('HEELS', GarmentCategory.footwear),
+  flats('FLATS', GarmentCategory.footwear),
+  otherFootwear('OTHER_FOOTWEAR', GarmentCategory.footwear),
+  bag('BAG', GarmentCategory.accessory),
+  hat('HAT', GarmentCategory.accessory),
+  scarf('SCARF', GarmentCategory.accessory),
+  belt('BELT', GarmentCategory.accessory),
+  tie('TIE', GarmentCategory.accessory),
+  otherAccessory('OTHER_ACCESSORY', GarmentCategory.accessory);
+
+  const GarmentSubcategory(this.code, this.category);
+
+  @override
+  final String code;
+
+  final GarmentCategory category;
+
+  /// Subcategories valid for [category] (empty for [GarmentCategory.unknown]).
+  static List<GarmentSubcategory> of(GarmentCategory category) =>
+      values.where((s) => s.category == category).toList(growable: false);
+
+  static GarmentSubcategory? tryFromCode(String? code) {
+    for (final value in values) {
+      if (value.code == code) return value;
+    }
+    return null;
+  }
+}
+
+/// Named colour families. Exact colour values are not stored in the MVP.
+enum ColorFamily implements CodedEnum {
+  black('BLACK', isNeutral: true),
+  white('WHITE', isNeutral: true),
+  grey('GREY', isNeutral: true),
+  beige('BEIGE', isNeutral: true),
+  brown('BROWN', isNeutral: true),
+  navy('NAVY', isNeutral: true),
+  blue('BLUE'),
+  green('GREEN'),
+  olive('OLIVE'),
+  yellow('YELLOW'),
+  orange('ORANGE'),
+  red('RED'),
+  burgundy('BURGUNDY'),
+  pink('PINK'),
+  purple('PURPLE'),
+  multicolor('MULTICOLOR');
+
+  const ColorFamily(this.code, {this.isNeutral = false});
+
+  @override
+  final String code;
+
+  /// Neutrals pair with almost anything (used by colour scoring later).
+  final bool isNeutral;
+
+  static ColorFamily? tryFromCode(String? code) {
+    for (final value in values) {
+      if (value.code == code) return value;
+    }
+    return null;
+  }
+}
+
+/// Optional style preferences chosen by the user (never inferred from photos).
+enum StylePreference implements CodedEnum {
+  casual('CASUAL'),
+  classic('CLASSIC'),
+  minimal('MINIMAL'),
+  sporty('SPORTY'),
+  streetwear('STREETWEAR'),
+  elegant('ELEGANT'),
+  bohemian('BOHEMIAN');
+
+  const StylePreference(this.code);
+
+  @override
+  final String code;
+
+  static StylePreference? tryFromCode(String? code) {
+    for (final value in values) {
+      if (value.code == code) return value;
     }
     return null;
   }
