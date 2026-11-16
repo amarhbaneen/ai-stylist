@@ -3,6 +3,8 @@
 /// This library must never import Flutter, database or AI-runtime packages.
 library;
 
+export 'src/analysis/analysis.dart';
+export 'src/analysis/output_validator.dart';
 export 'src/core/app_failure.dart';
 export 'src/core/clock.dart';
 export 'src/core/id_generator.dart';

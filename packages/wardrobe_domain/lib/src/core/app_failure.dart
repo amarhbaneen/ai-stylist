@@ -1,6 +1,9 @@
 /// Typed failures shared by every layer. Presentation maps each subtype to a
 /// user-friendly message; nothing is caught and silently ignored.
-sealed class AppFailure {
+///
+/// Normally returned inside a `Result`; it implements [Exception] so it can
+/// also be raised into async state (e.g. Riverpod's `AsyncError`).
+sealed class AppFailure implements Exception {
   const AppFailure(this.message, {this.cause});
 
   /// Developer-facing description (never shown verbatim to users).
