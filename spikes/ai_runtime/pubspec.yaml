@@ -1,0 +1,27 @@
+name: ai_runtime_spike
+description: "M3 spike: LiteRT on-device inference check. Not part of the product."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.14.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # Exact pins: spike measurements must be reproducible.
+  flutter_litert: 4.1.1
+  image: 4.13.1
+  material_ui: ^1.11.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    # Reference models are downloaded by tool/fetch_models.ps1 (not in git).
+    - assets/models/
+    - assets/images/

@@ -13,6 +13,8 @@ analyzer:
     - android/**
     - ios/**
     - "**/*.g.dart"
+    # Spikes are standalone apps with their own pubspec and lints.
+    - spikes/**
 
 linter:
   rules:
