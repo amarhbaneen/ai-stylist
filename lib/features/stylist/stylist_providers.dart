@@ -5,6 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:wardrobe_domain/wardrobe_domain.dart';
 
 import '../../core/providers.dart';
+import '../favorites/favorites_providers.dart';
 import '../profile/profile_providers.dart';
 import '../wardrobe/wardrobe_providers.dart';
 import 'data/drift_outfit_repository.dart';
@@ -45,6 +46,7 @@ GenerateOutfits generateOutfits(Ref ref) => GenerateOutfits(
   outfits: ref.watch(outfitRepositoryProvider),
   clock: ref.watch(clockProvider),
   runner: ref.watch(engineRunnerProvider),
+  personalization: ref.watch(personalizationRepositoryProvider),
 );
 
 /// One stored outfit, live.

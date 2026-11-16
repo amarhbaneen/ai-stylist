@@ -141,7 +141,7 @@ final class GenerateOutfitsProvider
   }
 }
 
-String _$generateOutfitsHash() => r'7934320342536a379d56dbbcdc9b04b078f30523';
+String _$generateOutfitsHash() => r'4dab6532db8aef87a180c5e0521ee8cf56836710';
 
 /// One stored outfit, live.
 

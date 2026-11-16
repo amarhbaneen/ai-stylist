@@ -128,11 +128,12 @@ final class DriftOutfitRepository implements OutfitRepository {
       final pieces = await (_db.select(
         _db.outfitItems,
       )..where((t) => t.outfitId.equals(id))).get();
-      return _toDomain(row, pieces);
+      return toDomain(row, pieces);
     });
   }
 
-  static SavedOutfit _toDomain(OutfitRow row, List<OutfitItemRow> rows) {
+  /// Maps stored rows back to a [SavedOutfit] (shared with feedback queries).
+  static SavedOutfit toDomain(OutfitRow row, List<OutfitItemRow> rows) {
     final breakdown = _decodeMap(row.breakdownJson);
     Map<ScoreComponent, double> components(Object? json) => {
       if (json is Map)
