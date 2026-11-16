@@ -138,12 +138,12 @@ Location permission: none. Weather uses manual city entry (REQUIREMENTS §6.6).
 `flutter_lints` 6 plus analyzer `strict-casts`, `strict-inference`, `strict-raw-types`, and
 `avoid_dynamic_calls`. `dart format` is enforced in CI.
 
-## D-15 Weather provider. Deferred to Phase 7 (needs approval)
+## D-15 Weather provider. Resolved in M7 by D-35 and D-36
 Manual weather first. The live provider is not chosen yet: candidates need a check of terms,
 because some free tiers are non-commercial only. Only a user-typed city name would be sent,
 never coordinates from GPS.
 
-## D-16 Model hosting for optional downloads. Deferred to Phase 7 (needs decision)
+## D-16 Model hosting for optional downloads. Still open (mechanism built in M7, D-37)
 Requires a hosting location you control, or approval to fetch directly from Hugging Face. The
 manifest (URL, size, SHA-256, licence) ships **inside the app**, so a downloaded file can never
 introduce new metadata.
@@ -365,6 +365,48 @@ Riverpod 3 retries failing providers without limit by default (200 ms backoff up
 Re-analysing a photo that can't be decoded won't succeed, so `clothingAnalysisProvider` uses
 `retry: _noRetry`. It fails once, and the screen falls back to manual entry.
 
+## D-35 Live weather uses Open-Meteo. Accepted (M7, owner's choice)
+The owner chose Open-Meteo over MET Norway. One request, made only when the user taps
+"Get current weather" after opting in:
+`GET https://api.open-meteo.com/v1/forecast?latitude&longitude&current=temperature_2m,precipitation,weather_code&timezone=UTC`.
+- Data licence CC BY 4.0: the attribution "Weather data by Open-Meteo.com" is shown next to
+  fetched values and in Style preferences.
+- **The free API is for non-commercial use only.** A commercial release needs a paid
+  Open-Meteo plan or a switch of provider (the `WeatherRepository` interface keeps that a
+  one-class change). Recorded here so it is not forgotten before release.
+- No API key, no cookies, 10 s timeout, results cached in memory for 15 minutes per city.
+- The fetched values only fill the manual temperature slider and rain switch, which stay
+  editable; any failure keeps manual weather.
+- Instead of D-12's `NetworkGateway`, a single injected `http.Client` provider is the only
+  HTTP client in the app. Tests replace it with a fake, so no test can reach the network.
+
+## D-36 Offline city list, rounded coordinates. Accepted (M7)
+Open-Meteo needs coordinates, but sending a typed city name to a geocoding service would add
+a second request. Instead the app bundles a city list built from GeoNames `cities15000`
+(CC BY 4.0) by `tools/build_cities.ps1`: places with population ≥ 50,000 plus capitals,
+12,467 cities, 699 KB. Coordinates are rounded to 2 decimals (~1 km) in the asset and again
+before sending, so nothing more precise than a city centre can leave the device. No location
+permission is used. Search is local and accent-insensitive.
+
+## D-37 Optional model downloads. Accepted (M7)
+`ModelDownloadManager` (lib/ai/download):
+- Only manifest entries with a `download` block (`https` URL, exact `sizeBytes` ≤ 200 MB) are
+  downloadable. IDs and versions must be safe folder names, so a manifest cannot cause path
+  traversal. An entry must have exactly one of `asset` or `download`.
+- Bytes go to `models/<id>/<version>/model.bin.part`. An interrupted download resumes with a
+  `Range` request (206 appends; 200 restarts; 416 discards the partial file). Pause keeps it.
+- More bytes than declared, a size mismatch or a SHA-256 mismatch delete the file and record
+  FAILED. Only a verified file is renamed to `model.bin` (atomic on one volume) and recorded
+  INSTALLED; older versions are removed afterwards, so a failed update keeps the old model.
+- The registry re-checks the SHA-256 every time it loads a model. Files are only read as
+  weights, never executed.
+- At startup `recover` drops records whose file vanished and versions the manifest no longer
+  lists.
+- There is no storage pre-check: Flutter has no free-space API without another plugin.
+  Running out of space maps to `InsufficientStorageFailure` and the partial file is deleted.
+- The manifest lists no downloadable models yet (D-16, P-3), so the Model manager screen says
+  so and the app is unaffected.
+
 ## D-26 Spikes live in `spikes/`, outside the product build. Accepted (M3)
 Each spike is a standalone Flutter app with its own pubspec (exact version pins) and is excluded
 from the root analyzer. Downloaded model binaries are git-ignored and fetched by a script that
@@ -373,6 +415,9 @@ verifies their SHA-256, so the repository never redistributes third-party weight
 ---
 
 ## Approval record
+
+**2026-11-16 (M7):** the owner chose Open-Meteo as the live weather provider (D-35) and
+approved downloading GeoNames `cities15000.zip` (CC BY 4.0) to build the offline city list.
 
 **2026-11-16:** the owner chose "start M2", so the draft taxonomy and outfit templates (P-6,
 IMPLEMENTATION_PLAN.md §4) are the working default. The values are stored as stable codes, so
@@ -394,5 +439,5 @@ where each one blocks work.
 | P-4 | Delete originals after processing? | No. Keep originals; offer "remove original" per item later |
 | P-5 | Encrypted-export design and password recovery | Defer to Phase 8 review. No recovery: a forgotten password means the archive is lost, with a clear warning |
 | P-6 | Fashion taxonomy and templates | Draft in IMPLEMENTATION_PLAN.md §4. Please review |
-| P-7 | New network transmissions | Only weather (city name) and model downloads. Reject MediaPipe/ML Kit telemetry |
+| P-7 | New network transmissions | Only weather (rounded city coordinates, D-36) and model downloads. Reject MediaPipe/ML Kit telemetry |
 | P-8 | Paid features | None |
