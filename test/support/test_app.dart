@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:ai_stylist/app/app.dart';
 import 'package:ai_stylist/core/database/app_database.dart';
 import 'package:ai_stylist/core/providers.dart';
+import 'package:ai_stylist/features/clothing_analysis/analysis_providers.dart';
 import 'package:ai_stylist/features/profile/profile_providers.dart';
 import 'package:ai_stylist/features/stylist/stylist_providers.dart';
 import 'package:ai_stylist/features/wardrobe/wardrobe_providers.dart';
@@ -18,12 +19,22 @@ import 'fakes.dart';
 /// A fully wired app over an in-memory database and a temp folder, with a
 /// scripted photo picker and image processor.
 final class TestApp {
-  TestApp._(this.tmp, this.db, this.picker, this.processor, this.container);
+  TestApp._(
+    this.tmp,
+    this.db,
+    this.picker,
+    this.processor,
+    this.analyzer,
+    this.container,
+  );
 
   final Directory tmp;
   final AppDatabase db;
   final FakeMediaPicker picker;
   final FakeImageProcessor processor;
+
+  /// Scripted on-device analysis (the fake thumbnails are not decodable).
+  final FakeClothingAnalyzer analyzer;
   final ProviderContainer container;
 
   /// Real file I/O never completes on the widget tester's fake clock, so the
@@ -38,6 +49,7 @@ final class TestApp {
     final db = AppDatabase(NativeDatabase.memory());
     final picker = FakeMediaPicker();
     final processor = FakeImageProcessor();
+    final analyzer = FakeClothingAnalyzer();
     final container = ProviderContainer(
       overrides: [
         appSupportDirectoryProvider.overrideWithValue(tmp),
@@ -50,9 +62,10 @@ final class TestApp {
         ),
         // Same engine, run inline: isolates do not advance on the fake clock.
         engineRunnerProvider.overrideWithValue(runEngineInline),
+        clothingAnalyzerProvider.overrideWithValue(analyzer),
       ],
     );
-    return TestApp._(tmp, db, picker, processor, container);
+    return TestApp._(tmp, db, picker, processor, analyzer, container);
   }
 
   Future<void> pump(WidgetTester tester) async {
@@ -100,7 +113,16 @@ final class TestApp {
     await tester.runAsync(() async {
       container.dispose();
       await db.close();
-      await tmp.delete(recursive: true);
+      // Windows keeps a file locked briefly after an image decode; retry,
+      // and leave the OS temp folder to the OS if it is still busy.
+      for (var attempt = 0; attempt < 5; attempt++) {
+        try {
+          await tmp.delete(recursive: true);
+          return;
+        } on FileSystemException {
+          await Future<void>.delayed(const Duration(milliseconds: 100));
+        }
+      }
     });
   }
 }

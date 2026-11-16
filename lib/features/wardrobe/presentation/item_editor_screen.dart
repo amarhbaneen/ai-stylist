@@ -7,6 +7,9 @@ import '../../../app/routes.dart';
 import '../../../shared/taxonomy_labels.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/item_thumbnail.dart';
+import '../../clothing_analysis/analysis_providers.dart';
+import '../../clothing_analysis/presentation/apply_suggestions.dart';
+import '../../clothing_analysis/presentation/color_suggestion_notes.dart';
 import '../wardrobe_providers.dart';
 import 'clothing_attributes_form.dart';
 
@@ -32,6 +35,10 @@ class _ItemEditorScreenState extends ConsumerState<ItemEditorScreen> {
   AttributesDraft? _draft;
   var _saving = false;
   var _showCategoryError = false;
+
+  /// Suggestions are applied once, when both the form and the analysis are
+  /// ready; later changes are entirely the user's.
+  var _suggestionsApplied = false;
 
   @override
   void dispose() {
@@ -63,6 +70,12 @@ class _ItemEditorScreenState extends ConsumerState<ItemEditorScreen> {
     setState(() => _saving = false);
     switch (result) {
       case Success(:final value):
+        // Record which suggestions were kept (provenance, FR-04). Best
+        // effort: the item itself is already saved.
+        await ref
+            .read(confirmAnalysisProvider)
+            .call(widget.itemId, value.attributes);
+        if (!mounted) return;
         if (widget.confirm) {
           context.pushReplacement(AppRoutes.item(value.id));
         } else {
@@ -138,6 +151,29 @@ class _ItemEditorScreenState extends ConsumerState<ItemEditorScreen> {
   Widget _buildForm(String title, ClothingItem item) {
     // Initialise once; later stream emissions must not clobber edits.
     final draft = _draft ??= AttributesDraft.from(item.attributes);
+
+    // On-device analysis only for items still under review (new photos).
+    final analyse = item.status == ItemStatus.draft;
+    final analysis = analyse
+        ? ref.watch(clothingAnalysisProvider(item.id))
+        : null;
+    final policy = ref.watch(confidencePolicyProvider);
+    if (analysis case AsyncData(:final value) when !_suggestionsApplied) {
+      // Mutating the local draft before it is rendered keeps this frame
+      // consistent; no setState needed.
+      applySuggestions(draft, value, policy);
+      _suggestionsApplied = true;
+    }
+    void pickPrimary(ColorFamily c) => setState(() {
+      draft.primaryColor = c;
+      draft.secondaryColors.remove(c);
+      draft.touched.add(AnalyzedAttribute.primaryColor);
+    });
+    void addSecondary(ColorFamily c) => setState(() {
+      draft.secondaryColors = {...draft.secondaryColors, c};
+      draft.touched.add(AnalyzedAttribute.secondaryColor);
+    });
+
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
@@ -176,6 +212,23 @@ class _ItemEditorScreenState extends ConsumerState<ItemEditorScreen> {
             draft: draft,
             showCategoryError: _showCategoryError,
             onChanged: () => setState(() => _showCategoryError = false),
+            primaryColorNote: analysis == null
+                ? null
+                : PrimaryColorNote(
+                    analysis: analysis,
+                    policy: policy,
+                    current: draft.primaryColor,
+                    onPick: pickPrimary,
+                  ),
+            secondaryColorNote: switch (analysis) {
+              AsyncData(:final value) => SecondaryColorNote(
+                suggestions: value.secondaryColors,
+                primary: draft.primaryColor,
+                selected: draft.secondaryColors,
+                onAdd: addSecondary,
+              ),
+              _ => null,
+            },
           ),
         ],
       ),

@@ -33,6 +33,9 @@ final class AttributesDraft {
   final TextEditingController brand;
   final TextEditingController notes;
 
+  /// Fields the user has changed by hand; suggestions never overwrite them.
+  final Set<AnalyzedAttribute> touched = {};
+
   ClothingAttributes build() => ClothingAttributes(
     category: category,
     subcategory: subcategory,
@@ -62,6 +65,8 @@ class ClothingAttributesForm extends StatelessWidget {
     required this.draft,
     required this.onChanged,
     this.showCategoryError = false,
+    this.primaryColorNote,
+    this.secondaryColorNote,
     super.key,
   });
 
@@ -70,6 +75,12 @@ class ClothingAttributesForm extends StatelessWidget {
   /// Called after any chip change so the parent rebuilds.
   final VoidCallback onChanged;
   final bool showCategoryError;
+
+  /// Optional AI explanation shown under "Main colour" (confidence, hints).
+  final Widget? primaryColorNote;
+
+  /// Optional AI hints shown under "Other colours".
+  final Widget? secondaryColorNote;
 
   void _set(VoidCallback change) {
     change();
@@ -128,6 +139,7 @@ class ClothingAttributesForm extends StatelessWidget {
           ),
         ),
         const FieldLabel('Main colour'),
+        ?primaryColorNote,
         SingleChipSelector<ColorFamily>(
           options: ColorFamily.values,
           selected: d.primaryColor,
@@ -136,15 +148,20 @@ class ClothingAttributesForm extends StatelessWidget {
           onChanged: (c) => _set(() {
             d.primaryColor = c;
             d.secondaryColors.remove(c);
+            d.touched.add(AnalyzedAttribute.primaryColor);
           }),
         ),
         const FieldLabel('Other colours'),
+        ?secondaryColorNote,
         MultiChipSelector<ColorFamily>(
           options: secondaryOptions,
           selected: d.secondaryColors,
           labelOf: Labels.color,
           avatarOf: dot,
-          onChanged: (s) => _set(() => d.secondaryColors = s),
+          onChanged: (s) => _set(() {
+            d.secondaryColors = s;
+            d.touched.add(AnalyzedAttribute.secondaryColor);
+          }),
         ),
         const FieldLabel('Pattern'),
         SingleChipSelector<GarmentPattern>(

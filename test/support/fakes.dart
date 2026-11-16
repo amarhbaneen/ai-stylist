@@ -102,6 +102,18 @@ final class FlakyFileStore implements FileStore {
   File resolve(String relativePath) => inner.resolve(relativePath);
 }
 
+/// Analyzer returning a scripted result (default: nothing suggested).
+final class FakeClothingAnalyzer implements ClothingAnalyzer {
+  Result<ClothingAnalysis> result = Success(ClothingAnalysis.empty);
+  var calls = 0;
+
+  @override
+  Future<Result<ClothingAnalysis>> analyze(AnalysisInput input) async {
+    calls++;
+    return result;
+  }
+}
+
 /// Writes a fake photo with distinct bytes into [dir].
 Future<String> writePhoto(Directory dir, String name, {int seed = 1}) async {
   final file = File('${dir.path}${Platform.pathSeparator}$name');
