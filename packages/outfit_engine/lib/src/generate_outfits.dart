@@ -2,6 +2,7 @@ import 'package:meta/meta.dart';
 import 'package:wardrobe_domain/wardrobe_domain.dart';
 
 import 'engine.dart';
+import 'feedback.dart';
 import 'history.dart';
 import 'outfit.dart';
 import 'request.dart';
@@ -71,7 +72,7 @@ final class GenerateOutfits {
     required this._outfits,
     required this._clock,
     this._runner = runEngineInline,
-    this._learned,
+    this._personalization,
     this.historyWindow = const Duration(days: 7),
   });
 
@@ -80,7 +81,10 @@ final class GenerateOutfits {
   final OutfitRepository _outfits;
   final Clock _clock;
   final EngineRunner _runner;
-  final LearnedPreferences Function()? _learned;
+
+  /// Learned preferences from feedback (M6). Optional: without it, or if it
+  /// fails to load, ranking simply uses explicit preferences only.
+  final PersonalizationRepository? _personalization;
 
   /// Suggestions in this window are avoided where possible.
   final Duration historyWindow;
@@ -108,12 +112,10 @@ final class GenerateOutfits {
       excludedSignatures: history.signatures,
       recentItemUse: history.itemUse,
     );
-    final result = await _runner(
-      items,
-      request,
-      profile,
-      _learned?.call() ?? LearnedPreferences.none,
-    );
+    final learned =
+        (await _personalization?.load())?.valueOrNull ??
+        LearnedPreferences.none;
+    final result = await _runner(items, request, profile, learned);
 
     // Defence in depth: never surface an outfit that references anything
     // but a real, ACTIVE item (CLAUDE.md rule 9).

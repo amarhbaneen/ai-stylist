@@ -5,8 +5,11 @@ library;
 
 export 'src/constraints.dart';
 export 'src/engine.dart';
+export 'src/feedback.dart';
+export 'src/feedback_use_cases.dart';
 export 'src/generate_outfits.dart';
 export 'src/history.dart';
+export 'src/learner.dart';
 export 'src/outfit.dart';
 export 'src/request.dart';
 export 'src/score_weights.dart';

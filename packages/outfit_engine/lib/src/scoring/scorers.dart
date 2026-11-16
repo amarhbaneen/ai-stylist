@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:wardrobe_domain/wardrobe_domain.dart';
 
+import '../learner.dart';
 import '../outfit.dart';
 import '../request.dart';
 import '../templates.dart';
@@ -211,15 +212,25 @@ ComponentScore scorePreference(
       reasons.add(ReasonCode.avoidedColor);
     }
   }
-  final learnedSum = pieces.values.fold<double>(
-    0,
-    (s, i) => s + learned.of('item:${i.id}'),
-  );
+  // Learned affinity for garments worn *together* (pair keys, D-11).
+  final ids = pieces.values.map((i) => i.id).toList()..sort();
+  final pairWeights = [
+    for (var a = 0; a < ids.length; a++)
+      for (var b = a + 1; b < ids.length; b++)
+        learned.of(PreferenceLearner.pairKey(ids[a], ids[b])),
+  ];
+  final pairAffinity = _mean(pairWeights);
+
+  final learnedSum =
+      pieces.values.fold<double>(0, (s, i) => s + learned.of('item:${i.id}')) +
+      pairWeights.fold<double>(0, (s, w) => s + w);
   if (learnedSum > 0.05) reasons.add(ReasonCode.learnedLike);
-  final score = _mean(
-    pieces.values.map((i) => itemPreferenceScore(i, profile, learned)),
-  );
-  return (score, reasons);
+  final score =
+      _mean(
+        pieces.values.map((i) => itemPreferenceScore(i, profile, learned)),
+      ) +
+      pairAffinity;
+  return (score.clamp(0.0, 1.0), reasons);
 }
 
 // ----------------------------------------------------------------- variety
