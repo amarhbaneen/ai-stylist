@@ -446,6 +446,25 @@ permission is used. Search is local and accent-insensitive.
   analyses keep only colour alternatives, so hint chips for category, type and pattern appear
   on the first review, not after reopening a draft. iOS is not built or tested.
 
+## D-39 Background removal: our own garment segmentation model. Accepted 2026-11-17 (owner)
+- **Need (FR-05).** Remove the background from flat-lay and hanger photos, and cut each garment
+  out of a photo of someone wearing it. The owner chose: train our own model, and let one worn
+  photo create several wardrobe items.
+- **Rejected.** ML Kit subject segmentation (telemetry, D-07). MediaPipe selfie multiclass
+  (Apache-2.0, but one "clothes" class for all garments, so it can't separate items).
+  U²-Net (code and weights reported as Apache-2.0, but trained on DUTS, whose terms are unclear
+  and labelled research-only or CC BY-NC by mirrors; it also cuts out the whole person, not
+  each garment).
+- **Model.** Trained in Colab on Fashionpedia masks (CC BY 4.0, already approved under P-3):
+  256×256, MobileNetV3-Large encoder, light decoder, the classifier's 23 garment types plus
+  background. Synthetic flat-lays (Fashionpedia garments pasted on plain backdrops) cover the
+  app's usual photos. Exported with the same XNNPACK check as the classifier.
+- **App rules (to build when the model arrives).** The original photo is always kept (D-06);
+  the cut-out is a separate image, and the user can switch back to the original. Segmentation
+  failing never blocks adding an item. Each garment covering at least 1% of the photo is
+  offered as an item; the user picks which ones to add. The classifier then runs on each
+  cut-out.
+
 ## D-26 Spikes live in `spikes/`, outside the product build. Accepted (M3)
 Each spike is a standalone Flutter app with its own pubspec (exact version pins) and is excluded
 from the root analyzer. Downloaded model binaries are git-ignored and fetched by a script that
@@ -454,6 +473,10 @@ verifies their SHA-256, so the repository never redistributes third-party weight
 ---
 
 ## Approval record
+
+**2026-11-17 (FR-05 background removal):** the owner chose to train our own garment
+segmentation model on Fashionpedia (D-39) over U²-Net, and chose that a photo of someone
+wearing several garments can add each of them as its own item.
 
 **2026-11-16 (M4 training):** the owner approved P-3 as recommended (a Tier-1 model trained on
 Fashionpedia, CC BY 4.0, with in-app attribution; Marqo only after legal review) and D-08
