@@ -8,7 +8,7 @@ status. REQUIREMENTS FR-09 and §18 require licensing to be approved before any 
 | `color-tier0` (v1.0.0) | Colour families (Tier 0) | Deterministic code in `lib/ai/color/` (no weights) | Project code | – | – | **Shipped** (M4): pre-fills the main colour on the review screen |
 | `efficientnet-lite0-int8` | Runtime test only | Google MediaPipe model storage (see the spike report §5) | Apache-2.0 per Google model cards | 5.18 MB | `bc2ffe19…a34b16` | **Spike only, never shipped** |
 | `efficientnet-lite0-float32` | Runtime test only | Same | Same | 17.72 MB | `6c7ab0a6…c8bde0` | **Spike only, never shipped** |
-| `fashion-tier1` (planned) | Category, type, pattern | To be trained on Fashionpedia (CC BY 4.0), optionally distilled from Marqo-FashionSigLIP | Depends on the training data (P-3) | target ≤ 10 MB | – | **Blocked**: training environment and licence sign-off |
+| `fashion-tier1` (planned) | Category, type, pattern | Trained on Fashionpedia (CC BY 4.0) with `training/` on Google Colab; MobileNetV3-Large backbone (Apache-2.0) | CC BY 4.0 data, attribution required (P-3 approved 2026-11-16) | expected ~5–6 MB int8 | – | **In training**: scripts ready, first Colab run pending |
 | `marqo-fashionsiglip-vision` (candidate) | Optional zero-shot attributes (Tier 2) | huggingface.co/Marqo/marqo-fashionSigLIP | Apache-2.0 (weights). Training-data provenance not fully documented | ~90 MB int8 ONNX | – | **Candidate**: needs conversion and parity checks, plus legal review |
 
 ## Attribution obligations (to include in the app's licences screen once shipped)

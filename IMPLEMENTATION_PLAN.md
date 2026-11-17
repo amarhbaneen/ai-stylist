@@ -14,7 +14,7 @@ Status: **Phase 0 complete, awaiting review.** No application code has been writ
 | B-2 ✅ | Android SDK/toolchain not installed. Resolved: Android Studio and SDK installed; debug APK builds | No Android build | Install Android Studio (bundles a JBR that Flutter uses) and the SDK + platform-tools + an emulator image on D:. Run `flutter doctor --android-licenses` |
 | B-3 | No macOS / Xcode | No iOS build, signing or test | Needs a Mac, or a macOS CI runner (your decision: CI builds code only and never touches user data) |
 | B-4 | No physical test devices known | Performance budgets (REQUIREMENTS §14) cannot be measured | Need 1 low-, 1 mid-, 1 high-tier Android device and 1 iPhone, or a device lab |
-| B-5 | No licence-clean, mobile-sized fashion classifier exists off the shelf | MVP acceptance #4 cannot be met by Phase 4 without one | Approve D-08: train or distil a Tier-1 model (needs a Python/GPU environment) |
+| B-5 | No licence-clean, mobile-sized fashion classifier exists off the shelf | MVP acceptance #4 cannot be met by Phase 4 without one | D-08 and P-3 approved 2026-11-16: train Tier 1 on Fashionpedia in Google Colab (`training/`) |
 | B-6 ✅ | Session folder is temporary, not a git repo. Resolved: D:\dev\ai_stylist, pushed to GitHub | Work would be lost; no feature branch | Move to a permanent project folder, `git init`, branch `feature/m1-foundation` |
 | B-7 | Product decisions P-1…P-8 (DECISIONS.md) | P-2 and P-6 are needed for Phase 1–2 | Review and approve |
 
@@ -133,7 +133,7 @@ survives an app restart (integration test).
 **Accept when:** a written spike report shows a model running on both platforms with
 measured numbers, or documents why not and selects the fallback adapter.
 
-### M4: Phase 4 — AI-assisted analysis (REQ M3) ◐ pipeline + colour suggestions verified on Android 2026-11-16; garment classifier blocked on a licensed model (B-5, P-3)
+### M4: Phase 4 — AI-assisted analysis (REQ M3) ◐ pipeline + colour suggestions verified on Android 2026-11-16; garment classifier: licensing approved, training scripts in `training/`, first Colab run pending
 Preprocessing contract, model registry, `InferenceRuntime` adapter, validator, thresholds,
 review/edit UI with confidence badges, stored model ID/version/timestamp. Model lifecycle:
 lazy load, dispose on memory pressure, never block the UI. Tests: loading/disposal, corrupt

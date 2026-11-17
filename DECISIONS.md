@@ -75,7 +75,7 @@ release and debug builds: the model loaded and ran in a background isolate, ther
 network egress with INTERNET granted, and the APK is 16 KB page-size compliant. iOS and
 real-device latency are still open. See `docs/spikes/M3_AI_RUNTIME_REPORT.md`.
 
-## D-08 Fashion model strategy: tiered. Proposed (needs licensing approval)
+## D-08 Fashion model strategy: tiered. Accepted 2026-11-16 (Tier 1; Tier 2 still needs legal review)
 - Tier 0: deterministic Dart colour extraction and manual entry. Always available.
 - Tier 1: a small bundled classifier (≤ 10 MB int8 `.tflite`) trained on Fashionpedia
   (CC BY 4.0, attribution required), optionally distilled from Marqo-FashionSigLIP
@@ -88,6 +88,8 @@ scraped data, or with an unclear licence (see the report §4).
 *Needs approval:* (a) redistribution of a model derived from Fashionpedia images; (b) use of
 Marqo weights, whose fine-tuning data provenance is not fully documented on the card. Legal
 review is advised. (c) Who trains Tier 1, on what hardware.
+*Approved 2026-11-16:* train Tier 1 ourselves on Fashionpedia, on Google Colab, with scripts
+in `training/` (Python, outside the app build). Tier 2 (Marqo) still needs a legal review.
 
 ## D-09 Analysis output contract and confidence thresholds. Accepted (values to calibrate)
 Each AI attribute is `Suggestion<T>{value, confidence 0..1, source(modelId, modelVersion), analyzedAtUtc}`.
@@ -415,6 +417,10 @@ verifies their SHA-256, so the repository never redistributes third-party weight
 ---
 
 ## Approval record
+
+**2026-11-16 (M4 training):** the owner approved P-3 as recommended (a Tier-1 model trained on
+Fashionpedia, CC BY 4.0, with in-app attribution; Marqo only after legal review) and D-08
+(train our own Tier-1 classifier), using Google Colab for training.
 
 **2026-11-16 (M7):** the owner chose Open-Meteo as the live weather provider (D-35) and
 approved downloading GeoNames `cities15000.zip` (CC BY 4.0) to build the offline city list.
