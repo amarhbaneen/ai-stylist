@@ -52,3 +52,4 @@ training/out/
 training/**/__pycache__/
 training/**/*.tflite
 training/**/*.keras
+dist/
