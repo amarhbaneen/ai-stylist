@@ -6,6 +6,8 @@ import 'package:wardrobe_domain/wardrobe_domain.dart';
 import '../../ai/color/color_tier0_analyzer.dart';
 import '../../ai/composite_analyzer.dart';
 import '../../ai/download/model_download_manager.dart';
+import '../../ai/garment/garment_classifier.dart';
+import '../../ai/garment/garment_model_loader.dart';
 import '../../ai/model_registry.dart';
 import '../../core/logging/app_logger.dart';
 import '../../core/providers.dart';
@@ -28,7 +30,7 @@ ModelDownloadManager modelDownloadManager(Ref ref) => ModelDownloadManager(
   clock: ref.watch(clockProvider),
 );
 
-/// Bundled and optional models (none yet). Loading a model always goes
+/// Bundled and optional models. Loading a model always goes
 /// through the SHA-256 check in [ModelRegistry.loadVerified].
 @Riverpod(keepAlive: true)
 Future<ModelRegistry> modelRegistry(Ref ref) async {
@@ -51,11 +53,26 @@ Future<ModelRegistry> modelRegistry(Ref ref) async {
   return registry;
 }
 
-/// All analyzers available on this device. Tier 0 (colour) always; a
-/// garment classifier joins here once a licensed model ships (D-08).
+/// The bundled Tier-1 garment classifier (D-08, D-38). The model is
+/// opened on first use and released when the provider is disposed.
+@Riverpod(keepAlive: true)
+GarmentClassifier garmentClassifier(Ref ref) {
+  final classifier = GarmentClassifier(
+    open: () async =>
+        openGarmentModel(await ref.read(modelRegistryProvider.future)),
+    clock: ref.watch(clockProvider),
+  );
+  ref.onDispose(classifier.close);
+  return classifier;
+}
+
+/// All analyzers available on this device: Tier 0 (colour) and the Tier-1
+/// garment classifier (category, type, pattern). Either can fail without
+/// blocking the other or manual entry.
 @Riverpod(keepAlive: true)
 ClothingAnalyzer clothingAnalyzer(Ref ref) => CompositeClothingAnalyzer([
   ColorTier0Analyzer(clock: ref.watch(clockProvider)),
+  ref.watch(garmentClassifierProvider),
 ]);
 
 @Riverpod(keepAlive: true)
