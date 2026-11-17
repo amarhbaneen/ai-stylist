@@ -65,6 +65,9 @@ class ClothingAttributesForm extends StatelessWidget {
     required this.draft,
     required this.onChanged,
     this.showCategoryError = false,
+    this.categoryNote,
+    this.subcategoryNote,
+    this.patternNote,
     this.primaryColorNote,
     this.secondaryColorNote,
     super.key,
@@ -75,6 +78,11 @@ class ClothingAttributesForm extends StatelessWidget {
   /// Called after any chip change so the parent rebuilds.
   final VoidCallback onChanged;
   final bool showCategoryError;
+
+  /// Optional AI explanations under "Category", "Type" and "Pattern".
+  final Widget? categoryNote;
+  final Widget? subcategoryNote;
+  final Widget? patternNote;
 
   /// Optional AI explanation shown under "Main colour" (confidence, hints).
   final Widget? primaryColorNote;
@@ -100,6 +108,7 @@ class ClothingAttributesForm extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const FieldLabel('Category *'),
+        ?categoryNote,
         SingleChipSelector<GarmentCategory>(
           options: GarmentCategory.values
               .where((c) => c != GarmentCategory.unknown)
@@ -109,6 +118,7 @@ class ClothingAttributesForm extends StatelessWidget {
           onChanged: (c) => _set(() {
             d.category = c ?? GarmentCategory.unknown;
             if (d.subcategory?.category != d.category) d.subcategory = null;
+            d.touched.add(AnalyzedAttribute.category);
           }),
         ),
         if (showCategoryError)
@@ -121,11 +131,15 @@ class ClothingAttributesForm extends StatelessWidget {
           ),
         if (d.category != GarmentCategory.unknown) ...[
           const FieldLabel('Type'),
+          ?subcategoryNote,
           SingleChipSelector<GarmentSubcategory>(
             options: GarmentSubcategory.of(d.category),
             selected: d.subcategory,
             labelOf: Labels.subcategory,
-            onChanged: (s) => _set(() => d.subcategory = s),
+            onChanged: (s) => _set(() {
+              d.subcategory = s;
+              d.touched.add(AnalyzedAttribute.subcategory);
+            }),
           ),
         ],
         const FieldLabel('Name (optional)'),
@@ -164,13 +178,17 @@ class ClothingAttributesForm extends StatelessWidget {
           }),
         ),
         const FieldLabel('Pattern'),
+        ?patternNote,
         SingleChipSelector<GarmentPattern>(
           options: GarmentPattern.values
               .where((p) => p != GarmentPattern.unknown)
               .toList(),
           selected: d.pattern == GarmentPattern.unknown ? null : d.pattern,
           labelOf: Labels.pattern,
-          onChanged: (p) => _set(() => d.pattern = p ?? GarmentPattern.unknown),
+          onChanged: (p) => _set(() {
+            d.pattern = p ?? GarmentPattern.unknown;
+            d.touched.add(AnalyzedAttribute.pattern);
+          }),
         ),
         const FieldLabel('Seasons'),
         MultiChipSelector<Season>(

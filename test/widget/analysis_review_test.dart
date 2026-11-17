@@ -158,4 +158,61 @@ void main() {
     expect(saved.attributes.primaryColor, ColorFamily.red);
     await app.dispose(tester);
   });
+
+  testWidgets('category, type and pattern suggestions follow the same rules', (
+    tester,
+  ) async {
+    const garment = AnalysisSource(
+      modelId: 'garment-tier1',
+      modelVersion: '1.0.0',
+    );
+    Suggestion<T> s<T>(T v, double c, [List<(T, double)> alt = const []]) =>
+        Suggestion(
+          value: v,
+          confidence: c,
+          source: garment,
+          analyzedAt: _at,
+          alternatives: alt,
+        );
+    final app = await review(
+      tester,
+      Success(
+        ClothingAnalysis(
+          category: s(GarmentCategory.outerwear, 0.9),
+          subcategory: s(GarmentSubcategory.coat, 0.55),
+          pattern: s(GarmentPattern.floral, 0.3, [
+            (GarmentPattern.checked, 0.25),
+          ]),
+        ),
+      ),
+    );
+    Finder chip<T>(String label) => find.descendant(
+      of: find.byType(SingleChipSelector<T>),
+      matching: find.widgetWithText(ChoiceChip, label),
+    );
+    bool on<T>(String label) =>
+        tester.widget<ChoiceChip>(chip<T>(label)).selected;
+
+    await scrollTo(
+      tester,
+      find.textContaining('Suggested from the photo (90%)'),
+    );
+    expect(on<GarmentCategory>('Outerwear'), isTrue, reason: 'prefilled');
+    await scrollTo(tester, find.textContaining('not sure about this type'));
+    expect(on<GarmentSubcategory>('Coat'), isTrue, reason: 'please confirm');
+    await scrollTo(tester, find.text('Not sure about the pattern. Possible:'));
+    expect(on<GarmentPattern>('Floral'), isFalse, reason: 'only a hint');
+
+    await tapAndSettle(tester, find.widgetWithText(ActionChip, 'Checked 25%'));
+    expect(on<GarmentPattern>('Checked'), isTrue);
+
+    await tapAndSettle(tester, find.text('Add to wardrobe'));
+    await pumpUntil(tester, find.byTooltip('Edit'));
+    final saved = (await items(tester, app)).single;
+    expect(saved.status, ItemStatus.active);
+    expect(saved.attributes.category, GarmentCategory.outerwear);
+    expect(saved.attributes.subcategory, GarmentSubcategory.coat);
+    expect(saved.attributes.pattern, GarmentPattern.checked);
+    await app.dispose(tester);
+  });
 }
