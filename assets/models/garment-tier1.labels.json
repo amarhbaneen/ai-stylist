@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "inputs": {
+    "image": "float32 [1,224,224,3] RGB, 0-255"
+  },
+  "outputs": {
+    "type": [
+      {
+        "label": "shirt_blouse",
+        "category": "TOP",
+        "subcategory": null
+      },
+      {
+        "label": "top_tshirt_sweatshirt",
+        "category": "TOP",
+        "subcategory": null
+      },
+      {
+        "label": "sweater",
+        "category": "TOP",
+        "subcategory": "SWEATER"
+      },
+      {
+        "label": "cardigan",
+        "category": "OUTERWEAR",
+        "subcategory": "CARDIGAN"
+      },
+      {
+        "label": "jacket",
+        "category": "OUTERWEAR",
+        "subcategory": "JACKET"
+      },
+      {
+        "label": "vest",
+        "category": "OUTERWEAR",
+        "subcategory": "VEST"
+      },
+      {
+        "label": "coat",
+        "category": "OUTERWEAR",
+        "subcategory": "COAT"
+      },
+      {
+        "label": "cape",
+        "category": "OUTERWEAR",
+        "subcategory": "OTHER_OUTERWEAR"
+      },
+      {
+        "label": "pants",
+        "category": "BOTTOM",
+        "subcategory": null
+      },
+      {
+        "label": "shorts",
+        "category": "BOTTOM",
+        "subcategory": "SHORTS"
+      },
+      {
+        "label": "skirt",
+        "category": "BOTTOM",
+        "subcategory": "SKIRT"
+      },
+      {
+        "label": "dress",
+        "category": "ONE_PIECE",
+        "subcategory": "DRESS"
+      },
+      {
+        "label": "jumpsuit",
+        "category": "ONE_PIECE",
+        "subcategory": "JUMPSUIT"
+      },
+      {
+        "label": "shoe",
+        "category": "FOOTWEAR",
+        "subcategory": null
+      },
+      {
+        "label": "bag_wallet",
+        "category": "ACCESSORY",
+        "subcategory": "BAG"
+      },
+      {
+        "label": "hat",
+        "category": "ACCESSORY",
+        "subcategory": "HAT"
+      },
+      {
+        "label": "scarf",
+        "category": "ACCESSORY",
+        "subcategory": "SCARF"
+      },
+      {
+        "label": "belt",
+        "category": "ACCESSORY",
+        "subcategory": "BELT"
+      },
+      {
+        "label": "tie",
+        "category": "ACCESSORY",
+        "subcategory": "TIE"
+      },
+      {
+        "label": "glasses",
+        "category": "ACCESSORY",
+        "subcategory": "OTHER_ACCESSORY"
+      },
+      {
+        "label": "headwear_other",
+        "category": "ACCESSORY",
+        "subcategory": "OTHER_ACCESSORY"
+      },
+      {
+        "label": "glove",
+        "category": "ACCESSORY",
+        "subcategory": "OTHER_ACCESSORY"
+      },
+      {
+        "label": "watch",
+        "category": "ACCESSORY",
+        "subcategory": "OTHER_ACCESSORY"
+      }
+    ],
+    "pattern": [
+      "SOLID",
+      "STRIPED",
+      "CHECKED",
+      "FLORAL",
+      "GRAPHIC",
+      "DOTTED",
+      "ANIMAL",
+      "OTHER"
+    ]
+  }
+}

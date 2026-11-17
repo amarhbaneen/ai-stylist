@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "comment": "Maps Fashionpedia names to the app taxonomy (packages/wardrobe_domain/lib/src/taxonomy/taxonomy.dart). Category names must match the annotation file exactly; prepare_data.py fails on any name it cannot find. subcategory is null when the Fashionpedia class is ambiguous (the app then suggests only the category).",
+  "classes": [
+    { "label": "shirt_blouse", "fashionpedia": "shirt, blouse", "category": "TOP", "subcategory": null },
+    { "label": "top_tshirt_sweatshirt", "fashionpedia": "top, t-shirt, sweatshirt", "category": "TOP", "subcategory": null },
+    { "label": "sweater", "fashionpedia": "sweater", "category": "TOP", "subcategory": "SWEATER" },
+    { "label": "cardigan", "fashionpedia": "cardigan", "category": "OUTERWEAR", "subcategory": "CARDIGAN" },
+    { "label": "jacket", "fashionpedia": "jacket", "category": "OUTERWEAR", "subcategory": "JACKET" },
+    { "label": "vest", "fashionpedia": "vest", "category": "OUTERWEAR", "subcategory": "VEST" },
+    { "label": "coat", "fashionpedia": "coat", "category": "OUTERWEAR", "subcategory": "COAT" },
+    { "label": "cape", "fashionpedia": "cape", "category": "OUTERWEAR", "subcategory": "OTHER_OUTERWEAR" },
+    { "label": "pants", "fashionpedia": "pants", "category": "BOTTOM", "subcategory": null },
+    { "label": "shorts", "fashionpedia": "shorts", "category": "BOTTOM", "subcategory": "SHORTS" },
+    { "label": "skirt", "fashionpedia": "skirt", "category": "BOTTOM", "subcategory": "SKIRT" },
+    { "label": "dress", "fashionpedia": "dress", "category": "ONE_PIECE", "subcategory": "DRESS" },
+    { "label": "jumpsuit", "fashionpedia": "jumpsuit", "category": "ONE_PIECE", "subcategory": "JUMPSUIT" },
+    { "label": "shoe", "fashionpedia": "shoe", "category": "FOOTWEAR", "subcategory": null },
+    { "label": "bag_wallet", "fashionpedia": "bag, wallet", "category": "ACCESSORY", "subcategory": "BAG" },
+    { "label": "hat", "fashionpedia": "hat", "category": "ACCESSORY", "subcategory": "HAT" },
+    { "label": "scarf", "fashionpedia": "scarf", "category": "ACCESSORY", "subcategory": "SCARF" },
+    { "label": "belt", "fashionpedia": "belt", "category": "ACCESSORY", "subcategory": "BELT" },
+    { "label": "tie", "fashionpedia": "tie", "category": "ACCESSORY", "subcategory": "TIE" },
+    { "label": "glasses", "fashionpedia": "glasses", "category": "ACCESSORY", "subcategory": "OTHER_ACCESSORY" },
+    { "label": "headwear_other", "fashionpedia": "headband, head covering, hair accessory", "category": "ACCESSORY", "subcategory": "OTHER_ACCESSORY" },
+    { "label": "glove", "fashionpedia": "glove", "category": "ACCESSORY", "subcategory": "OTHER_ACCESSORY" },
+    { "label": "watch", "fashionpedia": "watch", "category": "ACCESSORY", "subcategory": "OTHER_ACCESSORY" }
+  ],
+  "excludedComment": "Not wardrobe items in the app taxonomy, or usually too small or hidden to crop well. Parts (sleeve, collar, pocket...) are never classes.",
+  "excluded": ["leg warmer", "tights, stockings", "sock", "umbrella"],
+  "patternSupercategory": "textile pattern",
+  "patternComment": "Each attribute in the pattern supercategory is mapped by the first rule whose keyword appears in its name (case-insensitive). Unmatched pattern attributes map to OTHER. Garments with no pattern attribute get no pattern label (masked in training). prepare_data.py writes the resolved mapping to its report for review.",
+  "patternRules": [
+    { "code": "SOLID", "keywords": ["plain"] },
+    { "code": "STRIPED", "keywords": ["stripe"] },
+    { "code": "CHECKED", "keywords": ["check", "plaid", "tartan", "gingham", "houndstooth"] },
+    { "code": "FLORAL", "keywords": ["floral", "flower"] },
+    { "code": "DOTTED", "keywords": ["dot"] },
+    { "code": "ANIMAL", "keywords": ["animal", "leopard", "zebra", "snake"] },
+    { "code": "GRAPHIC", "keywords": ["letter", "number", "cartoon", "graphic", "logo"] }
+  ],
+  "patternClasses": ["SOLID", "STRIPED", "CHECKED", "FLORAL", "GRAPHIC", "DOTTED", "ANIMAL", "OTHER"]
+}

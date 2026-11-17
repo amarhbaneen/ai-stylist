@@ -48,9 +48,16 @@ dependencies:
   # Only network client (D-12): opt-in live weather and model downloads.
   # Every request is listed in docs/NETWORK.md.
   http: ^1.6.0
+  # On-device LiteRT inference for the bundled garment classifier (D-07, D-38).
+  # Bundled runtime only, no Play-services mode. Held to 4.1.x, the line the
+  # M3 spike verified; 4.2.0 was published the day this was added.
+  flutter_litert: '>=4.1.1 <4.2.0'
 
 dev_dependencies:
   flutter_test:
+    sdk: flutter
+  # On-device checks of the bundled model (integration_test/).
+  integration_test:
     sdk: flutter
   flutter_lints: ^6.0.0
   build_runner: ^2.17.1
@@ -61,7 +68,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    # Bundled model manifest (empty until a licensed fashion model ships).
+    # Model manifest, the garment classifier and its label table.
     - assets/models/
     # Offline city list for live weather (GeoNames, CC BY 4.0;
     # tools/build_cities.ps1).

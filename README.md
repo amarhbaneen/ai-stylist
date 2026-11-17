@@ -45,9 +45,14 @@ device.
     hints. Secondary colours are offered as "Also detected" chips.
   - Suggestions are stored with their source model, version, confidence and time, plus whether
     you kept each one.
-  - A model registry with SHA-256 checks and an output validator are ready for a fashion model.
-  - Category, type and pattern classification is waiting on a licensed model (see
-    [docs/MODELS.md](docs/MODELS.md)).
+  - A built-in garment classifier (`garment-tier1`, 3.4 MB, trained on Fashionpedia with
+    [training/](training/README.md)) suggests category, type and pattern with the same
+    prefill / confirm / hint rules. Every suggestion is editable, and manual entry works if
+    the model fails. Credits are on the On-device models screen. See DECISIONS D-38 and
+    [docs/MODELS.md](docs/MODELS.md).
+  - Runs on the Android emulator in about 50 ms per photo
+    (`flutter test integration_test/garment_model_test.dart -d <device>`).
+  - Not yet measured on real flat-lay or hanger photos; iOS not built.
   - Verified on the emulator offline: a new green shirt photo had Green pre-filled.
 - **M6 (feedback and personalisation):** complete for Android; merged into `main`.
   - Like, dislike (with optional reasons and a note) and save on every outfit.

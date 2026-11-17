@@ -44,6 +44,7 @@ final class ModelDescriptor {
     this.asset,
     this.download,
     this.title,
+    this.labelsAsset,
     Map<String, String> labels = const {},
   }) : assert((asset == null) != (download == null), 'asset XOR download'),
        labels = Map.unmodifiable(labels);
@@ -62,6 +63,10 @@ final class ModelDescriptor {
 
   /// Short human-readable name for the model manager.
   final String? title;
+
+  /// Asset key of a bundled label table, for models whose outputs need more
+  /// than [labels] (for example `garment-tier1`, see `GarmentLabels`).
+  final String? labelsAsset;
 
   /// Lower-case hex SHA-256 of the model file.
   final String sha256;
@@ -113,6 +118,7 @@ final class ModelDescriptor {
       asset: asset,
       download: download,
       title: str('title'),
+      labelsAsset: str('labelsAsset'),
       sha256: sha,
       license: license!,
       labels: labels,
@@ -190,6 +196,15 @@ final class ModelRegistry {
       if (m.task == task) return m;
     }
     return null;
+  }
+
+  /// A bundled text asset, such as a model's label table.
+  Future<Result<String>> loadText(String key) async {
+    try {
+      return Success(utf8.decode(await _load(key)));
+    } on Exception catch (e) {
+      return Failure(ModelUnavailableFailure('Missing asset $key', cause: e));
+    }
   }
 
   /// The model's bytes, only if they match the manifest's SHA-256.

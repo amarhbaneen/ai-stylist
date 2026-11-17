@@ -46,3 +46,9 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+# Python training outputs (never commit data or model weights)
+training/data/
+training/out/
+training/**/__pycache__/
+training/**/*.tflite
+training/**/*.keras

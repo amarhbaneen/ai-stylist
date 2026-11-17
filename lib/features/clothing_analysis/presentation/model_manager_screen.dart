@@ -19,25 +19,27 @@ class ModelManagerScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('On-device models')),
       body: switch (registry) {
-        AsyncData(:final value) when value.downloadable.isEmpty => const Center(
-          child: Padding(
-            padding: EdgeInsets.all(24),
-            child: Text(
-              'No optional models are available in this version.\n\n'
-              'Colour detection is built in and works offline. You can '
-              'always set every detail by hand.',
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ),
         AsyncData(:final value) => ListView(
           padding: const EdgeInsets.all(16),
           children: [
             const Text(
-              'Models run only on this phone. Downloading one sends a normal '
-              'web request to its host; your photos never leave the device.',
+              'Models run only on this phone; your photos never leave the '
+              'device. You can always set every detail by hand.',
             ),
-            for (final m in value.downloadable) _ModelTile(model: m),
+            for (final m in value.models)
+              if (m.asset != null) _BundledModelTile(model: m),
+            const Padding(
+              padding: EdgeInsets.only(top: 16, bottom: 8),
+              child: Text('Optional downloads'),
+            ),
+            if (value.downloadable.isEmpty)
+              const Text('No optional models are available in this version.')
+            else ...[
+              const Text(
+                'Downloading one sends a normal web request to its host.',
+              ),
+              for (final m in value.downloadable) _ModelTile(model: m),
+            ],
           ],
         ),
         AsyncError() => const Center(
@@ -45,6 +47,39 @@ class ModelManagerScreen extends ConsumerWidget {
         ),
         _ => const Center(child: CircularProgressIndicator()),
       },
+    );
+  }
+}
+
+/// Attribution for bundled models (licence obligations, docs/MODELS.md).
+const _credits = {
+  'garment-tier1':
+      'Trained on Fashionpedia annotations (Jia et al., 2020), licensed '
+      'CC BY 4.0 (creativecommons.org/licenses/by/4.0). Changes: garment '
+      "classes regrouped into this app's categories. Backbone: MobileNetV3 "
+      'ImageNet weights from Keras (Apache 2.0).',
+};
+
+/// A model that ships inside the app: always available, nothing to manage.
+class _BundledModelTile extends StatelessWidget {
+  const _BundledModelTile({required this.model});
+
+  final ModelDescriptor model;
+
+  @override
+  Widget build(BuildContext context) {
+    final credit = _credits[model.id];
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: const Icon(Icons.memory_outlined),
+      title: Text(model.title ?? model.id),
+      subtitle: Text(
+        [
+          'Built in, version ${model.version}. Suggests category, type and '
+              'pattern; you confirm or change them.',
+          ?credit,
+        ].join('\n\n'),
+      ),
     );
   }
 }

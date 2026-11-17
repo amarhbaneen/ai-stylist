@@ -9,6 +9,7 @@ import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/item_thumbnail.dart';
 import '../../clothing_analysis/analysis_providers.dart';
 import '../../clothing_analysis/presentation/apply_suggestions.dart';
+import '../../clothing_analysis/presentation/attribute_suggestion_note.dart';
 import '../../clothing_analysis/presentation/color_suggestion_notes.dart';
 import '../wardrobe_providers.dart';
 import 'clothing_attributes_form.dart';
@@ -173,6 +174,13 @@ class _ItemEditorScreenState extends ConsumerState<ItemEditorScreen> {
       draft.secondaryColors = {...draft.secondaryColors, c};
       draft.touched.add(AnalyzedAttribute.secondaryColor);
     });
+    final suggested = switch (analysis) {
+      AsyncData(:final value) => value,
+      _ => null,
+    };
+    // A type suggestion only makes sense for the category in the form.
+    final typeSuggestion = suggested?.subcategory;
+    final typeFits = typeSuggestion?.value.category == draft.category;
 
     return Scaffold(
       appBar: AppBar(
@@ -212,6 +220,49 @@ class _ItemEditorScreenState extends ConsumerState<ItemEditorScreen> {
             draft: draft,
             showCategoryError: _showCategoryError,
             onChanged: () => setState(() => _showCategoryError = false),
+            categoryNote: suggested == null
+                ? null
+                : AttributeSuggestionNote<GarmentCategory>(
+                    suggestion: suggested.category,
+                    policy: policy,
+                    current: draft.category,
+                    labelOf: Labels.category,
+                    noun: 'category',
+                    onPick: (c) => setState(() {
+                      draft.category = c;
+                      if (draft.subcategory?.category != c) {
+                        draft.subcategory = null;
+                      }
+                      draft.touched.add(AnalyzedAttribute.category);
+                      _showCategoryError = false;
+                    }),
+                  ),
+            subcategoryNote: !typeFits
+                ? null
+                : AttributeSuggestionNote<GarmentSubcategory>(
+                    suggestion: typeSuggestion,
+                    policy: policy,
+                    current: draft.subcategory,
+                    labelOf: Labels.subcategory,
+                    noun: 'type',
+                    onPick: (s) => setState(() {
+                      draft.subcategory = s;
+                      draft.touched.add(AnalyzedAttribute.subcategory);
+                    }),
+                  ),
+            patternNote: suggested == null
+                ? null
+                : AttributeSuggestionNote<GarmentPattern>(
+                    suggestion: suggested.pattern,
+                    policy: policy,
+                    current: draft.pattern,
+                    labelOf: Labels.pattern,
+                    noun: 'pattern',
+                    onPick: (p) => setState(() {
+                      draft.pattern = p;
+                      draft.touched.add(AnalyzedAttribute.pattern);
+                    }),
+                  ),
             primaryColorNote: analysis == null
                 ? null
                 : PrimaryColorNote(

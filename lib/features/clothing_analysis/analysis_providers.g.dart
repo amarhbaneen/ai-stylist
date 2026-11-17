@@ -112,13 +112,13 @@ final class ModelDownloadManagerProvider
 String _$modelDownloadManagerHash() =>
     r'13e302eb359773a0aba03fdfc6b2041fcdf2d6ad';
 
-/// Bundled and optional models (none yet). Loading a model always goes
+/// Bundled and optional models. Loading a model always goes
 /// through the SHA-256 check in [ModelRegistry.loadVerified].
 
 @ProviderFor(modelRegistry)
 final modelRegistryProvider = ModelRegistryProvider._();
 
-/// Bundled and optional models (none yet). Loading a model always goes
+/// Bundled and optional models. Loading a model always goes
 /// through the SHA-256 check in [ModelRegistry.loadVerified].
 
 final class ModelRegistryProvider
@@ -129,7 +129,7 @@ final class ModelRegistryProvider
           FutureOr<ModelRegistry>
         >
     with $FutureModifier<ModelRegistry>, $FutureProvider<ModelRegistry> {
-  /// Bundled and optional models (none yet). Loading a model always goes
+  /// Bundled and optional models. Loading a model always goes
   /// through the SHA-256 check in [ModelRegistry.loadVerified].
   ModelRegistryProvider._()
     : super(
@@ -159,14 +159,71 @@ final class ModelRegistryProvider
 
 String _$modelRegistryHash() => r'00c6421315424e9b3d823292e5d5c8ff13c525e9';
 
-/// All analyzers available on this device. Tier 0 (colour) always; a
-/// garment classifier joins here once a licensed model ships (D-08).
+/// The bundled Tier-1 garment classifier (D-08, D-38). The model is
+/// opened on first use and released when the provider is disposed.
+
+@ProviderFor(garmentClassifier)
+final garmentClassifierProvider = GarmentClassifierProvider._();
+
+/// The bundled Tier-1 garment classifier (D-08, D-38). The model is
+/// opened on first use and released when the provider is disposed.
+
+final class GarmentClassifierProvider
+    extends
+        $FunctionalProvider<
+          GarmentClassifier,
+          GarmentClassifier,
+          GarmentClassifier
+        >
+    with $Provider<GarmentClassifier> {
+  /// The bundled Tier-1 garment classifier (D-08, D-38). The model is
+  /// opened on first use and released when the provider is disposed.
+  GarmentClassifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'garmentClassifierProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$garmentClassifierHash();
+
+  @$internal
+  @override
+  $ProviderElement<GarmentClassifier> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  GarmentClassifier create(Ref ref) {
+    return garmentClassifier(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(GarmentClassifier value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<GarmentClassifier>(value),
+    );
+  }
+}
+
+String _$garmentClassifierHash() => r'786132c016903c38fa66dd73e0259c19d22cb9c9';
+
+/// All analyzers available on this device: Tier 0 (colour) and the Tier-1
+/// garment classifier (category, type, pattern). Either can fail without
+/// blocking the other or manual entry.
 
 @ProviderFor(clothingAnalyzer)
 final clothingAnalyzerProvider = ClothingAnalyzerProvider._();
 
-/// All analyzers available on this device. Tier 0 (colour) always; a
-/// garment classifier joins here once a licensed model ships (D-08).
+/// All analyzers available on this device: Tier 0 (colour) and the Tier-1
+/// garment classifier (category, type, pattern). Either can fail without
+/// blocking the other or manual entry.
 
 final class ClothingAnalyzerProvider
     extends
@@ -176,8 +233,9 @@ final class ClothingAnalyzerProvider
           ClothingAnalyzer
         >
     with $Provider<ClothingAnalyzer> {
-  /// All analyzers available on this device. Tier 0 (colour) always; a
-  /// garment classifier joins here once a licensed model ships (D-08).
+  /// All analyzers available on this device: Tier 0 (colour) and the Tier-1
+  /// garment classifier (category, type, pattern). Either can fail without
+  /// blocking the other or manual entry.
   ClothingAnalyzerProvider._()
     : super(
         from: null,
@@ -211,7 +269,7 @@ final class ClothingAnalyzerProvider
   }
 }
 
-String _$clothingAnalyzerHash() => r'98f9f72de1b7ee17f4ebb444967837875742693f';
+String _$clothingAnalyzerHash() => r'f2302c25e2b8e407c7adcfbc925461127b9a7454';
 
 @ProviderFor(analysisRepository)
 final analysisRepositoryProvider = AnalysisRepositoryProvider._();

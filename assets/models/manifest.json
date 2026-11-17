@@ -1,4 +1,15 @@
 {
   "schemaVersion": 1,
-  "models": []
+  "models": [
+    {
+      "id": "garment-tier1",
+      "version": "1.0.0",
+      "task": "garment-type-pattern",
+      "title": "Clothing type and pattern",
+      "asset": "assets/models/garment-tier1.tflite",
+      "labelsAsset": "assets/models/garment-tier1.labels.json",
+      "sha256": "d562792cd42234b0df2e8a10f3e857957ab4793aba42b66387123e75ed8dc397",
+      "license": "CC-BY-4.0 (Fashionpedia annotations)"
+    }
+  ]
 }
