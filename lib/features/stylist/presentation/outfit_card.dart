@@ -94,7 +94,7 @@ class PieceThumbnail extends ConsumerWidget {
             child: SizedBox(
               width: double.infinity,
               child: StoredImage(
-                relativePath: item?.images?.thumbnail,
+                relativePath: item?.images?.displayThumbnail,
                 cacheWidth: 240,
                 semanticLabel: label,
               ),

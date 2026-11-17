@@ -38,9 +38,9 @@ def _split_for(image_id: int, holdout: float) -> str:
     return "val" if int.from_bytes(digest[:4], "big") / 2**32 < holdout else "train"
 
 
-def resolve(data: dict, labels: lm.LabelMap) -> tuple[dict[int, int], dict[int, str], dict]:
-    """Maps Fashionpedia category ids to class indices and attribute ids to
-    pattern codes. Fails if a configured name is missing from the file."""
+def resolve_classes(data: dict, labels: lm.LabelMap) -> tuple[dict[int, int], dict[str, int]]:
+    """Fashionpedia category id -> class index, and all category ids by name.
+    Fails, listing the available names, if a configured name is missing."""
     categories = {c["name"]: c["id"] for c in data["categories"]}
     missing = [c.fashionpedia for c in labels.classes if c.fashionpedia not in categories]
     missing += [n for n in labels.excluded if n not in categories]
@@ -50,7 +50,13 @@ def resolve(data: dict, labels: lm.LabelMap) -> tuple[dict[int, int], dict[int, 
             + ", ".join(sorted(missing))
             + "\nAvailable: " + ", ".join(sorted(categories))
         )
-    class_of = {categories[c.fashionpedia]: i for i, c in enumerate(labels.classes)}
+    return {categories[c.fashionpedia]: i for i, c in enumerate(labels.classes)}, categories
+
+
+def resolve(data: dict, labels: lm.LabelMap) -> tuple[dict[int, int], dict[int, str], dict]:
+    """Maps Fashionpedia category ids to class indices and attribute ids to
+    pattern codes. Fails if a configured name is missing from the file."""
+    class_of, categories = resolve_classes(data, labels)
 
     pattern_attrs = [
         a for a in data.get("attributes", [])

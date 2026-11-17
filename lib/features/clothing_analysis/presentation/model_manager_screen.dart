@@ -52,12 +52,28 @@ class ModelManagerScreen extends ConsumerWidget {
 }
 
 /// Attribution for bundled models (licence obligations, docs/MODELS.md).
+/// What each bundled model does, by manifest task.
+const _purposes = {
+  'garment-type-pattern':
+      'Suggests category, type and pattern; you confirm or change them.',
+  'garment-segmentation':
+      'Removes the background and finds each garment in a photo. The '
+      'original photo is always kept.',
+};
+
+const _fashionpedia =
+    'Trained on Fashionpedia annotations (Jia et al., 2020), licensed '
+    'CC BY 4.0 (creativecommons.org/licenses/by/4.0).';
+
 const _credits = {
   'garment-tier1':
-      'Trained on Fashionpedia annotations (Jia et al., 2020), licensed '
-      'CC BY 4.0 (creativecommons.org/licenses/by/4.0). Changes: garment '
-      "classes regrouped into this app's categories. Backbone: MobileNetV3 "
-      'ImageNet weights from Keras (Apache 2.0).',
+      '$_fashionpedia Changes: garment classes regrouped into this '
+      "app's categories. Backbone: MobileNetV3 ImageNet weights from Keras "
+      '(Apache 2.0).',
+  'garment-seg':
+      '$_fashionpedia Changes: garment masks regrouped into this '
+      "app's categories; extra flat-lay images made from them. Backbone: "
+      'MobileNetV3 ImageNet weights from Keras (Apache 2.0).',
 };
 
 /// A model that ships inside the app: always available, nothing to manage.
@@ -75,8 +91,10 @@ class _BundledModelTile extends StatelessWidget {
       title: Text(model.title ?? model.id),
       subtitle: Text(
         [
-          'Built in, version ${model.version}. Suggests category, type and '
-              'pattern; you confirm or change them.',
+          [
+            'Built in, version ${model.version}.',
+            ?_purposes[model.task],
+          ].join(' '),
           ?credit,
         ].join('\n\n'),
       ),

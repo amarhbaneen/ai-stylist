@@ -139,7 +139,9 @@ review/edit UI with confidence badges, stored model ID/version/timestamp. Model 
 lazy load, dispose on memory pressure, never block the UI. Tests: loading/disposal, corrupt
 model, schema validation, thresholds, golden images.
 Segmentation (FR-05) only after the classifier works, and only if a licence-clean model is
-verified. Otherwise defer.
+verified. Otherwise defer. Done 2026-11-17: `garment-seg` trained on Fashionpedia masks and
+bundled, with cut-outs, a switch back to the original, and several items from one photo
+(D-39, D-40); real-photo and phone checks still open.
 
 ### M5: Phase 5 — Outfit engine (REQ M4) ✅ Android verified 2026-11-16 (Home daily suggestion still a placeholder; see README)
 `packages/outfit_engine` with templates (§4), hard filters, the six scorers, weight

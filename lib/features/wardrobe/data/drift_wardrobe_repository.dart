@@ -15,7 +15,9 @@ import 'clothing_item_mapper.dart';
 ///
 /// Image layout under the file store root:
 /// `images/originals/<id>.<ext>`, `images/working/<id>.jpg`,
-/// `images/thumbs/<id>.jpg`.
+/// `images/thumbs/<id>.jpg`, and for cut-outs `images/cutouts/<name>.png`
+/// and `images/cutouts/<name>_thumb.png` (a fresh name per cut-out, so
+/// image caches never show a replaced file).
 final class DriftWardrobeRepository implements WardrobeRepository {
   DriftWardrobeRepository({
     required AppDatabase database,
@@ -303,6 +305,195 @@ final class DriftWardrobeRepository implements WardrobeRepository {
     }
   }
 
+  // ---------------------------------------------------------------- cut-outs
+
+  @override
+  Future<Result<ClothingItem>> saveCutout(
+    String id,
+    CutoutImages cutout,
+  ) async {
+    final List<ClothingImageRow> previous;
+    try {
+      if (await _load(id) == null) return Failure(NotFoundFailure('No $id'));
+      previous = await _imageRows(id, {
+        ImageKind.cutout,
+        ImageKind.cutoutThumbnail,
+      });
+    } on Exception catch (e) {
+      return Failure(StorageFailure('Could not read item $id', cause: e));
+    }
+
+    final name = _ids.newId();
+    final imagePath = '$imagesDir/cutouts/$name.png';
+    final thumbPath = '$imagesDir/cutouts/${name}_thumb.png';
+    final written = <String>[];
+    Future<Result<ClothingItem>> fail(AppFailure failure) async {
+      await _deleteFiles(written);
+      return Failure(failure);
+    }
+
+    for (final (path, bytes) in [
+      (imagePath, cutout.image),
+      (thumbPath, cutout.thumbnail),
+    ]) {
+      final saved = await _files.writeBytes(path, bytes);
+      if (saved case Failure(:final failure)) return fail(failure);
+      written.add(path);
+    }
+
+    final now = toEpochMillisUtc(_clock.nowUtc());
+    try {
+      await _db.transaction(() async {
+        await (_db.delete(
+          _db.clothingImages,
+        )..where((t) => t.id.isIn(previous.map((i) => i.id)))).go();
+        await _db
+            .into(_db.clothingImages)
+            .insert(
+              ClothingImagesCompanion.insert(
+                id: _ids.newId(),
+                itemId: id,
+                kind: ImageKind.cutout,
+                relativePath: imagePath,
+                width: Value(cutout.width),
+                height: Value(cutout.height),
+                byteSize: Value(cutout.image.length),
+                createdAt: now,
+              ),
+            );
+        await _db
+            .into(_db.clothingImages)
+            .insert(
+              ClothingImagesCompanion.insert(
+                id: _ids.newId(),
+                itemId: id,
+                kind: ImageKind.cutoutThumbnail,
+                relativePath: thumbPath,
+                byteSize: Value(cutout.thumbnail.length),
+                createdAt: now,
+              ),
+            );
+        await _touch(id, now, showCutout: true);
+      });
+    } on Exception catch (e) {
+      return fail(StorageFailure('Could not save the cut-out', cause: e));
+    }
+    await _deleteFiles(previous.map((i) => i.relativePath));
+    return _reload(id);
+  }
+
+  @override
+  Future<Result<ClothingItem>> setShowCutout(
+    String id, {
+    required bool show,
+  }) async {
+    try {
+      final existing = await _load(id);
+      if (existing == null) return Failure(NotFoundFailure('No item $id'));
+      if (show && existing.images?.cutout == null) {
+        return const Failure(ValidationFailure('This item has no cut-out'));
+      }
+      await _touch(id, toEpochMillisUtc(_clock.nowUtc()), showCutout: show);
+      return await _reload(id);
+    } on Exception catch (e) {
+      return Failure(StorageFailure('Could not update item $id', cause: e));
+    }
+  }
+
+  @override
+  Future<Result<ClothingItem>> copyPhotoToNewItem(String sourceId) async {
+    final ClothingItemRow? source;
+    final List<ClothingImageRow> photo;
+    try {
+      source =
+          await (_db.select(_db.clothingItems)
+                ..where((t) => t.id.equals(sourceId) & t.deletedAt.isNull()))
+              .getSingleOrNull();
+      photo = await _imageRows(sourceId, ImageKind.photo);
+    } on Exception catch (e) {
+      return Failure(StorageFailure('Could not read item $sourceId', cause: e));
+    }
+    if (source == null || photo.isEmpty) {
+      return Failure(NotFoundFailure('No photo for item $sourceId'));
+    }
+
+    final id = _ids.newId();
+    final copies = <(ClothingImageRow, String)>[];
+    Future<Result<ClothingItem>> fail(AppFailure failure) async {
+      await _deleteFiles(copies.map((c) => c.$2));
+      return Failure(failure);
+    }
+
+    for (final row in photo) {
+      final dir = p.posix.dirname(row.relativePath);
+      final ext = p.posix.extension(row.relativePath);
+      final target = '$dir/$id$ext';
+      final copied = await _files.copyIn(
+        _files.resolve(row.relativePath),
+        target,
+      );
+      if (copied case Failure(:final failure)) return fail(failure);
+      copies.add((row, target));
+    }
+
+    final now = toEpochMillisUtc(_clock.nowUtc());
+    try {
+      await _db.transaction(() async {
+        await _db
+            .into(_db.clothingItems)
+            .insert(
+              ClothingItemsCompanion.insert(
+                id: id,
+                category: GarmentCategory.unknown.code,
+                status: ItemStatus.draft.code,
+                contentSha256: Value(source!.contentSha256),
+                createdAt: now,
+                updatedAt: now,
+              ),
+            );
+        for (final (row, path) in copies) {
+          await _db
+              .into(_db.clothingImages)
+              .insert(
+                ClothingImagesCompanion.insert(
+                  id: _ids.newId(),
+                  itemId: id,
+                  kind: row.kind,
+                  relativePath: path,
+                  width: Value(row.width),
+                  height: Value(row.height),
+                  byteSize: Value(row.byteSize),
+                  createdAt: now,
+                ),
+              );
+        }
+      });
+    } on Exception catch (e) {
+      return fail(StorageFailure('Could not save the new item', cause: e));
+    }
+    return _reload(id);
+  }
+
+  Future<List<ClothingImageRow>> _imageRows(String id, Set<String> kinds) =>
+      (_db.select(
+        _db.clothingImages,
+      )..where((t) => t.itemId.equals(id) & t.kind.isIn(kinds))).get();
+
+  Future<void> _touch(String id, int now, {required bool showCutout}) =>
+      (_db.update(_db.clothingItems)..where((t) => t.id.equals(id))).write(
+        ClothingItemsCompanion(
+          showCutout: Value(showCutout),
+          updatedAt: Value(now),
+        ),
+      );
+
+  Future<Result<ClothingItem>> _reload(String id) async {
+    final item = await _load(id);
+    return item == null
+        ? Failure(NotFoundFailure('No item $id'))
+        : Success(item);
+  }
+
   @override
   Future<Result<ClothingItem>> setStatus(String id, ItemStatus status) async {
     try {
@@ -356,10 +547,10 @@ final class DriftWardrobeRepository implements WardrobeRepository {
           0;
 
       if (usedInHistory) {
-        // Keep the row and thumbnail so outfit history still renders.
+        // Keep the row and thumbnails so outfit history still renders.
         final toRemove = [
           for (final i in images)
-            if (i.kind != ImageKind.thumbnail) i,
+            if (!ImageKind.history.contains(i.kind)) i,
         ];
         await _db.transaction(() async {
           await (_db.update(

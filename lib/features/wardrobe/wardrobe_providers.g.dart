@@ -233,6 +233,95 @@ final class SaveClothingItemProvider
 
 String _$saveClothingItemHash() => r'70da50912a377028418f6b8e5a7335a8eb29a0fb';
 
+@ProviderFor(addGarmentsFromPhoto)
+final addGarmentsFromPhotoProvider = AddGarmentsFromPhotoProvider._();
+
+final class AddGarmentsFromPhotoProvider
+    extends
+        $FunctionalProvider<
+          AddGarmentsFromPhoto,
+          AddGarmentsFromPhoto,
+          AddGarmentsFromPhoto
+        >
+    with $Provider<AddGarmentsFromPhoto> {
+  AddGarmentsFromPhotoProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'addGarmentsFromPhotoProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$addGarmentsFromPhotoHash();
+
+  @$internal
+  @override
+  $ProviderElement<AddGarmentsFromPhoto> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  AddGarmentsFromPhoto create(Ref ref) {
+    return addGarmentsFromPhoto(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(AddGarmentsFromPhoto value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<AddGarmentsFromPhoto>(value),
+    );
+  }
+}
+
+String _$addGarmentsFromPhotoHash() =>
+    r'4872fb6920c50f6ed8ef1edb405d45773fb39e68';
+
+@ProviderFor(showCutout)
+final showCutoutProvider = ShowCutoutProvider._();
+
+final class ShowCutoutProvider
+    extends $FunctionalProvider<ShowCutout, ShowCutout, ShowCutout>
+    with $Provider<ShowCutout> {
+  ShowCutoutProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'showCutoutProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$showCutoutHash();
+
+  @$internal
+  @override
+  $ProviderElement<ShowCutout> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  ShowCutout create(Ref ref) {
+    return showCutout(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(ShowCutout value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<ShowCutout>(value),
+    );
+  }
+}
+
+String _$showCutoutHash() => r'31a11c2547b20ae12dc57362d023a122a97b9114';
+
 @ProviderFor(archiveClothingItem)
 final archiveClothingItemProvider = ArchiveClothingItemProvider._();
 

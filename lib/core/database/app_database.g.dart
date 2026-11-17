@@ -677,6 +677,21 @@ class $ClothingItemsTable extends ClothingItems
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _showCutoutMeta = const VerificationMeta(
+    'showCutout',
+  );
+  @override
+  late final GeneratedColumn<bool> showCutout = GeneratedColumn<bool>(
+    'show_cutout',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("show_cutout" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   static const VerificationMeta _contentSha256Meta = const VerificationMeta(
     'contentSha256',
   );
@@ -735,6 +750,7 @@ class $ClothingItemsTable extends ClothingItems
     brand,
     warmth,
     status,
+    showCutout,
     contentSha256,
     deletedAt,
     createdAt,
@@ -836,6 +852,12 @@ class $ClothingItemsTable extends ClothingItems
     } else if (isInserting) {
       context.missing(_statusMeta);
     }
+    if (data.containsKey('show_cutout')) {
+      context.handle(
+        _showCutoutMeta,
+        showCutout.isAcceptableOrUnknown(data['show_cutout']!, _showCutoutMeta),
+      );
+    }
     if (data.containsKey('content_sha256')) {
       context.handle(
         _contentSha256Meta,
@@ -924,6 +946,10 @@ class $ClothingItemsTable extends ClothingItems
         DriftSqlType.string,
         data['${effectivePrefix}status'],
       )!,
+      showCutout: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}show_cutout'],
+      )!,
       contentSha256: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}content_sha256'],
@@ -969,7 +995,12 @@ class ClothingItemRow extends DataClass implements Insertable<ClothingItemRow> {
   /// DRAFT, ACTIVE or ARCHIVED (ItemStatus codes).
   final String status;
 
+  /// Show the background-removed cut-out instead of the photo (schema v2,
+  /// FR-05). The original photo is always kept.
+  final bool showCutout;
+
   /// SHA-256 of the original image bytes, used for duplicate detection.
+  /// Items made from one photo with several garments share it (D-39).
   final String? contentSha256;
 
   /// Set when the user deletes an item that outfit history still references.
@@ -990,6 +1021,7 @@ class ClothingItemRow extends DataClass implements Insertable<ClothingItemRow> {
     this.brand,
     this.warmth,
     required this.status,
+    required this.showCutout,
     this.contentSha256,
     this.deletedAt,
     required this.createdAt,
@@ -1028,6 +1060,7 @@ class ClothingItemRow extends DataClass implements Insertable<ClothingItemRow> {
       map['warmth'] = Variable<int>(warmth);
     }
     map['status'] = Variable<String>(status);
+    map['show_cutout'] = Variable<bool>(showCutout);
     if (!nullToAbsent || contentSha256 != null) {
       map['content_sha256'] = Variable<String>(contentSha256);
     }
@@ -1069,6 +1102,7 @@ class ClothingItemRow extends DataClass implements Insertable<ClothingItemRow> {
           ? const Value.absent()
           : Value(warmth),
       status: Value(status),
+      showCutout: Value(showCutout),
       contentSha256: contentSha256 == null && nullToAbsent
           ? const Value.absent()
           : Value(contentSha256),
@@ -1098,6 +1132,7 @@ class ClothingItemRow extends DataClass implements Insertable<ClothingItemRow> {
       brand: serializer.fromJson<String?>(json['brand']),
       warmth: serializer.fromJson<int?>(json['warmth']),
       status: serializer.fromJson<String>(json['status']),
+      showCutout: serializer.fromJson<bool>(json['showCutout']),
       contentSha256: serializer.fromJson<String?>(json['contentSha256']),
       deletedAt: serializer.fromJson<int?>(json['deletedAt']),
       createdAt: serializer.fromJson<int>(json['createdAt']),
@@ -1120,6 +1155,7 @@ class ClothingItemRow extends DataClass implements Insertable<ClothingItemRow> {
       'brand': serializer.toJson<String?>(brand),
       'warmth': serializer.toJson<int?>(warmth),
       'status': serializer.toJson<String>(status),
+      'showCutout': serializer.toJson<bool>(showCutout),
       'contentSha256': serializer.toJson<String?>(contentSha256),
       'deletedAt': serializer.toJson<int?>(deletedAt),
       'createdAt': serializer.toJson<int>(createdAt),
@@ -1140,6 +1176,7 @@ class ClothingItemRow extends DataClass implements Insertable<ClothingItemRow> {
     Value<String?> brand = const Value.absent(),
     Value<int?> warmth = const Value.absent(),
     String? status,
+    bool? showCutout,
     Value<String?> contentSha256 = const Value.absent(),
     Value<int?> deletedAt = const Value.absent(),
     int? createdAt,
@@ -1157,6 +1194,7 @@ class ClothingItemRow extends DataClass implements Insertable<ClothingItemRow> {
     brand: brand.present ? brand.value : this.brand,
     warmth: warmth.present ? warmth.value : this.warmth,
     status: status ?? this.status,
+    showCutout: showCutout ?? this.showCutout,
     contentSha256: contentSha256.present
         ? contentSha256.value
         : this.contentSha256,
@@ -1184,6 +1222,9 @@ class ClothingItemRow extends DataClass implements Insertable<ClothingItemRow> {
       brand: data.brand.present ? data.brand.value : this.brand,
       warmth: data.warmth.present ? data.warmth.value : this.warmth,
       status: data.status.present ? data.status.value : this.status,
+      showCutout: data.showCutout.present
+          ? data.showCutout.value
+          : this.showCutout,
       contentSha256: data.contentSha256.present
           ? data.contentSha256.value
           : this.contentSha256,
@@ -1208,6 +1249,7 @@ class ClothingItemRow extends DataClass implements Insertable<ClothingItemRow> {
           ..write('brand: $brand, ')
           ..write('warmth: $warmth, ')
           ..write('status: $status, ')
+          ..write('showCutout: $showCutout, ')
           ..write('contentSha256: $contentSha256, ')
           ..write('deletedAt: $deletedAt, ')
           ..write('createdAt: $createdAt, ')
@@ -1230,6 +1272,7 @@ class ClothingItemRow extends DataClass implements Insertable<ClothingItemRow> {
     brand,
     warmth,
     status,
+    showCutout,
     contentSha256,
     deletedAt,
     createdAt,
@@ -1251,6 +1294,7 @@ class ClothingItemRow extends DataClass implements Insertable<ClothingItemRow> {
           other.brand == this.brand &&
           other.warmth == this.warmth &&
           other.status == this.status &&
+          other.showCutout == this.showCutout &&
           other.contentSha256 == this.contentSha256 &&
           other.deletedAt == this.deletedAt &&
           other.createdAt == this.createdAt &&
@@ -1270,6 +1314,7 @@ class ClothingItemsCompanion extends UpdateCompanion<ClothingItemRow> {
   final Value<String?> brand;
   final Value<int?> warmth;
   final Value<String> status;
+  final Value<bool> showCutout;
   final Value<String?> contentSha256;
   final Value<int?> deletedAt;
   final Value<int> createdAt;
@@ -1288,6 +1333,7 @@ class ClothingItemsCompanion extends UpdateCompanion<ClothingItemRow> {
     this.brand = const Value.absent(),
     this.warmth = const Value.absent(),
     this.status = const Value.absent(),
+    this.showCutout = const Value.absent(),
     this.contentSha256 = const Value.absent(),
     this.deletedAt = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -1307,6 +1353,7 @@ class ClothingItemsCompanion extends UpdateCompanion<ClothingItemRow> {
     this.brand = const Value.absent(),
     this.warmth = const Value.absent(),
     required String status,
+    this.showCutout = const Value.absent(),
     this.contentSha256 = const Value.absent(),
     this.deletedAt = const Value.absent(),
     required int createdAt,
@@ -1330,6 +1377,7 @@ class ClothingItemsCompanion extends UpdateCompanion<ClothingItemRow> {
     Expression<String>? brand,
     Expression<int>? warmth,
     Expression<String>? status,
+    Expression<bool>? showCutout,
     Expression<String>? contentSha256,
     Expression<int>? deletedAt,
     Expression<int>? createdAt,
@@ -1349,6 +1397,7 @@ class ClothingItemsCompanion extends UpdateCompanion<ClothingItemRow> {
       if (brand != null) 'brand': brand,
       if (warmth != null) 'warmth': warmth,
       if (status != null) 'status': status,
+      if (showCutout != null) 'show_cutout': showCutout,
       if (contentSha256 != null) 'content_sha256': contentSha256,
       if (deletedAt != null) 'deleted_at': deletedAt,
       if (createdAt != null) 'created_at': createdAt,
@@ -1370,6 +1419,7 @@ class ClothingItemsCompanion extends UpdateCompanion<ClothingItemRow> {
     Value<String?>? brand,
     Value<int?>? warmth,
     Value<String>? status,
+    Value<bool>? showCutout,
     Value<String?>? contentSha256,
     Value<int?>? deletedAt,
     Value<int>? createdAt,
@@ -1389,6 +1439,7 @@ class ClothingItemsCompanion extends UpdateCompanion<ClothingItemRow> {
       brand: brand ?? this.brand,
       warmth: warmth ?? this.warmth,
       status: status ?? this.status,
+      showCutout: showCutout ?? this.showCutout,
       contentSha256: contentSha256 ?? this.contentSha256,
       deletedAt: deletedAt ?? this.deletedAt,
       createdAt: createdAt ?? this.createdAt,
@@ -1436,6 +1487,9 @@ class ClothingItemsCompanion extends UpdateCompanion<ClothingItemRow> {
     if (status.present) {
       map['status'] = Variable<String>(status.value);
     }
+    if (showCutout.present) {
+      map['show_cutout'] = Variable<bool>(showCutout.value);
+    }
     if (contentSha256.present) {
       map['content_sha256'] = Variable<String>(contentSha256.value);
     }
@@ -1469,6 +1523,7 @@ class ClothingItemsCompanion extends UpdateCompanion<ClothingItemRow> {
           ..write('brand: $brand, ')
           ..write('warmth: $warmth, ')
           ..write('status: $status, ')
+          ..write('showCutout: $showCutout, ')
           ..write('contentSha256: $contentSha256, ')
           ..write('deletedAt: $deletedAt, ')
           ..write('createdAt: $createdAt, ')
@@ -2193,7 +2248,7 @@ class ClothingImageRow extends DataClass
   final String id;
   final String itemId;
 
-  /// ORIGINAL, WORKING, THUMBNAIL or CUTOUT.
+  /// ORIGINAL, WORKING, THUMBNAIL, CUTOUT or CUTOUT_THUMBNAIL.
   final String kind;
 
   /// Path relative to the app's private storage root. Never absolute.
@@ -5820,6 +5875,7 @@ typedef $$ClothingItemsTableCreateCompanionBuilder =
       Value<String?> brand,
       Value<int?> warmth,
       required String status,
+      Value<bool> showCutout,
       Value<String?> contentSha256,
       Value<int?> deletedAt,
       required int createdAt,
@@ -5840,6 +5896,7 @@ typedef $$ClothingItemsTableUpdateCompanionBuilder =
       Value<String?> brand,
       Value<int?> warmth,
       Value<String> status,
+      Value<bool> showCutout,
       Value<String?> contentSha256,
       Value<int?> deletedAt,
       Value<int> createdAt,
@@ -6031,6 +6088,11 @@ class $$ClothingItemsTableFilterComposer
 
   ColumnFilters<String> get status => $composableBuilder(
     column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get showCutout => $composableBuilder(
+    column: $table.showCutout,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6249,6 +6311,11 @@ class $$ClothingItemsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get showCutout => $composableBuilder(
+    column: $table.showCutout,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get contentSha256 => $composableBuilder(
     column: $table.contentSha256,
     builder: (column) => ColumnOrderings(column),
@@ -6320,6 +6387,11 @@ class $$ClothingItemsTableAnnotationComposer
 
   GeneratedColumn<String> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<bool> get showCutout => $composableBuilder(
+    column: $table.showCutout,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get contentSha256 => $composableBuilder(
     column: $table.contentSha256,
@@ -6510,6 +6582,7 @@ class $$ClothingItemsTableTableManager
                 Value<String?> brand = const Value.absent(),
                 Value<int?> warmth = const Value.absent(),
                 Value<String> status = const Value.absent(),
+                Value<bool> showCutout = const Value.absent(),
                 Value<String?> contentSha256 = const Value.absent(),
                 Value<int?> deletedAt = const Value.absent(),
                 Value<int> createdAt = const Value.absent(),
@@ -6528,6 +6601,7 @@ class $$ClothingItemsTableTableManager
                 brand: brand,
                 warmth: warmth,
                 status: status,
+                showCutout: showCutout,
                 contentSha256: contentSha256,
                 deletedAt: deletedAt,
                 createdAt: createdAt,
@@ -6548,6 +6622,7 @@ class $$ClothingItemsTableTableManager
                 Value<String?> brand = const Value.absent(),
                 Value<int?> warmth = const Value.absent(),
                 required String status,
+                Value<bool> showCutout = const Value.absent(),
                 Value<String?> contentSha256 = const Value.absent(),
                 Value<int?> deletedAt = const Value.absent(),
                 required int createdAt,
@@ -6566,6 +6641,7 @@ class $$ClothingItemsTableTableManager
                 brand: brand,
                 warmth: warmth,
                 status: status,
+                showCutout: showCutout,
                 contentSha256: contentSha256,
                 deletedAt: deletedAt,
                 createdAt: createdAt,

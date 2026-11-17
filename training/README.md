@@ -49,9 +49,36 @@ and `labels.json` are copied into the app.
   predicted; the user picks them.
 - Patterns are only learned from garments that have a pattern attribute.
 
+## Garment cut-out model (FR-05)
+
+`garment_segmentation.ipynb` trains a second model that outlines each garment, so the app can
+remove the background (flat-lay, hanger) and cut each garment out of a photo of someone
+wearing it. Same data, licence and Colab setup as the classifier.
+
+| Step | Script | Output |
+| --- | --- | --- |
+| Masks from Fashionpedia, plus synthetic flat-lays | `seg_prepare.py` | `{train,val,test}/images`, `/masks`, CSVs, `*_report.json` |
+| Train MobileNetV3 encoder + light decoder | `seg_train.py` | `model.keras`, `history.csv` |
+| Cut-out and per-garment quality | `seg_evaluate.py` | `seg_eval_report.json` |
+| LiteRT export with the XNNPACK check | `seg_export.py` | `garment-seg.tflite`, `seg_labels.json`, `seg_model_card.json` |
+
+- **Labels:** 0 background (skin and hair too: only clothing is cut out), 1–23 the
+  classifier's garment types, 255 ignored (crowd regions, socks, tights). Garment parts are not
+  painted; smaller garments are painted over larger ones.
+- **Synthetic flat-lays:** for half the photos, the largest garment is also cut out with its
+  mask and placed on a plain backdrop (white, grey, beige, wood, dark), because Fashionpedia
+  photos show worn clothes and app photos are often flat-lays.
+- **Model:** 256×256 input, MobileNetV3-Large encoder, LR-ASPP-style decoder with stride-8 and
+  stride-4 skips for sharp edges. Loss: weighted cross-entropy plus soft Dice on
+  garment-vs-background.
+- **Metrics:** garment-vs-background IoU (cut-out quality), per-class IoU, and item recall (the
+  share of garments the app would offer), for real and synthetic test photos separately.
+- **Smoke test:** the notebook runs the whole pipeline on 300 photos first, in about 10
+  minutes.
+
 ## Local tests
 
-The data preparation needs only Python 3.10+ and Pillow:
+The data preparation and metrics need only Python 3.10+, Pillow and numpy:
 
 ```bash
 python -m unittest discover -s tests -v

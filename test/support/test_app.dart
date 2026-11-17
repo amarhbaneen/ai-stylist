@@ -29,6 +29,7 @@ final class TestApp {
     this.picker,
     this.processor,
     this.analyzer,
+    this.garments,
     this.network,
     this.container,
   );
@@ -40,6 +41,9 @@ final class TestApp {
 
   /// Scripted on-device analysis (the fake thumbnails are not decodable).
   final FakeClothingAnalyzer analyzer;
+
+  /// Scripted background removal (the real model needs isolates).
+  final FakeGarmentFinder garments;
 
   /// Every HTTP request the app makes. Tests never reach the real network.
   final FakeNetwork network;
@@ -58,6 +62,7 @@ final class TestApp {
     final picker = FakeMediaPicker();
     final processor = FakeImageProcessor();
     final analyzer = FakeClothingAnalyzer();
+    final garments = FakeGarmentFinder();
     final network = FakeNetwork();
     final container = ProviderContainer(
       overrides: [
@@ -72,6 +77,7 @@ final class TestApp {
         // Same engine, run inline: isolates do not advance on the fake clock.
         engineRunnerProvider.overrideWithValue(runEngineInline),
         clothingAnalyzerProvider.overrideWithValue(analyzer),
+        garmentFinderProvider.overrideWithValue(garments),
         httpClientProvider.overrideWithValue(MockClient(network.handle)),
         // A tiny list instead of the 700 KB bundled asset.
         cityDirectoryProvider.overrideWithValue(
@@ -79,7 +85,16 @@ final class TestApp {
         ),
       ],
     );
-    return TestApp._(tmp, db, picker, processor, analyzer, network, container);
+    return TestApp._(
+      tmp,
+      db,
+      picker,
+      processor,
+      analyzer,
+      garments,
+      network,
+      container,
+    );
   }
 
   Future<void> pump(WidgetTester tester) async {

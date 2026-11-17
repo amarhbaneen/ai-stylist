@@ -214,6 +214,55 @@ final class GarmentClassifierProvider
 
 String _$garmentClassifierHash() => r'786132c016903c38fa66dd73e0259c19d22cb9c9';
 
+/// The bundled garment segmentation model (FR-05, D-39, D-40). Opened on
+/// first use and released when the provider is disposed.
+
+@ProviderFor(garmentFinder)
+final garmentFinderProvider = GarmentFinderProvider._();
+
+/// The bundled garment segmentation model (FR-05, D-39, D-40). Opened on
+/// first use and released when the provider is disposed.
+
+final class GarmentFinderProvider
+    extends $FunctionalProvider<GarmentFinder, GarmentFinder, GarmentFinder>
+    with $Provider<GarmentFinder> {
+  /// The bundled garment segmentation model (FR-05, D-39, D-40). Opened on
+  /// first use and released when the provider is disposed.
+  GarmentFinderProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'garmentFinderProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$garmentFinderHash();
+
+  @$internal
+  @override
+  $ProviderElement<GarmentFinder> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  GarmentFinder create(Ref ref) {
+    return garmentFinder(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(GarmentFinder value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<GarmentFinder>(value),
+    );
+  }
+}
+
+String _$garmentFinderHash() => r'5871f954b5742ee7bd5e5eb5d9afa6e62a83ee23';
+
 /// All analyzers available on this device: Tier 0 (colour) and the Tier-1
 /// garment classifier (category, type, pattern). Either can fail without
 /// blocking the other or manual entry.
@@ -362,14 +411,16 @@ final class ConfirmAnalysisProvider
 String _$confirmAnalysisHash() => r'54d3fea21f367878b6a5c40b700224071058248a';
 
 /// Suggestions for one item: cached if analysed before, otherwise computed
-/// from its thumbnail off the UI thread. Errors surface as `AsyncError`;
+/// off the UI thread from the thumbnail being shown (the cut-out when the
+/// background was removed). Errors surface as `AsyncError`;
 /// the review screen then simply offers manual entry.
 
 @ProviderFor(clothingAnalysis)
 final clothingAnalysisProvider = ClothingAnalysisFamily._();
 
 /// Suggestions for one item: cached if analysed before, otherwise computed
-/// from its thumbnail off the UI thread. Errors surface as `AsyncError`;
+/// off the UI thread from the thumbnail being shown (the cut-out when the
+/// background was removed). Errors surface as `AsyncError`;
 /// the review screen then simply offers manual entry.
 
 final class ClothingAnalysisProvider
@@ -381,7 +432,8 @@ final class ClothingAnalysisProvider
         >
     with $FutureModifier<ClothingAnalysis>, $FutureProvider<ClothingAnalysis> {
   /// Suggestions for one item: cached if analysed before, otherwise computed
-  /// from its thumbnail off the UI thread. Errors surface as `AsyncError`;
+  /// off the UI thread from the thumbnail being shown (the cut-out when the
+  /// background was removed). Errors surface as `AsyncError`;
   /// the review screen then simply offers manual entry.
   ClothingAnalysisProvider._({
     required ClothingAnalysisFamily super.from,
@@ -427,10 +479,11 @@ final class ClothingAnalysisProvider
   }
 }
 
-String _$clothingAnalysisHash() => r'7f59f18dfbddc3ef04d15b187240c93f3815d60c';
+String _$clothingAnalysisHash() => r'bc129bcdb934d33f3b06239f326536a5922df5c9';
 
 /// Suggestions for one item: cached if analysed before, otherwise computed
-/// from its thumbnail off the UI thread. Errors surface as `AsyncError`;
+/// off the UI thread from the thumbnail being shown (the cut-out when the
+/// background was removed). Errors surface as `AsyncError`;
 /// the review screen then simply offers manual entry.
 
 final class ClothingAnalysisFamily extends $Family
@@ -445,7 +498,8 @@ final class ClothingAnalysisFamily extends $Family
       );
 
   /// Suggestions for one item: cached if analysed before, otherwise computed
-  /// from its thumbnail off the UI thread. Errors surface as `AsyncError`;
+  /// off the UI thread from the thumbnail being shown (the cut-out when the
+  /// background was removed). Errors surface as `AsyncError`;
   /// the review screen then simply offers manual entry.
 
   ClothingAnalysisProvider call(String itemId) =>

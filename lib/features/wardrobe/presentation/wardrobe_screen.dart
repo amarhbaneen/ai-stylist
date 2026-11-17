@@ -204,7 +204,7 @@ class _ItemCard extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   StoredImage(
-                    relativePath: item.images?.thumbnail,
+                    relativePath: item.images?.displayThumbnail,
                     cacheWidth: 360,
                     semanticLabel: title,
                   ),

@@ -6,13 +6,13 @@ import 'package:wardrobe_domain/wardrobe_domain.dart';
 import '../../../app/routes.dart';
 import '../../../shared/taxonomy_labels.dart';
 import '../../../shared/widgets/empty_state.dart';
-import '../../../shared/widgets/item_thumbnail.dart';
 import '../../clothing_analysis/analysis_providers.dart';
 import '../../clothing_analysis/presentation/apply_suggestions.dart';
 import '../../clothing_analysis/presentation/attribute_suggestion_note.dart';
 import '../../clothing_analysis/presentation/color_suggestion_notes.dart';
 import '../wardrobe_providers.dart';
 import 'clothing_attributes_form.dart';
+import 'item_photo.dart';
 
 /// Review a newly imported photo ([confirm] = true) or edit an existing item.
 ///
@@ -197,17 +197,7 @@ class _ItemEditorScreenState extends ConsumerState<ItemEditorScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: AspectRatio(
-              aspectRatio: 4 / 3,
-              child: StoredImage(
-                relativePath: item.images?.working,
-                fit: BoxFit.contain,
-                semanticLabel: 'Photo of the item',
-              ),
-            ),
-          ),
+          ItemPhoto(item: item, semanticLabel: 'Photo of the item'),
           if (widget.confirm)
             const Padding(
               padding: EdgeInsets.only(top: 12),

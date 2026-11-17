@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "task": "garment-segmentation",
+  "input": {
+    "name": "image",
+    "size": 256,
+    "format": "float32 [1,256,256,3] RGB 0-255, whole photo resized"
+  },
+  "output": {
+    "name": "mask",
+    "format": "float32 [1,256,256,C] class probabilities"
+  },
+  "minAreaShare": 0.01,
+  "classes": [
+    {
+      "index": 0,
+      "label": "background"
+    },
+    {
+      "index": 1,
+      "label": "shirt_blouse",
+      "category": "TOP",
+      "subcategory": null
+    },
+    {
+      "index": 2,
+      "label": "top_tshirt_sweatshirt",
+      "category": "TOP",
+      "subcategory": null
+    },
+    {
+      "index": 3,
+      "label": "sweater",
+      "category": "TOP",
+      "subcategory": "SWEATER"
+    },
+    {
+      "index": 4,
+      "label": "cardigan",
+      "category": "OUTERWEAR",
+      "subcategory": "CARDIGAN"
+    },
+    {
+      "index": 5,
+      "label": "jacket",
+      "category": "OUTERWEAR",
+      "subcategory": "JACKET"
+    },
+    {
+      "index": 6,
+      "label": "vest",
+      "category": "OUTERWEAR",
+      "subcategory": "VEST"
+    },
+    {
+      "index": 7,
+      "label": "coat",
+      "category": "OUTERWEAR",
+      "subcategory": "COAT"
+    },
+    {
+      "index": 8,
+      "label": "cape",
+      "category": "OUTERWEAR",
+      "subcategory": "OTHER_OUTERWEAR"
+    },
+    {
+      "index": 9,
+      "label": "pants",
+      "category": "BOTTOM",
+      "subcategory": null
+    },
+    {
+      "index": 10,
+      "label": "shorts",
+      "category": "BOTTOM",
+      "subcategory": "SHORTS"
+    },
+    {
+      "index": 11,
+      "label": "skirt",
+      "category": "BOTTOM",
+      "subcategory": "SKIRT"
+    },
+    {
+      "index": 12,
+      "label": "dress",
+      "category": "ONE_PIECE",
+      "subcategory": "DRESS"
+    },
+    {
+      "index": 13,
+      "label": "jumpsuit",
+      "category": "ONE_PIECE",
+      "subcategory": "JUMPSUIT"
+    },
+    {
+      "index": 14,
+      "label": "shoe",
+      "category": "FOOTWEAR",
+      "subcategory": null
+    },
+    {
+      "index": 15,
+      "label": "bag_wallet",
+      "category": "ACCESSORY",
+      "subcategory": "BAG"
+    },
+    {
+      "index": 16,
+      "label": "hat",
+      "category": "ACCESSORY",
+      "subcategory": "HAT"
+    },
+    {
+      "index": 17,
+      "label": "scarf",
+      "category": "ACCESSORY",
+      "subcategory": "SCARF"
+    },
+    {
+      "index": 18,
+      "label": "belt",
+      "category": "ACCESSORY",
+      "subcategory": "BELT"
+    },
+    {
+      "index": 19,
+      "label": "tie",
+      "category": "ACCESSORY",
+      "subcategory": "TIE"
+    },
+    {
+      "index": 20,
+      "label": "glasses",
+      "category": "ACCESSORY",
+      "subcategory": "OTHER_ACCESSORY"
+    },
+    {
+      "index": 21,
+      "label": "headwear_other",
+      "category": "ACCESSORY",
+      "subcategory": "OTHER_ACCESSORY"
+    },
+    {
+      "index": 22,
+      "label": "glove",
+      "category": "ACCESSORY",
+      "subcategory": "OTHER_ACCESSORY"
+    },
+    {
+      "index": 23,
+      "label": "watch",
+      "category": "ACCESSORY",
+      "subcategory": "OTHER_ACCESSORY"
+    }
+  ]
+}

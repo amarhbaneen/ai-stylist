@@ -34,6 +34,14 @@ SaveClothingItem saveClothingItem(Ref ref) =>
     SaveClothingItem(ref.watch(wardrobeRepositoryProvider));
 
 @riverpod
+AddGarmentsFromPhoto addGarmentsFromPhoto(Ref ref) =>
+    AddGarmentsFromPhoto(ref.watch(wardrobeRepositoryProvider));
+
+@riverpod
+ShowCutout showCutout(Ref ref) =>
+    ShowCutout(ref.watch(wardrobeRepositoryProvider));
+
+@riverpod
 ArchiveClothingItem archiveClothingItem(Ref ref) =>
     ArchiveClothingItem(ref.watch(wardrobeRepositoryProvider));
 

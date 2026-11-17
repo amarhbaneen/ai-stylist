@@ -6,8 +6,8 @@ import 'package:wardrobe_domain/wardrobe_domain.dart';
 import '../../../app/routes.dart';
 import '../../../shared/taxonomy_labels.dart';
 import '../../../shared/widgets/empty_state.dart';
-import '../../../shared/widgets/item_thumbnail.dart';
 import '../wardrobe_providers.dart';
+import 'item_photo.dart';
 
 /// Read-only view of an item with edit, archive/restore and delete.
 class ItemDetailsScreen extends ConsumerWidget {
@@ -211,17 +211,7 @@ class _Details extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: AspectRatio(
-              aspectRatio: 4 / 3,
-              child: StoredImage(
-                relativePath: item.images?.working,
-                fit: BoxFit.contain,
-                semanticLabel: title,
-              ),
-            ),
-          ),
+          ItemPhoto(item: item, semanticLabel: title),
           const SizedBox(height: 8),
           for (final (label, value) in rows)
             ListTile(

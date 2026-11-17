@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:ai_stylist/ai/segmentation/garment_segmenter.dart';
 import 'package:ai_stylist/core/media/image_processor.dart';
 import 'package:ai_stylist/core/media/media_picker.dart';
 import 'package:ai_stylist/core/storage/file_store.dart';
@@ -80,8 +81,14 @@ final class FlakyFileStore implements FileStore {
   }
 
   @override
-  Future<Result<void>> copyIn(File source, String relativePath) =>
-      inner.copyIn(source, relativePath);
+  Future<Result<void>> copyIn(File source, String relativePath) {
+    if (failOn != null && relativePath.contains(failOn!)) {
+      return Future.value(
+        const Failure(InsufficientStorageFailure('Disk full (simulated)')),
+      );
+    }
+    return inner.copyIn(source, relativePath);
+  }
 
   @override
   Future<Result<Uint8List>> readBytes(String relativePath) =>
@@ -100,6 +107,19 @@ final class FlakyFileStore implements FileStore {
 
   @override
   File resolve(String relativePath) => inner.resolve(relativePath);
+}
+
+/// Scripted garment finder (default: finds nothing, so imports behave as
+/// they did before background removal).
+final class FakeGarmentFinder implements GarmentFinder {
+  Result<List<FoundGarment>> result = const Success([]);
+  final paths = <String>[];
+
+  @override
+  Future<Result<List<FoundGarment>>> findGarments(String imagePath) async {
+    paths.add(imagePath);
+    return result;
+  }
 }
 
 /// Analyzer returning a scripted result (default: nothing suggested).
