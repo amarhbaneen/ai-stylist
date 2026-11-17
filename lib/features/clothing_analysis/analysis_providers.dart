@@ -9,6 +9,8 @@ import '../../ai/download/model_download_manager.dart';
 import '../../ai/garment/garment_classifier.dart';
 import '../../ai/garment/garment_model_loader.dart';
 import '../../ai/model_registry.dart';
+import '../../ai/segmentation/garment_segmenter.dart';
+import '../../ai/segmentation/litert_segmentation_session.dart';
 import '../../core/logging/app_logger.dart';
 import '../../core/providers.dart';
 import '../wardrobe/wardrobe_providers.dart';
@@ -66,6 +68,18 @@ GarmentClassifier garmentClassifier(Ref ref) {
   return classifier;
 }
 
+/// The bundled garment segmentation model (FR-05, D-39, D-40). Opened on
+/// first use and released when the provider is disposed.
+@Riverpod(keepAlive: true)
+GarmentFinder garmentFinder(Ref ref) {
+  final segmenter = GarmentSegmenter(
+    open: () async =>
+        openSegmentationModel(await ref.read(modelRegistryProvider.future)),
+  );
+  ref.onDispose(segmenter.close);
+  return segmenter;
+}
+
 /// All analyzers available on this device: Tier 0 (colour) and the Tier-1
 /// garment classifier (category, type, pattern). Either can fail without
 /// blocking the other or manual entry.
@@ -91,13 +105,14 @@ ConfirmAnalysis confirmAnalysis(Ref ref) =>
 Duration? _noRetry(int retryCount, Object error) => null;
 
 /// Suggestions for one item: cached if analysed before, otherwise computed
-/// from its thumbnail off the UI thread. Errors surface as `AsyncError`;
+/// off the UI thread from the thumbnail being shown (the cut-out when the
+/// background was removed). Errors surface as `AsyncError`;
 /// the review screen then simply offers manual entry.
 @Riverpod(retry: _noRetry)
 Future<ClothingAnalysis> clothingAnalysis(Ref ref, String itemId) async {
   final item = (await ref.read(wardrobeRepositoryProvider).getItem(itemId));
   final thumbnail = switch (item) {
-    Success(:final value) => value.images?.thumbnail,
+    Success(:final value) => value.images?.displayThumbnail,
     Failure(:final failure) => throw failure,
   };
   if (thumbnail == null) {

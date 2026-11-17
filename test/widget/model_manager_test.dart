@@ -11,8 +11,10 @@ void main() {
     await tapAndSettle(tester, find.byTooltip('Style preferences'));
     await tapAndSettle(tester, find.text('On-device models'));
 
-    await pumpUntil(tester, find.textContaining('No optional models'));
+    await pumpUntil(tester, find.text('Garment cut-out'));
+    expect(find.text('Clothing type and pattern'), findsOneWidget);
     expect(find.textContaining('set every detail by hand'), findsOneWidget);
+    await scrollTo(tester, find.textContaining('No optional models'));
     expect(app.network.requests, isEmpty);
     await app.dispose(tester);
   });

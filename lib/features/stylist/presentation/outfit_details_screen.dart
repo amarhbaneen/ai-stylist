@@ -110,7 +110,7 @@ class _PieceTile extends ConsumerWidget {
         child: SizedBox.square(
           dimension: 56,
           child: StoredImage(
-            relativePath: item?.images?.thumbnail,
+            relativePath: item?.images?.displayThumbnail,
             cacheWidth: 168,
           ),
         ),
