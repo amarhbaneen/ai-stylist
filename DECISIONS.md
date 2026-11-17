@@ -409,6 +409,43 @@ permission is used. Search is local and accent-insensitive.
 - The manifest lists no downloadable models yet (D-16, P-3), so the Model manager screen says
   so and the app is unaffected.
 
+## D-38 Tier-1 garment classifier in the app. Accepted (M4)
+- **Model.** `garment-tier1` 1.0.0, trained with `training/` on Google Colab (D-08, P-3).
+  MobileNetV3-Large, two heads: 23 garment types and 8 patterns. Calibrated probabilities
+  (one temperature per head) are built into the file. Model card and evaluation report:
+  `training/model_cards/`.
+- **Variant.** Full int8 failed to load under XNNPACK, the default CPU accelerator ("Node
+  number 127 failed to prepare"), so the export chose the next variant: **int8 weights, float
+  activations** ("dynamic range"). 3.36 MB, agrees with the float model on 97.6% of 1,000 test
+  crops. The export now always runs this check (`export_tflite.py`).
+- **Test-set results** (3,426 Fashionpedia crops; photos of worn clothes): category 90.6%
+  top-1; 81% of items reach the 0.80 prefill level, and those are 97% correct. Type 85% top-1,
+  96% top-3. Pattern 80% top-1. Weak: cardigan, shirt/blouse, sweater, vest, floral, dotted.
+  No test examples for tie or animal print.
+- **Runtime.** `flutter_litert` held to 4.1.x (4.1.2 resolved), bundled runtime only, as the
+  M3 spike verified (D-07). Inference runs on its own isolate; decoding and resizing run on
+  another. The model is opened on first use, kept for later photos, and closed when the
+  provider is disposed.
+- **Input.** The whole thumbnail, resized to 224×224 without cropping, RGB 0–255 float, the
+  same as `training/` evaluated.
+- **Labels.** `assets/models/garment-tier1.labels.json`, named by the new optional manifest
+  field `labelsAsset`, parsed strictly. Types sum into categories through `OutputValidator`.
+  Ambiguous classes (shirt/blouse, T-shirt/sweatshirt, pants, shoe) suggest a category only.
+  A type is dropped if it belongs to another category than the suggested one, or if it is
+  below 0.15.
+- **Form.** Category, type and pattern follow D-09 like colour: prefill at ≥ 0.80, prefill and
+  "please confirm" at 0.50–0.80, hint chips below. Fields the user changed are never
+  overwritten, and a type is only prefilled when it fits the form's category.
+- **Attribution.** The On-device models screen lists the built-in model and credits
+  Fashionpedia (CC BY 4.0) and the Keras ImageNet weights.
+- **Android check (2026-11-17).** `integration_test/garment_model_test.dart` on the x86_64
+  emulator (API 37): model opened in 423 ms; 49 ms median and 162 ms worst over 10 analyses,
+  decoding included. A synthetic red T-shirt gave Top (69%, "please confirm") and Solid (74%).
+  Release APK builds (89.9 MB, all ABIs). Real-phone numbers are still open.
+- **Limits.** Accuracy on flat-lay and hanger photos is not measured yet (domain gap). Cached
+  analyses keep only colour alternatives, so hint chips for category, type and pattern appear
+  on the first review, not after reopening a draft. iOS is not built or tested.
+
 ## D-26 Spikes live in `spikes/`, outside the product build. Accepted (M3)
 Each spike is a standalone Flutter app with its own pubspec (exact version pins) and is excluded
 from the root analyzer. Downloaded model binaries are git-ignored and fetched by a script that

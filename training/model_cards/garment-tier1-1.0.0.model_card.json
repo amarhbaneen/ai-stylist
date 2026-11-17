@@ -1,0 +1,216 @@
+{
+  "modelId": "garment-tier1",
+  "version": "1.0.0",
+  "shippable": true,
+  "variant": "dynamic",
+  "quantizer": "legacy",
+  "file": "garment-tier1.tflite",
+  "sizeBytes": 3361672,
+  "sha256": "d562792cd42234b0df2e8a10f3e857957ab4793aba42b66387123e75ed8dc397",
+  "floatSizeBytes": 12065208,
+  "io": {
+    "inputs": {
+      "image": {
+        "shape": [
+          1,
+          224,
+          224,
+          3
+        ],
+        "dtype": "float32"
+      }
+    },
+    "outputs": {
+      "pattern": {
+        "shape": [
+          1,
+          8
+        ],
+        "dtype": "float32"
+      },
+      "type": {
+        "shape": [
+          1,
+          23
+        ],
+        "dtype": "float32"
+      }
+    }
+  },
+  "temperatures": {
+    "type": 1.1402016844582339,
+    "pattern": 1.0416675574330605
+  },
+  "reference": {
+    "samples": 1000,
+    "typeTop1": 0.85,
+    "patternTop1": 0.811
+  },
+  "variants": [
+    {
+      "variant": "int8",
+      "quantizer": "legacy",
+      "file": "garment-tier1-int8.tflite",
+      "sizeBytes": 3571752,
+      "xnnpack": false,
+      "error": "failed to create XNNPACK runtimeNode number 127 (TfLiteXNNPackDelegate) failed to prepare.",
+      "failingOp": null
+    },
+    {
+      "variant": "dynamic",
+      "quantizer": "legacy",
+      "file": "garment-tier1-dynamic.tflite",
+      "sizeBytes": 3361672,
+      "xnnpack": true,
+      "typeTop1": 0.852,
+      "patternTop1": 0.799,
+      "agreesWithKeras": 0.976,
+      "maxTypeProbDiff": 0.357566
+    }
+  ],
+  "labels": {
+    "schemaVersion": 1,
+    "inputs": {
+      "image": "float32 [1,224,224,3] RGB, 0-255"
+    },
+    "outputs": {
+      "type": [
+        {
+          "label": "shirt_blouse",
+          "category": "TOP",
+          "subcategory": null
+        },
+        {
+          "label": "top_tshirt_sweatshirt",
+          "category": "TOP",
+          "subcategory": null
+        },
+        {
+          "label": "sweater",
+          "category": "TOP",
+          "subcategory": "SWEATER"
+        },
+        {
+          "label": "cardigan",
+          "category": "OUTERWEAR",
+          "subcategory": "CARDIGAN"
+        },
+        {
+          "label": "jacket",
+          "category": "OUTERWEAR",
+          "subcategory": "JACKET"
+        },
+        {
+          "label": "vest",
+          "category": "OUTERWEAR",
+          "subcategory": "VEST"
+        },
+        {
+          "label": "coat",
+          "category": "OUTERWEAR",
+          "subcategory": "COAT"
+        },
+        {
+          "label": "cape",
+          "category": "OUTERWEAR",
+          "subcategory": "OTHER_OUTERWEAR"
+        },
+        {
+          "label": "pants",
+          "category": "BOTTOM",
+          "subcategory": null
+        },
+        {
+          "label": "shorts",
+          "category": "BOTTOM",
+          "subcategory": "SHORTS"
+        },
+        {
+          "label": "skirt",
+          "category": "BOTTOM",
+          "subcategory": "SKIRT"
+        },
+        {
+          "label": "dress",
+          "category": "ONE_PIECE",
+          "subcategory": "DRESS"
+        },
+        {
+          "label": "jumpsuit",
+          "category": "ONE_PIECE",
+          "subcategory": "JUMPSUIT"
+        },
+        {
+          "label": "shoe",
+          "category": "FOOTWEAR",
+          "subcategory": null
+        },
+        {
+          "label": "bag_wallet",
+          "category": "ACCESSORY",
+          "subcategory": "BAG"
+        },
+        {
+          "label": "hat",
+          "category": "ACCESSORY",
+          "subcategory": "HAT"
+        },
+        {
+          "label": "scarf",
+          "category": "ACCESSORY",
+          "subcategory": "SCARF"
+        },
+        {
+          "label": "belt",
+          "category": "ACCESSORY",
+          "subcategory": "BELT"
+        },
+        {
+          "label": "tie",
+          "category": "ACCESSORY",
+          "subcategory": "TIE"
+        },
+        {
+          "label": "glasses",
+          "category": "ACCESSORY",
+          "subcategory": "OTHER_ACCESSORY"
+        },
+        {
+          "label": "headwear_other",
+          "category": "ACCESSORY",
+          "subcategory": "OTHER_ACCESSORY"
+        },
+        {
+          "label": "glove",
+          "category": "ACCESSORY",
+          "subcategory": "OTHER_ACCESSORY"
+        },
+        {
+          "label": "watch",
+          "category": "ACCESSORY",
+          "subcategory": "OTHER_ACCESSORY"
+        }
+      ],
+      "pattern": [
+        "SOLID",
+        "STRIPED",
+        "CHECKED",
+        "FLORAL",
+        "GRAPHIC",
+        "DOTTED",
+        "ANIMAL",
+        "OTHER"
+      ]
+    }
+  },
+  "license": "Model weights: project licence. Trained on Fashionpedia annotations (CC BY 4.0, attribution required). Backbone: Keras ImageNet weights.",
+  "manifestEntry": {
+    "id": "garment-tier1",
+    "version": "1.0.0",
+    "task": "garment-type-pattern",
+    "title": "Clothing type and pattern",
+    "asset": "assets/models/garment-tier1.tflite",
+    "sha256": "d562792cd42234b0df2e8a10f3e857957ab4793aba42b66387123e75ed8dc397",
+    "license": "CC-BY-4.0 (Fashionpedia annotations)"
+  }
+}
