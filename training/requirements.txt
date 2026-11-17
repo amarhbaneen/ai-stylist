@@ -1,0 +1,4 @@
+# Local runs only; Colab already has these.
+tensorflow>=2.16
+pillow>=10
+numpy>=1.26
