@@ -75,22 +75,38 @@ final class ColorExtractor {
   static const _minForegroundShare = 0.08;
 
   /// Analyses tightly packed 8-bit RGB pixels ([rgb].length == w*h*3).
-  ColorAnalysis analyzeRgb(Uint8List rgb, int width, int height) {
+  ///
+  /// [opaque] (one byte per pixel, 0 = transparent) marks the garment in a
+  /// cut-out (FR-05). With it, transparent pixels are ignored and the border
+  /// heuristic is skipped: the background is already gone.
+  ColorAnalysis analyzeRgb(
+    Uint8List rgb,
+    int width,
+    int height, {
+    Uint8List? opaque,
+  }) {
     if (width <= 0 || height <= 0 || rgb.length < width * height * 3) {
       return ColorAnalysis.empty;
     }
+    if (opaque != null && opaque.length < width * height) {
+      return ColorAnalysis.empty;
+    }
+    bool visible(int i) => opaque == null || opaque[i] != 0;
     final labs = List<Lab>.generate(
       width * height,
       (i) => Lab.fromRgb(rgb[i * 3], rgb[i * 3 + 1], rgb[i * 3 + 2]),
       growable: false,
     );
 
-    final background = _uniformBorder(labs, width, height);
+    final background = opaque == null
+        ? _uniformBorder(labs, width, height)
+        : null;
     final weights = Float64List(labs.length);
     var kept = 0;
     final cx = (width - 1) / 2, cy = (height - 1) / 2;
     final maxR2 = cx * cx + cy * cy;
     for (var i = 0; i < labs.length; i++) {
+      if (!visible(i)) continue;
       if (background != null &&
           labs[i].distanceTo(background) < _backgroundDistance) {
         continue;
@@ -100,8 +116,8 @@ final class ColorExtractor {
       weights[i] = 1 - 0.65 * (dx * dx + dy * dy) / (maxR2 == 0 ? 1 : maxR2);
       kept++;
     }
-    var backgroundRemoved = background != null;
-    if (kept < labs.length * _minForegroundShare) {
+    var backgroundRemoved = background != null || opaque != null;
+    if (opaque == null && kept < labs.length * _minForegroundShare) {
       backgroundRemoved = false;
       for (var i = 0; i < labs.length; i++) {
         weights[i] = 1;

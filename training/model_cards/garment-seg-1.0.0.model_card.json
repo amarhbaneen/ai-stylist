@@ -1,0 +1,222 @@
+{
+  "modelId": "garment-seg",
+  "version": "1.0.0",
+  "shippable": true,
+  "variant": "dynamic",
+  "file": "garment-seg.tflite",
+  "sizeBytes": 3844192,
+  "sha256": "39224bc4977c8ee5b283131ca0355f897245a91c33295c990604ab6dd8aeab19",
+  "floatSizeBytes": 13965996,
+  "io": {
+    "inputs": {
+      "image": {
+        "shape": [
+          1,
+          256,
+          256,
+          3
+        ],
+        "dtype": "float32"
+      }
+    },
+    "outputs": {
+      "mask": {
+        "shape": [
+          1,
+          256,
+          256,
+          24
+        ],
+        "dtype": "float32"
+      }
+    }
+  },
+  "variants": [
+    {
+      "variant": "int8",
+      "file": "garment-seg-int8.tflite",
+      "sizeBytes": 4060744,
+      "xnnpack": false,
+      "error": "failed to create XNNPACK runtimeNode number 137 (TfLiteXNNPackDelegate) failed to prepare.",
+      "failingOp": null
+    },
+    {
+      "variant": "dynamic",
+      "file": "garment-seg-dynamic.tflite",
+      "sizeBytes": 3844192,
+      "xnnpack": true,
+      "pixelAgreement": 0.9849,
+      "foregroundIoUvsKeras": 0.9822,
+      "maxProbDiff": 0.839883
+    }
+  ],
+  "labels": {
+    "schemaVersion": 1,
+    "task": "garment-segmentation",
+    "input": {
+      "name": "image",
+      "size": 256,
+      "format": "float32 [1,256,256,3] RGB 0-255, whole photo resized"
+    },
+    "output": {
+      "name": "mask",
+      "format": "float32 [1,256,256,C] class probabilities"
+    },
+    "minAreaShare": 0.01,
+    "classes": [
+      {
+        "index": 0,
+        "label": "background"
+      },
+      {
+        "index": 1,
+        "label": "shirt_blouse",
+        "category": "TOP",
+        "subcategory": null
+      },
+      {
+        "index": 2,
+        "label": "top_tshirt_sweatshirt",
+        "category": "TOP",
+        "subcategory": null
+      },
+      {
+        "index": 3,
+        "label": "sweater",
+        "category": "TOP",
+        "subcategory": "SWEATER"
+      },
+      {
+        "index": 4,
+        "label": "cardigan",
+        "category": "OUTERWEAR",
+        "subcategory": "CARDIGAN"
+      },
+      {
+        "index": 5,
+        "label": "jacket",
+        "category": "OUTERWEAR",
+        "subcategory": "JACKET"
+      },
+      {
+        "index": 6,
+        "label": "vest",
+        "category": "OUTERWEAR",
+        "subcategory": "VEST"
+      },
+      {
+        "index": 7,
+        "label": "coat",
+        "category": "OUTERWEAR",
+        "subcategory": "COAT"
+      },
+      {
+        "index": 8,
+        "label": "cape",
+        "category": "OUTERWEAR",
+        "subcategory": "OTHER_OUTERWEAR"
+      },
+      {
+        "index": 9,
+        "label": "pants",
+        "category": "BOTTOM",
+        "subcategory": null
+      },
+      {
+        "index": 10,
+        "label": "shorts",
+        "category": "BOTTOM",
+        "subcategory": "SHORTS"
+      },
+      {
+        "index": 11,
+        "label": "skirt",
+        "category": "BOTTOM",
+        "subcategory": "SKIRT"
+      },
+      {
+        "index": 12,
+        "label": "dress",
+        "category": "ONE_PIECE",
+        "subcategory": "DRESS"
+      },
+      {
+        "index": 13,
+        "label": "jumpsuit",
+        "category": "ONE_PIECE",
+        "subcategory": "JUMPSUIT"
+      },
+      {
+        "index": 14,
+        "label": "shoe",
+        "category": "FOOTWEAR",
+        "subcategory": null
+      },
+      {
+        "index": 15,
+        "label": "bag_wallet",
+        "category": "ACCESSORY",
+        "subcategory": "BAG"
+      },
+      {
+        "index": 16,
+        "label": "hat",
+        "category": "ACCESSORY",
+        "subcategory": "HAT"
+      },
+      {
+        "index": 17,
+        "label": "scarf",
+        "category": "ACCESSORY",
+        "subcategory": "SCARF"
+      },
+      {
+        "index": 18,
+        "label": "belt",
+        "category": "ACCESSORY",
+        "subcategory": "BELT"
+      },
+      {
+        "index": 19,
+        "label": "tie",
+        "category": "ACCESSORY",
+        "subcategory": "TIE"
+      },
+      {
+        "index": 20,
+        "label": "glasses",
+        "category": "ACCESSORY",
+        "subcategory": "OTHER_ACCESSORY"
+      },
+      {
+        "index": 21,
+        "label": "headwear_other",
+        "category": "ACCESSORY",
+        "subcategory": "OTHER_ACCESSORY"
+      },
+      {
+        "index": 22,
+        "label": "glove",
+        "category": "ACCESSORY",
+        "subcategory": "OTHER_ACCESSORY"
+      },
+      {
+        "index": 23,
+        "label": "watch",
+        "category": "ACCESSORY",
+        "subcategory": "OTHER_ACCESSORY"
+      }
+    ]
+  },
+  "license": "Model weights: project licence. Trained on Fashionpedia annotations (CC BY 4.0, attribution required). Backbone: Keras ImageNet weights.",
+  "manifestEntry": {
+    "id": "garment-seg",
+    "version": "1.0.0",
+    "task": "garment-segmentation",
+    "title": "Garment cut-out",
+    "asset": "assets/models/garment-seg.tflite",
+    "labelsAsset": "assets/models/garment-seg.labels.json",
+    "sha256": "39224bc4977c8ee5b283131ca0355f897245a91c33295c990604ab6dd8aeab19",
+    "license": "CC-BY-4.0 (Fashionpedia annotations)"
+  }
+}

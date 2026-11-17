@@ -39,14 +39,25 @@ final class ImageColorAnalyzer {
           ? img.copyResize(decoded, width: size)
           : img.copyResize(decoded, height: size);
       final rgb = Uint8List(scaled.width * scaled.height * 3);
-      var o = 0;
+      // Cut-outs (FR-05) are transparent outside the garment.
+      final opaque = scaled.hasAlpha
+          ? Uint8List(scaled.width * scaled.height)
+          : null;
+      var o = 0, i = 0;
       for (final p in scaled) {
         rgb[o++] = p.r.toInt();
         rgb[o++] = p.g.toInt();
         rgb[o++] = p.b.toInt();
+        if (opaque != null) opaque[i] = p.a >= p.maxChannelValue / 2 ? 1 : 0;
+        i++;
       }
       return Success(
-        const ColorExtractor().analyzeRgb(rgb, scaled.width, scaled.height),
+        const ColorExtractor().analyzeRgb(
+          rgb,
+          scaled.width,
+          scaled.height,
+          opaque: opaque,
+        ),
       );
     });
   }

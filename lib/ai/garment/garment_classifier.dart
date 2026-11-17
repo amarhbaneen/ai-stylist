@@ -186,8 +186,11 @@ Float32List preprocess(String path, int size) =>
 /// Exposed for tests with in-memory images.
 Float32List pixelsOf(img.Image? image, int size, [String what = 'image']) {
   if (image == null) throw UnsupportedImageException(what);
+  // Cut-outs (FR-05) are transparent PNGs: composite them onto white, like
+  // a product photo, so hidden background pixels never reach the model.
+  final hasAlpha = image.hasAlpha;
   final resized = img.copyResize(
-    image.convert(format: img.Format.uint8, numChannels: 3),
+    image.convert(format: img.Format.uint8, numChannels: hasAlpha ? 4 : 3),
     width: size,
     height: size,
     interpolation: img.Interpolation.linear,
@@ -195,9 +198,11 @@ Float32List pixelsOf(img.Image? image, int size, [String what = 'image']) {
   final out = Float32List(size * size * 3);
   var o = 0;
   for (final p in resized) {
-    out[o++] = p.r.toDouble();
-    out[o++] = p.g.toDouble();
-    out[o++] = p.b.toDouble();
+    final a = hasAlpha ? p.a / 255 : 1.0;
+    final white = 255 * (1 - a);
+    out[o++] = p.r * a + white;
+    out[o++] = p.g * a + white;
+    out[o++] = p.b * a + white;
   }
   return out;
 }
