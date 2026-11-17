@@ -42,6 +42,19 @@ abstract interface class WardrobeRepository {
     required bool activate,
   });
 
+  /// Stores a background-removed copy of the item's photo and shows it.
+  /// Replaces an earlier cut-out. The original photo is never changed.
+  Future<Result<ClothingItem>> saveCutout(String id, CutoutImages cutout);
+
+  /// Chooses between the cut-out and the original photo. Fails with
+  /// `ValidationFailure` when [show] is true and there is no cut-out.
+  Future<Result<ClothingItem>> setShowCutout(String id, {required bool show});
+
+  /// Creates a new DRAFT item from the same photo as [sourceId], for a photo
+  /// with several garments (D-39). The new item gets its own copies of the
+  /// photo files, so deleting one item never affects another.
+  Future<Result<ClothingItem>> copyPhotoToNewItem(String sourceId);
+
   /// Archives or restores an item. DRAFT items cannot be archived.
   Future<Result<ClothingItem>> setStatus(String id, ItemStatus status);
 

@@ -1,3 +1,4 @@
+import '../core/app_failure.dart';
 import '../core/result.dart';
 import '../taxonomy/taxonomy.dart';
 import 'clothing_attributes.dart';
@@ -13,6 +14,62 @@ final class ImportClothingPhoto {
 
   Future<Result<ClothingItem>> call(String sourcePath) =>
       _repository.importImage(sourcePath);
+}
+
+/// Applies cut-outs found in one photo (FR-05, D-39): the first goes to
+/// [itemId]; each other one becomes a new DRAFT item from the same photo.
+///
+/// All or nothing for the new items: if one cannot be created, the ones
+/// already created are removed and the failure is returned. The first item
+/// keeps its photo either way, so adding it is never blocked.
+final class AddGarmentsFromPhoto {
+  const AddGarmentsFromPhoto(this._repository);
+
+  final WardrobeRepository _repository;
+
+  /// Returns the items in the order of [cutouts].
+  Future<Result<List<ClothingItem>>> call(
+    String itemId,
+    List<CutoutImages> cutouts,
+  ) async {
+    if (cutouts.isEmpty) {
+      return const Failure(ValidationFailure('No garments were selected'));
+    }
+    final first = await _repository.saveCutout(itemId, cutouts.first);
+    if (first case Failure(:final failure)) return Failure(failure);
+    final items = [(first as Success<ClothingItem>).value];
+
+    for (final cutout in cutouts.skip(1)) {
+      final created = await _repository.copyPhotoToNewItem(itemId);
+      final Result<ClothingItem> saved = switch (created) {
+        Success(:final value) => await _repository.saveCutout(value.id, cutout),
+        Failure(:final failure) => Failure(failure),
+      };
+      switch (saved) {
+        case Success(:final value):
+          items.add(value);
+        case Failure(:final failure):
+          if (created case Success(:final value)) {
+            await _repository.deleteItem(value.id);
+          }
+          for (final item in items.skip(1)) {
+            await _repository.deleteItem(item.id);
+          }
+          return Failure(failure);
+      }
+    }
+    return Success(items);
+  }
+}
+
+/// Switches an item between its cut-out and its original photo.
+final class ShowCutout {
+  const ShowCutout(this._repository);
+
+  final WardrobeRepository _repository;
+
+  Future<Result<ClothingItem>> call(String id, {required bool show}) =>
+      _repository.setShowCutout(id, show: show);
 }
 
 /// Validates and saves attributes; [confirm] makes the item ACTIVE.

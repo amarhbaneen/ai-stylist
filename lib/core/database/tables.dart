@@ -62,7 +62,12 @@ class ClothingItems extends Table {
   /// DRAFT, ACTIVE or ARCHIVED (ItemStatus codes).
   TextColumn get status => text()();
 
+  /// Show the background-removed cut-out instead of the photo (schema v2,
+  /// FR-05). The original photo is always kept.
+  BoolColumn get showCutout => boolean().withDefault(const Constant(false))();
+
   /// SHA-256 of the original image bytes, used for duplicate detection.
+  /// Items made from one photo with several garments share it (D-39).
   TextColumn get contentSha256 => text().nullable()();
 
   /// Set when the user deletes an item that outfit history still references.
@@ -109,7 +114,7 @@ class ClothingImages extends Table {
   TextColumn get itemId =>
       text().references(ClothingItems, #id, onDelete: KeyAction.cascade)();
 
-  /// ORIGINAL, WORKING, THUMBNAIL or CUTOUT.
+  /// ORIGINAL, WORKING, THUMBNAIL, CUTOUT or CUTOUT_THUMBNAIL.
   TextColumn get kind => text()();
 
   /// Path relative to the app's private storage root. Never absolute.

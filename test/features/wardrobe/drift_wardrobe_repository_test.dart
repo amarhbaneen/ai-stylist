@@ -333,4 +333,176 @@ void main() {
     expect(await storedFiles(), hasLength(3));
     expect(await files.exists(item.images!.thumbnail), isTrue);
   });
+
+  group('cut-outs', () {
+    CutoutImages cutout(int tag) => CutoutImages(
+      image: Uint8List.fromList([tag, 1]),
+      thumbnail: Uint8List.fromList([tag, 2]),
+      width: 30,
+      height: 40,
+    );
+
+    test('saveCutout stores both images and shows the cut-out', () async {
+      final item = await importOk('a.jpg');
+
+      final saved = (await repo.saveCutout(item.id, cutout(7))).valueOrNull!;
+
+      final images = saved.images!;
+      expect(images.showCutout, isTrue);
+      expect(images.cutout!.image, endsWith('.png'));
+      expect(images.cutout!.thumbnail, endsWith('_thumb.png'));
+      expect(images.display, images.cutout!.image);
+      expect(images.displayThumbnail, images.cutout!.thumbnail);
+      // The photo itself is untouched.
+      expect(images.original, item.images!.original);
+      expect((await files.readBytes(images.cutout!.image)).valueOrNull, [7, 1]);
+      final row = await (db.select(
+        db.clothingImages,
+      )..where((t) => t.kind.equals('CUTOUT'))).getSingle();
+      expect((row.width, row.height, row.byteSize), (30, 40, 2));
+    });
+
+    test('a new cut-out replaces the old one and its files', () async {
+      final item = await importOk('a.jpg');
+      final first = (await repo.saveCutout(item.id, cutout(1))).valueOrNull!;
+
+      final second = (await repo.saveCutout(item.id, cutout(2))).valueOrNull!;
+
+      expect(second.images!.cutout!.image, isNot(first.images!.cutout!.image));
+      expect(await files.exists(first.images!.cutout!.image), isFalse);
+      expect(await files.exists(first.images!.cutout!.thumbnail), isFalse);
+      expect(await storedFiles(), hasLength(5));
+    });
+
+    test('a failed write leaves the item and no stray files', () async {
+      final item = await importOk('a.jpg');
+      files.failOn = '_thumb.png';
+
+      final result = await repo.saveCutout(item.id, cutout(1));
+
+      expect((result as Failure).failure, isA<InsufficientStorageFailure>());
+      expect(await storedFiles(), hasLength(3));
+      final after = (await repo.getItem(item.id)).valueOrNull!;
+      expect(after.images!.cutout, isNull);
+      expect(after.images!.showCutout, isFalse);
+    });
+
+    test('setShowCutout switches back and forth', () async {
+      final item = await importOk('a.jpg');
+      await repo.saveCutout(item.id, cutout(1));
+
+      final original = (await repo.setShowCutout(
+        item.id,
+        show: false,
+      )).valueOrNull!;
+      expect(original.images!.display, item.images!.working);
+      expect(original.images!.cutout, isNotNull);
+
+      final back = (await repo.setShowCutout(item.id, show: true)).valueOrNull!;
+      expect(back.images!.display, back.images!.cutout!.image);
+    });
+
+    test('setShowCutout without a cut-out is rejected', () async {
+      final item = await importOk('a.jpg');
+      final result = await repo.setShowCutout(item.id, show: true);
+      expect((result as Failure).failure, isA<ValidationFailure>());
+    });
+
+    test(
+      'copyPhotoToNewItem makes a separate DRAFT with its own files',
+      () async {
+        final item = await importOk('a.jpg');
+        await repo.saveCutout(item.id, cutout(1));
+
+        final copy = (await repo.copyPhotoToNewItem(item.id)).valueOrNull!;
+
+        expect(copy.id, isNot(item.id));
+        expect(copy.status, ItemStatus.draft);
+        expect(copy.attributes.category, GarmentCategory.unknown);
+        // Photo files are copied; the other garment's cut-out is not.
+        expect(copy.images!.cutout, isNull);
+        expect(copy.images!.original, 'images/originals/${copy.id}.jpg');
+        expect(
+          (await files.readBytes(copy.images!.original)).valueOrNull,
+          (await files.readBytes(item.images!.original)).valueOrNull,
+        );
+
+        // Deleting one item never removes the other's files.
+        await repo.deleteItem(item.id);
+        expect(await files.exists(copy.images!.original), isTrue);
+        expect(await files.exists(copy.images!.thumbnail), isTrue);
+      },
+    );
+
+    test('copyPhotoToNewItem cleans up after a failed copy', () async {
+      final item = await importOk('a.jpg');
+      files.failOn = 'thumbs/';
+
+      final result = await repo.copyPhotoToNewItem(item.id);
+
+      expect(result.isSuccess, isFalse);
+      expect(await storedFiles(), hasLength(3));
+      expect(await db.select(db.clothingItems).get(), hasLength(1));
+    });
+
+    test('items from one photo still block re-importing it', () async {
+      final item = await importOk('a.jpg');
+      await repo.copyPhotoToNewItem(item.id);
+
+      final again = await repo.importImage(p.join(tmp.path, 'a.jpg'));
+
+      expect((again as Failure).failure, isA<DuplicateItemFailure>());
+    });
+
+    test('history keeps the cut-out thumbnail of a deleted item', () async {
+      final item = await importOk('a.jpg');
+      final saved = (await repo.saveCutout(item.id, cutout(1))).valueOrNull!;
+      await repo.saveAttributes(
+        item.id,
+        ClothingAttributes(category: GarmentCategory.top),
+        activate: true,
+      );
+      await db
+          .into(db.outfits)
+          .insert(
+            OutfitsCompanion.insert(
+              id: 'o1',
+              signature: 's',
+              occasion: 'CASUAL',
+              requestJson: '{}',
+              totalScore: 1,
+              breakdownJson: '{}',
+              reasonsJson: '[]',
+              weatherConsidered: false,
+              createdAt: 0,
+            ),
+          );
+      await db
+          .into(db.outfitItems)
+          .insert(
+            OutfitItemsCompanion.insert(
+              outfitId: 'o1',
+              itemId: item.id,
+              slot: 'TOP',
+            ),
+          );
+
+      await repo.deleteItem(item.id);
+
+      expect(await storedFiles(), {
+        'images/thumbs/${item.id}.jpg',
+        saved.images!.cutout!.thumbnail,
+      });
+    });
+
+    test('removeOrphanFiles keeps cut-outs', () async {
+      final item = await importOk('a.jpg');
+      await repo.saveCutout(item.id, cutout(1));
+
+      final removed = await repo.removeOrphanFiles();
+
+      expect(removed.valueOrNull, 0);
+      expect(await storedFiles(), hasLength(5));
+    });
+  });
 }

@@ -51,7 +51,7 @@ void main() {
         );
   }
 
-  test('schema v1 creates every required table', () async {
+  test('the current schema creates every required table', () async {
     final rows = await db
         .customSelect(
           "SELECT name FROM sqlite_master WHERE type = 'table' "
@@ -76,7 +76,7 @@ void main() {
         'app_settings',
       ]),
     );
-    expect(db.schemaVersion, 1);
+    expect(db.schemaVersion, 2);
   });
 
   test('foreign keys are enforced on open', () async {
