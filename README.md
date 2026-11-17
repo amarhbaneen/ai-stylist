@@ -53,6 +53,13 @@ device.
   - Runs on the Android emulator in about 50 ms per photo
     (`flutter test integration_test/garment_model_test.dart -d <device>`).
   - Not yet measured on real flat-lay or hanger photos; iOS not built.
+  - Background removal (FR-05): a built-in segmentation model (`garment-seg`, 3.8 MB, also
+    trained on Fashionpedia) cuts the garment out of each new photo. When a photo holds several
+    garments (someone wearing an outfit), you pick which ones to add, and each becomes its own
+    item. The original photo is always kept, and a switch shows either. If the model fails,
+    the photo is added as before. About 0.7 s per photo on the emulator
+    (`flutter test integration_test/garment_segmentation_test.dart -d <device>`). See DECISIONS
+    D-39 and D-40.
   - Verified on the emulator offline: a new green shirt photo had Green pre-filled.
 - **M6 (feedback and personalisation):** complete for Android; merged into `main`.
   - Like, dislike (with optional reasons and a note) and save on every outfit.

@@ -459,11 +459,57 @@ permission is used. Search is local and accent-insensitive.
   256×256, MobileNetV3-Large encoder, light decoder, the classifier's 23 garment types plus
   background. Synthetic flat-lays (Fashionpedia garments pasted on plain backdrops) cover the
   app's usual photos. Exported with the same XNNPACK check as the classifier.
-- **App rules (to build when the model arrives).** The original photo is always kept (D-06);
+- **App rules (built in D-40).** The original photo is always kept (D-06);
   the cut-out is a separate image, and the user can switch back to the original. Segmentation
   failing never blocks adding an item. Each garment covering at least 1% of the photo is
   offered as an item; the user picks which ones to add. The classifier then runs on each
   cut-out.
+
+## D-40 Garment cut-out in the app (FR-05). Accepted (M4)
+- **Model shipped.** `garment-seg` 1.0.0, 3.84 MB, SHA-256 `39224bc4…6dd8aeab19`. Full int8
+  failed under XNNPACK ("Node number 137 failed to prepare"), so the dynamic-range variant
+  ships, as for the classifier. It agrees with the Keras model on 98.5% of pixels (garment vs.
+  background IoU 0.982). Model card and evaluation are in `training/model_cards/`.
+- **Quality (Fashionpedia test set).** Real photos: garment-vs-background IoU 0.84, 76% of
+  garments found (covering at least 1% of the photo). Synthetic flat-lays: IoU 0.97, 87% found.
+  Per-class IoU is low (mean 0.27): the model finds garments much better than it names them.
+  It also reports many extra items, which is why the next three rules exist.
+- **Grouping.** Pixels are grouped by app category, not model class, so a garment the model
+  half-calls "shirt" and half "sweater" stays one garment. The model's category only labels
+  the picker; the classifier (90.6% category accuracy, D-38) suggests the item's attributes
+  from the cut-out.
+- **Clean-up.** Within each garment, connected parts smaller than 20% of its largest part are
+  removed. A garment that falls below 1% of the photo afterwards is dropped, and the masks are
+  rebuilt so its pixels go back to the others. With one garment, the mask is "not background".
+- **Choosing.** One garment covering at least 4% is cut out directly; a lone smaller find is
+  ignored. With several, a picker shows each cut-out; those covering at least 4% start ticked.
+  "Keep the whole photo" adds the photo as before.
+- **Storage.** Schema v2 adds `clothing_items.show_cutout` (step-by-step migration with a data
+  test). A cut-out is two transparent PNGs, `CUTOUT` (cropped, up to 1024 px) and
+  `CUTOUT_THUMBNAIL` (up to 320 px), under `images/cutouts/` with a fresh name each time so image
+  caches never show a replaced file. The original photo is untouched, and a switch on the
+  review and details screens shows either.
+- **Several items from one photo.** Each extra item is a new DRAFT with its own copies of the
+  photo files, so deleting one item never affects another. The copies share the photo's
+  SHA-256, so importing the photo again is still caught as a duplicate. Creating them is all
+  or nothing: on any failure the new items are removed and the first keeps its photo. The first
+  item opens for review; the others wait under "Needs review", and a message says so.
+- **Analysis on cut-outs.** Analysis reads the thumbnail being shown. The classifier
+  composites transparent pixels onto white. Colour extraction skips transparent pixels and its
+  plain-border heuristic, so a white shirt on a pale backdrop is still measured correctly.
+- **Android check (2026-11-17).** `integration_test/garment_segmentation_test.dart` on the
+  x86_64 emulator (API 37): model opened in 538–770 ms; finding and cutting out garments in a
+  1024×768 photo took 681–843 ms median, under 910 ms worst (decode, inference, masks and PNG
+  encoding). On a synthetic red T-shirt the masks line up with the shape; it was labelled
+  one-piece, with a spurious accessory, as expected for an image unlike any photo. Release APK
+  builds (94.2 MB, all ABIs).
+- **Build note.** The Dart AOT compiler crashed ("linearscan.cc: unreachable code") on this
+  code until two constructs were rewritten plainly: a record-pattern assignment into `final`
+  locals, and a `for`-in over five-field records with `null` fields. Which one triggered it was
+  not isolated; if the crash returns after a Flutter upgrade, look at similar constructs.
+- **Limits.** Not yet measured on real flat-lay, hanger or worn photos, or on a real phone.
+  iOS is not built. Each extra item stores its own copy of the photo (more storage, simpler
+  and safer deletes). Changing the cut-out choice does not re-run analysis.
 
 ## D-26 Spikes live in `spikes/`, outside the product build. Accepted (M3)
 Each spike is a standalone Flutter app with its own pubspec (exact version pins) and is excluded
