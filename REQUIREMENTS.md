@@ -212,6 +212,12 @@ uncertain.
     photo when there is no cut-out) to Google Lens or a visual search app
     the user picks, so they can choose the official product photo. The
     app itself sends nothing over the network; this is the only sharing.
+-   Owner change 2026-11-18 (DECISIONS D-43): if the user turns on
+    "Find official photos automatically" and adds their own Google Cloud
+    API key, the garment cut-out (never the original photo or face) is sent
+    to Google Cloud Vision to find the official product photo, and the best
+    matches are downloaded and offered next to the cut-out. Off by default;
+    the user always chooses.
 
 ### FR-06 Outfit generation
 

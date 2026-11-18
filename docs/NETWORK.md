@@ -36,6 +36,19 @@ City search uses the bundled GeoNames list (`assets/cities/cities.json`) and sen
 | Verification | Exact size and SHA-256 from the bundled manifest; a mismatch deletes the file. Files are only read as model weights, never executed (D-37). |
 | Failure | The app keeps working; colour analysis is built in and every attribute can be set by hand. |
 
+## 3. Automatic official photo (opt-in, D-43)
+
+| | |
+| --- | --- |
+| When | Only if the user turned on **Find official photos automatically** in Style preferences, accepted the consent dialog and saved their own API key. Then once per new cut-out on the review or details screen, and again on **Search again** / **Try again**. |
+| Host | `vision.googleapis.com` (HTTPS) |
+| Request | `POST /v1/images:annotate`, JSON body with one image (base64 JPEG) and feature `WEB_DETECTION`, `maxResults` 20. |
+| Data sent | The garment cut-out flattened onto white (≤6 MB), the user's API key in the `X-goog-api-key` header, on Android the app's package name and signing SHA-1 (`X-Android-Package`, `X-Android-Cert`), and the IP address. |
+| Not sent | The original photo, faces, the room, any wardrobe, profile or feedback data. The key never appears in a URL. |
+| Then | Up to eight result images are fetched with `GET` from the hosts Google returned (shops, retailers), until three usable ones are found: `https` only, `image/*`, ≤8 MB, ≥200 px, decodable. Those hosts see the IP address. |
+| Failure | No key, rejected key, quota reached, timeout (20 s / 15 s per image) or no connection → a plain message and a retry. The cut-out stays. |
+| Turning it off | Style preferences → Official photos. Off by default. |
+
 ## Not a network request: Find official photo (D-41)
 
 When the user taps **Find official photo** on an item, the app hands one image to Google Lens

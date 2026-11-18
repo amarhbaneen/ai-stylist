@@ -65,6 +65,11 @@ device.
     not cut out with the garment. **Flip** fixes mirrored selfies. **Find official photo**
     hands the cut-out (never the face or room) to Google Lens; save the matching product photo
     and tap **Use official photo** to show it instead. The app itself uploads nothing.
+  - Automatic official photo (D-43, opt-in): turn on **Find official photos automatically**
+    in Style preferences and add your own Google Cloud API key (Cloud Vision API enabled;
+    first 1,000 searches a month are free). After the background is removed, the app sends
+    only the cut-out to Google Cloud Vision, downloads the closest product photos and offers
+    them next to your cut-out. See [docs/NETWORK.md](docs/NETWORK.md).
   - Verified on the emulator offline: a new green shirt photo had Green pre-filled.
 - **M6 (feedback and personalisation):** complete for Android; merged into `main`.
   - Like, dislike (with optional reasons and a note) and save on every outfit.

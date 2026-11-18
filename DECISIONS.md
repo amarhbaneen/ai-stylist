@@ -565,6 +565,71 @@ permission is used. Search is local and accent-insensitive.
   share-back into the app yet). iOS not built: the share sheet is used there (the Google app
   offers a Lens share target). Not yet tried on a real phone.
 
+## D-42 Editorial design system. Accepted 2026-11-18 (owner)
+- **Why.** The app used stock Material 3 (seeded slate palette with a lavender tint, Roboto,
+  pill indicators, cards, a "sparkles" AI icon, the default Flutter launcher icon), which
+  reads as generated. The owner asked for a modern, fashion-led look with one accent, one
+  radius, a spacing scale, a non-Inter font, designed empty/loading/error states, real error
+  messages and meaningful motion.
+- **Direction.** Editorial and type-led, as in current fashion and editorial UI: warm paper
+  background, near-black ink, one accent (bottle green `#1F4D3A`; dark mode `#8CC2A6`), photos
+  framed without card chrome. All text pairs meet WCAG AA (most AAA).
+- **Tokens** (`lib/core/theme/tokens.dart`): spacing 4/8/12/16/24/32/48 with a 24 px page
+  margin; one radius, 8 px, for every shape; motion 150/250/400 ms with ease-out for entries,
+  turned off when the system asks for reduced motion. Raw numbers in widgets are a bug.
+- **Type.** Instrument Serif for titles and Geist for text, both SIL OFL 1.1, bundled in
+  `assets/fonts/` (Geist as static 400/500/600 instances of the variable font) and listed on
+  the licences page. Nothing is downloaded at runtime.
+- **Components.** Ink-filled chips and segmented buttons for selection; the accent only for the
+  main action, progress and focus; a hairline above the tab bar instead of a pill indicator;
+  frameless two-up wardrobe grid; cut-outs get a shadow traced from their outline so white
+  garments stay visible; product photos sit on white.
+- **States.** One `EmptyState`, `ErrorState` (plain-language message per failure type, retry
+  where it helps) and `LoadingState`, plus pulsing skeletons where the layout is known.
+- **Motion.** Staggered fade-up for grid items and states, cross-fade between photo, cut-out
+  and official photo, a Hero from grid tile to item photo, and the platform page transitions
+  (predictive back on Android, Cupertino on iOS).
+- **Icon.** A hanger in paper white on the accent, as an Android adaptive icon (with a
+  monochrome layer) and the iOS icon set.
+
+## D-43 Automatic official photo with Google Cloud Vision. Accepted 2026-11-18 (owner)
+- **Why.** The owner wants the flow "take or add a photo → remove the background → find the
+  official or a similar photo by itself → suggest the official photo or the cut-out". The
+  Lens hand-off (D-41) needed the user to search and save by hand. Lens has no API; scraping
+  it breaks Google's terms. The owner chose Google Cloud Vision Web Detection, with their own
+  API key (first 1,000 searches a month free per Google's pricing; billed beyond that).
+- **Requirement change (owner).** This is the first feature that uploads an image. It is
+  **off by default** and needs an explicit opt-in with a consent dialog in Style preferences.
+  Only the garment cut-out, flattened onto white (no face, no room, no original photo), is
+  sent, with the user's own key. Nothing else about the user or wardrobe is sent. Turning it
+  off stops all requests; the rest of the app is unchanged and works offline.
+- **Request.** `POST https://vision.googleapis.com/v1/images:annotate`, one request with the
+  JPEG as base64 `content` and feature `WEB_DETECTION`, `maxResults` 20 (docs:
+  docs.cloud.google.com/vision/docs/detecting-web). The key goes in the `X-goog-api-key`
+  header, never the URL. On Android the app also sends `X-Android-Package` and
+  `X-Android-Cert` (its signing SHA-1, read natively) so a key restricted to the app works.
+  Images over 6 MB are not sent (the API's JSON limit is 10 MB). Timeout 20 s.
+- **Ranking.** Exact matches (`fullMatchingImages`, those with a known page first), then partial
+  matches, then `visuallySimilarImages`; `https` only, each once. Page titles are stripped of
+  markup and shown as the source with the shop's host name.
+- **Downloads.** Candidates are downloaded in order until three usable ones are found (at most
+  eight tried): `https` only, `image/*` content type, at most 8 MB (checked while streaming),
+  at least 200 px on the shorter side, and decodable. Files go to
+  `<support>/official_photo_candidates/<itemId>/`, cleared before each search, and are only
+  ever decoded as images. The chosen one is stored as the item's product photo (D-41).
+- **Key storage.** The opt-in is in `app_settings`; the key is in the platform keystore with
+  `flutter_secure_storage` 11.2.0 (Android Keystore-backed AES-GCM, iOS Keychain), never in the
+  database or logs. It can be replaced or removed in Style preferences.
+- **UI.** Under a new cut-out: "Looking for the official photo" with placeholders, then
+  "Official photo found" (or "Similar product photos" when nothing matches exactly) with up to
+  three choices, **Use this photo** and **Keep my cut-out**. Nothing is applied without a tap.
+  No match and errors (no key, rejected key, quota, offline) say so in plain words, with
+  **Search again** or **Try again**. With the feature on, the manual Lens button is hidden;
+  choosing a photo from the gallery stays available.
+- **Not verified.** No real API key was available, so the live API, its result quality on worn
+  photos, and the Android key restriction were not tested end to end. All of it is covered by
+  unit and widget tests with a fake HTTP client.
+
 ## D-26 Spikes live in `spikes/`, outside the product build. Accepted (M3)
 Each spike is a standalone Flutter app with its own pubspec (exact version pins) and is excluded
 from the root analyzer. Downloaded model binaries are git-ignored and fetched by a script that
