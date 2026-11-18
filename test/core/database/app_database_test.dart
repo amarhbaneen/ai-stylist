@@ -76,7 +76,7 @@ void main() {
         'app_settings',
       ]),
     );
-    expect(db.schemaVersion, 2);
+    expect(db.schemaVersion, 3);
   });
 
   test('foreign keys are enforced on open', () async {

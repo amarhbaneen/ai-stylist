@@ -7,6 +7,7 @@ import 'package:ai_stylist/core/storage/file_store.dart';
 import 'package:ai_stylist/features/wardrobe/data/drift_wardrobe_repository.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:image/image.dart' as img;
 import 'package:path/path.dart' as p;
 import 'package:wardrobe_domain/wardrobe_domain.dart';
 
@@ -334,6 +335,85 @@ void main() {
     expect(await files.exists(item.images!.thumbnail), isTrue);
   });
 
+  group('product photos', () {
+    test('saveProductPhoto stores downscaled copies and shows them', () async {
+      final item = await importOk('a.jpg');
+      final source = await writePhoto(tmp, 'official.png');
+      processor.calls.clear();
+
+      final saved = (await repo.saveProductPhoto(item.id, source)).valueOrNull!;
+
+      final images = saved.images!;
+      expect(images.shown, ItemView.product);
+      expect(images.product!.image, startsWith('images/products/'));
+      expect(images.product!.thumbnail, endsWith('_thumb.jpg'));
+      expect(images.display, images.product!.image);
+      expect(processor.calls.map((c) => c.$2), [1024, 320]);
+      expect(images.original, item.images!.original);
+      expect(await storedFiles(), hasLength(5));
+    });
+
+    test('a new product photo replaces the old one', () async {
+      final item = await importOk('a.jpg');
+      final source = await writePhoto(tmp, 'official.png');
+      final first = (await repo.saveProductPhoto(item.id, source)).valueOrNull!;
+
+      final second = (await repo.saveProductPhoto(
+        item.id,
+        source,
+      )).valueOrNull!;
+
+      expect(
+        second.images!.product!.image,
+        isNot(first.images!.product!.image),
+      );
+      expect(await files.exists(first.images!.product!.image), isFalse);
+      expect(await storedFiles(), hasLength(5));
+    });
+
+    test('an unreadable image changes nothing', () async {
+      final item = await importOk('a.jpg');
+      final source = await writePhoto(tmp, 'official.png');
+      processor.fail = true;
+
+      final result = await repo.saveProductPhoto(item.id, source);
+
+      expect((result as Failure).failure, isA<UnsupportedImageFailure>());
+      expect(
+        (await repo.getItem(item.id)).valueOrNull!.images!.product,
+        isNull,
+      );
+      expect(await storedFiles(), hasLength(3));
+    });
+
+    test('removing it falls back to the cut-out, then the photo', () async {
+      final item = await importOk('a.jpg');
+      final source = await writePhoto(tmp, 'official.png');
+      await repo.saveCutout(
+        item.id,
+        CutoutImages(
+          image: Uint8List.fromList([1]),
+          thumbnail: Uint8List.fromList([2]),
+          width: 1,
+          height: 1,
+        ),
+      );
+      await repo.saveProductPhoto(item.id, source);
+
+      final removed = (await repo.removeProductPhoto(item.id)).valueOrNull!;
+
+      expect(removed.images!.product, isNull);
+      expect(removed.images!.shown, ItemView.cutout);
+      expect(await storedFiles(), hasLength(5));
+      expect(
+        await (db.select(
+          db.clothingImages,
+        )..where((t) => t.kind.isIn(['PRODUCT', 'PRODUCT_THUMBNAIL']))).get(),
+        isEmpty,
+      );
+    });
+  });
+
   group('cut-outs', () {
     CutoutImages cutout(int tag) => CutoutImages(
       image: Uint8List.fromList([tag, 1]),
@@ -348,7 +428,7 @@ void main() {
       final saved = (await repo.saveCutout(item.id, cutout(7))).valueOrNull!;
 
       final images = saved.images!;
-      expect(images.showCutout, isTrue);
+      expect(images.shown, ItemView.cutout);
       expect(images.cutout!.image, endsWith('.png'));
       expect(images.cutout!.thumbnail, endsWith('_thumb.png'));
       expect(images.display, images.cutout!.image);
@@ -384,27 +464,68 @@ void main() {
       expect(await storedFiles(), hasLength(3));
       final after = (await repo.getItem(item.id)).valueOrNull!;
       expect(after.images!.cutout, isNull);
-      expect(after.images!.showCutout, isFalse);
+      expect(after.images!.shown, ItemView.photo);
     });
 
-    test('setShowCutout switches back and forth', () async {
+    test('setView switches back and forth', () async {
       final item = await importOk('a.jpg');
       await repo.saveCutout(item.id, cutout(1));
 
-      final original = (await repo.setShowCutout(
+      final original = (await repo.setView(
         item.id,
-        show: false,
+        ItemView.photo,
       )).valueOrNull!;
       expect(original.images!.display, item.images!.working);
       expect(original.images!.cutout, isNotNull);
 
-      final back = (await repo.setShowCutout(item.id, show: true)).valueOrNull!;
+      final back = (await repo.setView(item.id, ItemView.cutout)).valueOrNull!;
       expect(back.images!.display, back.images!.cutout!.image);
     });
 
-    test('setShowCutout without a cut-out is rejected', () async {
+    test('setView to a missing image is rejected', () async {
       final item = await importOk('a.jpg');
-      final result = await repo.setShowCutout(item.id, show: true);
+      for (final view in [ItemView.cutout, ItemView.product]) {
+        final result = await repo.setView(item.id, view);
+        expect((result as Failure).failure, isA<ValidationFailure>());
+      }
+    });
+
+    test('flipCutout mirrors both images and keeps one copy', () async {
+      final item = await importOk('a.jpg');
+      Uint8List png() {
+        final image = img.Image(width: 2, height: 1, numChannels: 4)
+          ..setPixelRgba(0, 0, 255, 0, 0, 255)
+          ..setPixelRgba(1, 0, 0, 0, 255, 128);
+        return img.encodePng(image);
+      }
+
+      final before = (await repo.saveCutout(
+        item.id,
+        CutoutImages(image: png(), thumbnail: png(), width: 2, height: 1),
+      )).valueOrNull!;
+      await repo.setView(item.id, ItemView.photo);
+
+      final flipped = (await repo.flipCutout(item.id)).valueOrNull!;
+
+      expect(flipped.images!.shown, ItemView.cutout);
+      expect(await files.exists(before.images!.cutout!.image), isFalse);
+      for (final path in [
+        flipped.images!.cutout!.image,
+        flipped.images!.cutout!.thumbnail,
+      ]) {
+        final image = img.decodePng(
+          (await files.readBytes(path)).valueOrNull!,
+        )!;
+        expect(image.getPixel(0, 0).b, 255);
+        expect(image.getPixel(0, 0).a, 128);
+        expect(image.getPixel(1, 0).r, 255);
+      }
+      expect(await storedFiles(), hasLength(5));
+    });
+
+    test('flipCutout without a cut-out is rejected', () async {
+      final item = await importOk('a.jpg');
+      final result = await repo.flipCutout(item.id);
       expect((result as Failure).failure, isA<ValidationFailure>());
     });
 

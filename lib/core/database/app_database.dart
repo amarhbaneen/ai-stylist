@@ -31,7 +31,7 @@ class AppDatabase extends _$AppDatabase {
   /// Bump on every schema change and add a step to [migration]. Never drop
   /// user data in a migration (REQUIREMENTS §11).
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -42,6 +42,13 @@ class AppDatabase extends _$AppDatabase {
         await m.addColumn(
           schema.clothingItems,
           schema.clothingItems.showCutout,
+        );
+      },
+      // v3 (D-41): per-item choice of a product photo the user picked.
+      from2To3: (m, schema) async {
+        await m.addColumn(
+          schema.clothingItems,
+          schema.clothingItems.showProduct,
         );
       },
     ),

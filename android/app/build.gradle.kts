@@ -47,3 +47,9 @@ kotlin {
 flutter {
     source = "../.."
 }
+
+dependencies {
+    // FileProvider, to hand one image to Google Lens (D-41). Same version
+    // share_plus already brings in.
+    implementation("androidx.core:core-ktx:1.16.0")
+}

@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:drift/drift.dart';
+import 'package:image/image.dart' as img;
 import 'package:path/path.dart' as p;
 import 'package:wardrobe_domain/wardrobe_domain.dart';
 
@@ -15,9 +17,10 @@ import 'clothing_item_mapper.dart';
 ///
 /// Image layout under the file store root:
 /// `images/originals/<id>.<ext>`, `images/working/<id>.jpg`,
-/// `images/thumbs/<id>.jpg`, and for cut-outs `images/cutouts/<name>.png`
-/// and `images/cutouts/<name>_thumb.png` (a fresh name per cut-out, so
-/// image caches never show a replaced file).
+/// `images/thumbs/<id>.jpg`, for cut-outs `images/cutouts/<name>.png` and
+/// `<name>_thumb.png`, and for product photos `images/products/<name>.jpg`
+/// and `<name>_thumb.jpg` (a fresh name each time, so image caches never
+/// show a replaced file).
 final class DriftWardrobeRepository implements WardrobeRepository {
   DriftWardrobeRepository({
     required AppDatabase database,
@@ -305,100 +308,216 @@ final class DriftWardrobeRepository implements WardrobeRepository {
     }
   }
 
-  // ---------------------------------------------------------------- cut-outs
+  // ---------------------------------------------------------------- pictures
 
   @override
-  Future<Result<ClothingItem>> saveCutout(
-    String id,
-    CutoutImages cutout,
-  ) async {
-    final List<ClothingImageRow> previous;
+  Future<Result<ClothingItem>> saveCutout(String id, CutoutImages cutout) =>
+      _replacePicture(
+        id,
+        view: ItemView.cutout,
+        image: _NewFile(
+          '$imagesDir/cutouts/${_ids.newId()}',
+          '.png',
+          cutout.image,
+          width: cutout.width,
+          height: cutout.height,
+        ),
+        thumbnail: cutout.thumbnail,
+      );
+
+  @override
+  Future<Result<ClothingItem>> flipCutout(String id) async {
+    final ItemPicture? cutout;
     try {
-      if (await _load(id) == null) return Failure(NotFoundFailure('No $id'));
-      previous = await _imageRows(id, {
-        ImageKind.cutout,
-        ImageKind.cutoutThumbnail,
-      });
+      final existing = await _load(id);
+      if (existing == null) return Failure(NotFoundFailure('No item $id'));
+      cutout = existing.images?.cutout;
     } on Exception catch (e) {
       return Failure(StorageFailure('Could not read item $id', cause: e));
     }
-
-    final name = _ids.newId();
-    final imagePath = '$imagesDir/cutouts/$name.png';
-    final thumbPath = '$imagesDir/cutouts/${name}_thumb.png';
-    final written = <String>[];
-    Future<Result<ClothingItem>> fail(AppFailure failure) async {
-      await _deleteFiles(written);
-      return Failure(failure);
+    if (cutout == null) {
+      return const Failure(ValidationFailure('This item has no cut-out'));
     }
-
-    for (final (path, bytes) in [
-      (imagePath, cutout.image),
-      (thumbPath, cutout.thumbnail),
-    ]) {
-      final saved = await _files.writeBytes(path, bytes);
-      if (saved case Failure(:final failure)) return fail(failure);
-      written.add(path);
-    }
-
-    final now = toEpochMillisUtc(_clock.nowUtc());
+    final image = await _files.readBytes(cutout.image);
+    if (image case Failure(:final failure)) return Failure(failure);
+    final thumb = await _files.readBytes(cutout.thumbnail);
+    if (thumb case Failure(:final failure)) return Failure(failure);
+    final pngs = [
+      (image as Success<Uint8List>).value,
+      (thumb as Success<Uint8List>).value,
+    ];
+    final List<Uint8List>? flipped;
     try {
+      flipped = await Isolate.run(() => _flipPngs(pngs));
+    } on Exception catch (e) {
+      return Failure(
+        UnsupportedImageFailure('Could not flip the cut-out', cause: e),
+      );
+    }
+    if (flipped == null) {
+      return const Failure(
+        UnsupportedImageFailure('The cut-out could not be read'),
+      );
+    }
+    return _replacePicture(
+      id,
+      view: ItemView.cutout,
+      image: _NewFile('$imagesDir/cutouts/${_ids.newId()}', '.png', flipped[0]),
+      thumbnail: flipped[1],
+    );
+  }
+
+  @override
+  Future<Result<ClothingItem>> saveProductPhoto(
+    String id,
+    String sourcePath,
+  ) async {
+    if (!await File(sourcePath).exists()) {
+      return const Failure(StorageFailure('The selected image is unavailable'));
+    }
+    final large = await _images.downscaleToJpeg(
+      sourcePath,
+      maxEdge: workingMaxEdge,
+      quality: 90,
+    );
+    final small = await _images.downscaleToJpeg(
+      sourcePath,
+      maxEdge: thumbnailMaxEdge,
+      quality: 85,
+    );
+    if (large == null || large.isEmpty || small == null || small.isEmpty) {
+      return const Failure(
+        UnsupportedImageFailure('This image could not be opened'),
+      );
+    }
+    return _replacePicture(
+      id,
+      view: ItemView.product,
+      image: _NewFile('$imagesDir/products/${_ids.newId()}', '.jpg', large),
+      thumbnail: small,
+    );
+  }
+
+  @override
+  Future<Result<ClothingItem>> removeProductPhoto(String id) async {
+    final List<ClothingImageRow> previous;
+    try {
+      final existing = await _load(id);
+      if (existing == null) return Failure(NotFoundFailure('No item $id'));
+      previous = await _imageRows(id, _productKinds);
+      final view = existing.images?.cutout == null
+          ? ItemView.photo
+          : ItemView.cutout;
       await _db.transaction(() async {
-        await (_db.delete(
-          _db.clothingImages,
-        )..where((t) => t.id.isIn(previous.map((i) => i.id)))).go();
-        await _db
-            .into(_db.clothingImages)
-            .insert(
-              ClothingImagesCompanion.insert(
-                id: _ids.newId(),
-                itemId: id,
-                kind: ImageKind.cutout,
-                relativePath: imagePath,
-                width: Value(cutout.width),
-                height: Value(cutout.height),
-                byteSize: Value(cutout.image.length),
-                createdAt: now,
-              ),
-            );
-        await _db
-            .into(_db.clothingImages)
-            .insert(
-              ClothingImagesCompanion.insert(
-                id: _ids.newId(),
-                itemId: id,
-                kind: ImageKind.cutoutThumbnail,
-                relativePath: thumbPath,
-                byteSize: Value(cutout.thumbnail.length),
-                createdAt: now,
-              ),
-            );
-        await _touch(id, now, showCutout: true);
+        await _deleteRows(previous);
+        await _touch(id, toEpochMillisUtc(_clock.nowUtc()), view);
       });
     } on Exception catch (e) {
-      return fail(StorageFailure('Could not save the cut-out', cause: e));
+      return Failure(StorageFailure('Could not update item $id', cause: e));
     }
     await _deleteFiles(previous.map((i) => i.relativePath));
     return _reload(id);
   }
 
   @override
-  Future<Result<ClothingItem>> setShowCutout(
-    String id, {
-    required bool show,
-  }) async {
+  Future<Result<ClothingItem>> setView(String id, ItemView view) async {
     try {
       final existing = await _load(id);
       if (existing == null) return Failure(NotFoundFailure('No item $id'));
-      if (show && existing.images?.cutout == null) {
-        return const Failure(ValidationFailure('This item has no cut-out'));
+      if (!(existing.images?.has(view) ?? view == ItemView.photo)) {
+        return const Failure(ValidationFailure('This item has no such image'));
       }
-      await _touch(id, toEpochMillisUtc(_clock.nowUtc()), showCutout: show);
+      await _touch(id, toEpochMillisUtc(_clock.nowUtc()), view);
       return await _reload(id);
     } on Exception catch (e) {
       return Failure(StorageFailure('Could not update item $id', cause: e));
     }
   }
+
+  static const _cutoutKinds = {ImageKind.cutout, ImageKind.cutoutThumbnail};
+  static const _productKinds = {ImageKind.product, ImageKind.productThumbnail};
+
+  /// Writes a new cut-out or product photo (fresh file names, so image
+  /// caches never show a replaced file), swaps the rows in one
+  /// transaction, shows it, then deletes the old files. On failure nothing
+  /// changes.
+  Future<Result<ClothingItem>> _replacePicture(
+    String id, {
+    required ItemView view,
+    required _NewFile image,
+    required Uint8List thumbnail,
+  }) async {
+    final isCutout = view == ItemView.cutout;
+    final kinds = isCutout ? _cutoutKinds : _productKinds;
+    final largeKind = isCutout ? ImageKind.cutout : ImageKind.product;
+    final smallKind = isCutout
+        ? ImageKind.cutoutThumbnail
+        : ImageKind.productThumbnail;
+    final List<ClothingImageRow> previous;
+    try {
+      if (await _load(id) == null) return Failure(NotFoundFailure('No $id'));
+      previous = await _imageRows(id, kinds);
+    } on Exception catch (e) {
+      return Failure(StorageFailure('Could not read item $id', cause: e));
+    }
+
+    final imagePath = '${image.stem}${image.extension}';
+    final thumbPath = '${image.stem}_thumb${image.extension}';
+    final written = <String>[];
+    Future<Result<ClothingItem>> fail(AppFailure failure) async {
+      await _deleteFiles(written);
+      return Failure(failure);
+    }
+
+    final savedImage = await _files.writeBytes(imagePath, image.bytes);
+    if (savedImage case Failure(:final failure)) return fail(failure);
+    written.add(imagePath);
+    final savedThumb = await _files.writeBytes(thumbPath, thumbnail);
+    if (savedThumb case Failure(:final failure)) return fail(failure);
+    written.add(thumbPath);
+
+    final now = toEpochMillisUtc(_clock.nowUtc());
+    try {
+      await _db.transaction(() async {
+        await _deleteRows(previous);
+        await _db
+            .into(_db.clothingImages)
+            .insert(
+              ClothingImagesCompanion.insert(
+                id: _ids.newId(),
+                itemId: id,
+                kind: largeKind,
+                relativePath: imagePath,
+                width: Value(image.width),
+                height: Value(image.height),
+                byteSize: Value(image.bytes.length),
+                createdAt: now,
+              ),
+            );
+        await _db
+            .into(_db.clothingImages)
+            .insert(
+              ClothingImagesCompanion.insert(
+                id: _ids.newId(),
+                itemId: id,
+                kind: smallKind,
+                relativePath: thumbPath,
+                byteSize: Value(thumbnail.length),
+                createdAt: now,
+              ),
+            );
+        await _touch(id, now, view);
+      });
+    } on Exception catch (e) {
+      return fail(StorageFailure('Could not save the image', cause: e));
+    }
+    await _deleteFiles(previous.map((i) => i.relativePath));
+    return _reload(id);
+  }
+
+  Future<void> _deleteRows(List<ClothingImageRow> rows) => (_db.delete(
+    _db.clothingImages,
+  )..where((t) => t.id.isIn(rows.map((i) => i.id)))).go();
 
   @override
   Future<Result<ClothingItem>> copyPhotoToNewItem(String sourceId) async {
@@ -479,10 +598,11 @@ final class DriftWardrobeRepository implements WardrobeRepository {
         _db.clothingImages,
       )..where((t) => t.itemId.equals(id) & t.kind.isIn(kinds))).get();
 
-  Future<void> _touch(String id, int now, {required bool showCutout}) =>
+  Future<void> _touch(String id, int now, ItemView view) =>
       (_db.update(_db.clothingItems)..where((t) => t.id.equals(id))).write(
         ClothingItemsCompanion(
-          showCutout: Value(showCutout),
+          showCutout: Value(view == ItemView.cutout),
+          showProduct: Value(view == ItemView.product),
           updatedAt: Value(now),
         ),
       );
@@ -617,4 +737,34 @@ final class DriftWardrobeRepository implements WardrobeRepository {
       return Failure(StorageFailure('Could not clean up files', cause: e));
     }
   }
+}
+
+/// A picture's large file, before it is written.
+final class _NewFile {
+  const _NewFile(
+    this.stem,
+    this.extension,
+    this.bytes, {
+    this.width,
+    this.height,
+  });
+
+  /// Path without extension; the thumbnail adds `_thumb`.
+  final String stem;
+  final String extension;
+  final Uint8List bytes;
+  final int? width;
+  final int? height;
+}
+
+/// Mirrors PNGs left to right (runs on an isolate). `null` if one cannot
+/// be decoded.
+List<Uint8List>? _flipPngs(List<Uint8List> pngs) {
+  final out = <Uint8List>[];
+  for (final bytes in pngs) {
+    final image = img.decodePng(bytes);
+    if (image == null) return null;
+    out.add(img.encodePng(img.flipHorizontal(image)));
+  }
+  return out;
 }

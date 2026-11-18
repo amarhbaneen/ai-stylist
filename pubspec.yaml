@@ -52,6 +52,7 @@ dependencies:
   # Bundled runtime only, no Play-services mode. Held to 4.1.x, the line the
   # M3 spike verified; 4.2.0 was published the day this was added.
   flutter_litert: '>=4.1.1 <4.2.0'
+  share_plus: 13.3.1
 
 dev_dependencies:
   flutter_test:

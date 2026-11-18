@@ -5,16 +5,29 @@ import 'package:meta/meta.dart';
 import '../taxonomy/taxonomy.dart';
 import 'clothing_attributes.dart';
 
-/// App-relative paths to a background-removed copy of the photo (FR-05).
+/// App-relative paths to a large image and its small copy.
 @immutable
-final class ItemCutout {
-  const ItemCutout({required this.image, required this.thumbnail});
+final class ItemPicture {
+  const ItemPicture({required this.image, required this.thumbnail});
 
-  /// Transparent PNG of the garment, cropped to it.
+  /// Large image for the details screens.
   final String image;
 
-  /// Small transparent PNG for grids and analysis.
+  /// Small copy for grids and analysis.
   final String thumbnail;
+}
+
+/// Which of an item's images is shown (FR-05, DECISIONS D-39, D-41).
+enum ItemView {
+  /// The user's own photo.
+  photo,
+
+  /// The background-removed cut-out made on the device.
+  cutout,
+
+  /// A product photo the user chose (for example found with a visual
+  /// search app).
+  product,
 }
 
 /// App-relative paths to an item's stored images (never absolute paths).
@@ -25,7 +38,8 @@ final class ItemImages {
     required this.working,
     required this.thumbnail,
     this.cutout,
-    this.showCutout = false,
+    this.product,
+    this.view = ItemView.photo,
   });
 
   /// The user's photo exactly as imported (preserved, FR-02).
@@ -37,20 +51,44 @@ final class ItemImages {
   /// Small copy for grids.
   final String thumbnail;
 
-  /// Background-removed version, if one was made. The original photo is
-  /// always kept, so the user can switch back (DECISIONS D-39).
-  final ItemCutout? cutout;
+  /// Background-removed version (transparent PNGs), if one was made. The
+  /// original photo is always kept, so the user can switch back (D-39).
+  final ItemPicture? cutout;
 
-  /// Whether the user chose the cut-out over the photo.
-  final bool showCutout;
+  /// A product photo the user chose (JPEGs), if any (D-41).
+  final ItemPicture? product;
 
-  bool get _useCutout => showCutout && cutout != null;
+  /// The image the user chose to show. Falls back to the photo when the
+  /// chosen image does not exist.
+  final ItemView view;
 
-  /// The large image to show: the cut-out when chosen, else the photo.
-  String get display => _useCutout ? cutout!.image : working;
+  /// The view actually shown.
+  ItemView get shown => switch (view) {
+    ItemView.cutout when cutout != null => ItemView.cutout,
+    ItemView.product when product != null => ItemView.product,
+    _ => ItemView.photo,
+  };
+
+  /// The large image to show.
+  String get display => switch (shown) {
+    ItemView.cutout => cutout!.image,
+    ItemView.product => product!.image,
+    ItemView.photo => working,
+  };
 
   /// The small image to show and analyse.
-  String get displayThumbnail => _useCutout ? cutout!.thumbnail : thumbnail;
+  String get displayThumbnail => switch (shown) {
+    ItemView.cutout => cutout!.thumbnail,
+    ItemView.product => product!.thumbnail,
+    ItemView.photo => thumbnail,
+  };
+
+  /// Whether [v] can be shown.
+  bool has(ItemView v) => switch (v) {
+    ItemView.photo => true,
+    ItemView.cutout => cutout != null,
+    ItemView.product => product != null,
+  };
 }
 
 /// Encoded images for a cut-out, produced on device (FR-05).

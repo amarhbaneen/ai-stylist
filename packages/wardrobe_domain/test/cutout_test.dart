@@ -59,38 +59,49 @@ final class _Repo implements WardrobeRepository {
 
 void main() {
   group('ItemImages', () {
-    const cutout = ItemCutout(image: 'c.png', thumbnail: 'c_thumb.png');
+    const cutout = ItemPicture(image: 'c.png', thumbnail: 'c_thumb.png');
+    const product = ItemPicture(image: 'p.jpg', thumbnail: 'p_thumb.jpg');
 
-    test('shows the photo without a cut-out', () {
+    test('falls back to the photo when the chosen image is missing', () {
+      for (final view in ItemView.values) {
+        final images = ItemImages(
+          original: 'o.jpg',
+          working: 'w.jpg',
+          thumbnail: 't.jpg',
+          view: view,
+        );
+        expect(images.shown, ItemView.photo);
+        expect(images.display, 'w.jpg');
+        expect(images.displayThumbnail, 't.jpg');
+      }
+    });
+
+    test('shows the chosen image', () {
+      ItemImages withView(ItemView view) => ItemImages(
+        original: 'o.jpg',
+        working: 'w.jpg',
+        thumbnail: 't.jpg',
+        cutout: cutout,
+        product: product,
+        view: view,
+      );
+      expect(withView(ItemView.photo).display, 'w.jpg');
+      expect(withView(ItemView.cutout).display, 'c.png');
+      expect(withView(ItemView.cutout).displayThumbnail, 'c_thumb.png');
+      expect(withView(ItemView.product).display, 'p.jpg');
+      expect(withView(ItemView.product).displayThumbnail, 'p_thumb.jpg');
+      expect(withView(ItemView.photo).has(ItemView.product), isTrue);
+    });
+
+    test('defaults to the photo', () {
       const images = ItemImages(
         original: 'o.jpg',
         working: 'w.jpg',
         thumbnail: 't.jpg',
-        showCutout: true,
-      );
-      expect(images.display, 'w.jpg');
-      expect(images.displayThumbnail, 't.jpg');
-    });
-
-    test('shows the cut-out only when chosen', () {
-      const shown = ItemImages(
-        original: 'o.jpg',
-        working: 'w.jpg',
-        thumbnail: 't.jpg',
-        cutout: cutout,
-        showCutout: true,
-      );
-      expect(shown.display, 'c.png');
-      expect(shown.displayThumbnail, 'c_thumb.png');
-
-      const hidden = ItemImages(
-        original: 'o.jpg',
-        working: 'w.jpg',
-        thumbnail: 't.jpg',
         cutout: cutout,
       );
-      expect(hidden.display, 'w.jpg');
-      expect(hidden.displayThumbnail, 't.jpg');
+      expect(images.shown, ItemView.photo);
+      expect(images.has(ItemView.product), isFalse);
     });
   });
 
