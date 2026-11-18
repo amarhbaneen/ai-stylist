@@ -10,6 +10,7 @@ import '../garment/garment_classifier.dart'
     show UnsupportedImageException, preprocess;
 import 'cutout_renderer.dart';
 import 'garment_regions.dart';
+import 'person_mask.dart';
 import 'segmentation_labels.dart';
 
 /// A loaded segmentation model. Implementations run inference off the UI
@@ -56,14 +57,19 @@ abstract interface class GarmentFinder {
 /// - Opened lazily on first use and kept for later photos.
 /// - Decoding, mask processing and PNG encoding run on background isolates;
 ///   inference runs on the session's isolate. Nothing leaves the device.
+/// - With [openPerson], a person model limits garments to the person in
+///   photos of worn clothes (D-41). It is optional: if it is missing or
+///   fails, the garment model is used alone.
 /// - Never throws. On any failure the caller keeps the original photo, so
 ///   adding an item is never blocked.
 final class GarmentSegmenter implements GarmentFinder {
-  GarmentSegmenter({required this._open});
+  GarmentSegmenter({required this._open, this._openPerson});
 
   final SegmentationSessionOpener _open;
+  final PersonModelOpener? _openPerson;
 
   Future<Result<(SegmentationSession, SegmentationLabels)>>? _opening;
+  Future<Result<PersonModel>>? _openingPerson;
   var _closed = false;
 
   @override
@@ -99,9 +105,10 @@ final class GarmentSegmenter implements GarmentFinder {
       );
     }
 
+    final masked = await _withPerson(imagePath, rgb, probabilities, labels);
     try {
       return Success(
-        await Isolate.run(() => cutOut(imagePath, probabilities, labels)),
+        await Isolate.run(() => cutOut(imagePath, masked, labels)),
       );
     } on Exception catch (e) {
       return Failure(
@@ -110,14 +117,63 @@ final class GarmentSegmenter implements GarmentFinder {
     }
   }
 
-  /// Releases the model. Later calls return a typed failure.
+  /// [probabilities] limited to what the person wears, or unchanged when
+  /// there is no person model, it fails, or the photo shows too little of
+  /// a person.
+  Future<Float32List> _withPerson(
+    String imagePath,
+    Float32List rgb,
+    Float32List probabilities,
+    SegmentationLabels labels,
+  ) async {
+    final open = _openPerson;
+    if (open == null) return probabilities;
+    final opened = await (_openingPerson ??= open());
+    if (opened is! Success<PersonModel>) return probabilities;
+    final (session, personSize) = opened.value;
+    final size = labels.inputSize;
+    final classes = labels.classes.length;
+    try {
+      final input = personSize == size
+          ? rgb
+          : await Isolate.run(() => preprocess(imagePath, personSize));
+      final output = await session.run(personInput(input));
+      return await Isolate.run(() {
+        final worn = wornMask(output, personSize);
+        return worn == null
+            ? probabilities
+            : restrictToWorn(
+                probabilities,
+                size: size,
+                classes: classes,
+                worn: worn,
+                wornSize: personSize,
+              );
+      });
+    } on Object {
+      // Optional refinement: native and isolate errors are not always
+      // Exceptions, and any of them only means the garment model is used
+      // alone.
+      return probabilities;
+    }
+  }
+
+  /// Releases the models. Later calls return a typed failure.
   Future<void> close() async {
     _closed = true;
     final opening = _opening;
+    final openingPerson = _openingPerson;
     _opening = null;
-    if (opening == null) return;
-    if (await opening case Success(value: (final session, _))) {
-      await session.close();
+    _openingPerson = null;
+    if (opening != null) {
+      if (await opening case Success(value: (final session, _))) {
+        await session.close();
+      }
+    }
+    if (openingPerson != null) {
+      if (await openingPerson case Success(value: (final session, _))) {
+        await session.close();
+      }
     }
   }
 }
