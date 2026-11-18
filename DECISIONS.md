@@ -511,6 +511,60 @@ permission is used. Search is local and accent-insensitive.
   iOS is not built. Each extra item stores its own copy of the photo (more storage, simpler
   and safer deletes). Changing the cut-out choice does not re-run analysis.
 
+## D-41 Official product photo through Google Lens, and a person-aware cut-out. Accepted 2026-11-18 (owner)
+- **Why.** On a real worn photo (a selfie in a football shirt) the owner disliked the cut-out:
+  the mesh chair behind the shoulders and things on a shelf were kept, the text was mirrored by
+  the front camera, and the edges were rough. The owner wants the clean product photo the shop
+  shows, like Essembl does, but free. Essembl's own method is not public; generating such
+  images needs a paid cloud model (no cloud AI, P-7). Paid search APIs (Cloud Vision Web
+  Detection, Lens wrappers) need keys and money and would upload photos. Free option chosen
+  by the owner: hand the cut-out to Google Lens and let the user pick the product photo.
+- **Requirement change (owner).** REQUIREMENTS §3 lists "sharing" as a non-goal and the app
+  never uploads photos. Exception: when the user taps **Find official photo**, the app passes
+  one image to Google Lens (or, without the Google app, to the app the user picks in the share
+  sheet). The image is the garment cut-out flattened onto white when there is one (no face,
+  no room), else the working photo. The app itself still makes no network request; Lens is a
+  separate app the user chose, under Google's terms. Nothing else is shared, nothing is sent
+  automatically.
+- **Flow.** Find official photo → Lens opens with the image (Android: explicit intent to the
+  Google app's `LensShareEntryPointActivity`, found with `cmd package query-activities`;
+  fallback to the share sheet via `share_plus` 13.3.1 if it is missing) → the user saves the
+  matching product photo → **Use official photo** picks it from the gallery (system Photo
+  Picker, no permission) → stored as `PRODUCT` (≤1024 px JPEG) and `PRODUCT_THUMBNAIL` (≤320
+  px) under `images/products/`. The item's switch then offers Cut-out / Official / Original;
+  the user's photo is never changed. **Change** and **Remove** are offered. Only the share
+  folder `files/visual_search/` is exposed, read-only, through the app's own FileProvider.
+- **Storage.** Schema v3 adds `clothing_items.show_product` (step-by-step migration with a data
+  test). The domain exposes one `ItemView` (photo, cut-out, product); the two columns are its
+  storage. A missing chosen image falls back to the photo. Product thumbnails are kept for
+  outfit history like cut-out thumbnails.
+- **Person-aware cut-out.** The bundled `person-seg` model (MediaPipe Selfie Multiclass
+  Segmentation 256×256, Apache-2.0, Google; pinned `float32/1` file, SHA-256
+  `c6748b12…6507e0e0`, 16.4 MB) runs after the garment model. When at least 5% of the photo is
+  a person, garment pixels are kept only where the person model sees clothes or accessories
+  (grown by 2 px, with a 0.35–0.65 ramp so unsure pixels are not half-visible); background,
+  skin and hair go. Flat-lays and hangers (no person) are unchanged. If the model is missing or
+  fails, the garment model is used alone.
+- **Why this model.** The smaller MediaPipe selfie segmenter (250 KB) needs the MediaPipe custom
+  op `Convolution2DTransposeBias`, which the bundled LiteRT runtime lacks ("kTfLiteUnresolvedOps"
+  on the emulator). The multiclass model uses only built-in ops and labels clothes separately
+  from skin, which is what a cut-out needs. Its cost is 16.4 MB more in the app.
+- **Flip.** A Flip button mirrors the cut-out (both PNGs, on an isolate) for front-camera
+  selfies; the original photo is untouched.
+- **Product-style display.** Cut-outs and product photos are shown on a light backdrop with
+  padding, like a shop photo.
+- **Android check (2026-11-18, emulator API 37).** Person model loads and runs with LiteRT; on
+  the owner's selfie the garment area went from 46.4% to 44.0% of the photo, removing chair and
+  arm fragments at the sides; the chair mesh just above one shoulder remains, because both
+  models take it for clothing. Segmentation with both models: about 0.75 s per photo. Synthetic
+  flat-lay unchanged (no person found). Find official photo opened Google Lens directly with the
+  cut-out, which listed matching products; Use official photo stored the chosen image and the
+  three-way switch appeared.
+- **Limits.** Lens results and terms are Google's and may change; the Lens component name is
+  undocumented, hence the share-sheet fallback. Saving the photo in Lens is a manual step (no
+  share-back into the app yet). iOS not built: the share sheet is used there (the Google app
+  offers a Lens share target). Not yet tried on a real phone.
+
 ## D-26 Spikes live in `spikes/`, outside the product build. Accepted (M3)
 Each spike is a standalone Flutter app with its own pubspec (exact version pins) and is excluded
 from the root analyzer. Downloaded model binaries are git-ignored and fetched by a script that

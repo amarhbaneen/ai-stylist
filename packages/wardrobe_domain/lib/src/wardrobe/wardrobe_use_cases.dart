@@ -62,14 +62,37 @@ final class AddGarmentsFromPhoto {
   }
 }
 
-/// Switches an item between its cut-out and its original photo.
-final class ShowCutout {
-  const ShowCutout(this._repository);
+/// Chooses which of an item's images is shown (photo, cut-out or product
+/// photo).
+final class ChooseItemView {
+  const ChooseItemView(this._repository);
 
   final WardrobeRepository _repository;
 
-  Future<Result<ClothingItem>> call(String id, {required bool show}) =>
-      _repository.setShowCutout(id, show: show);
+  Future<Result<ClothingItem>> call(String id, ItemView view) =>
+      _repository.setView(id, view);
+}
+
+/// Mirrors an item's cut-out, for selfies the front camera saved mirrored.
+final class FlipCutout {
+  const FlipCutout(this._repository);
+
+  final WardrobeRepository _repository;
+
+  Future<Result<ClothingItem>> call(String id) => _repository.flipCutout(id);
+}
+
+/// Sets or removes the product photo the user chose for an item (D-41).
+final class ManageProductPhoto {
+  const ManageProductPhoto(this._repository);
+
+  final WardrobeRepository _repository;
+
+  Future<Result<ClothingItem>> use(String id, String sourcePath) =>
+      _repository.saveProductPhoto(id, sourcePath);
+
+  Future<Result<ClothingItem>> remove(String id) =>
+      _repository.removeProductPhoto(id);
 }
 
 /// Validates and saves attributes; [confirm] makes the item ACTIVE.

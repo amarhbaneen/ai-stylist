@@ -59,6 +59,9 @@ const _purposes = {
   'garment-segmentation':
       'Removes the background and finds each garment in a photo. The '
       'original photo is always kept.',
+  'person-segmentation':
+      'Finds the person in a photo of worn clothes, so the background '
+      'behind them (a chair, a wall) is not cut out with the garment.',
 };
 
 const _fashionpedia =
@@ -74,6 +77,9 @@ const _credits = {
       '$_fashionpedia Changes: garment masks regrouped into this '
       "app's categories; extra flat-lay images made from them. Backbone: "
       'MobileNetV3 ImageNet weights from Keras (Apache 2.0).',
+  'person-seg':
+      'MediaPipe Selfie Segmentation model by Google, licensed Apache 2.0 '
+      '(apache.org/licenses/LICENSE-2.0). Used unchanged.',
 };
 
 /// A model that ships inside the app: always available, nothing to manage.

@@ -11,6 +11,7 @@ import '../../ai/garment/garment_model_loader.dart';
 import '../../ai/model_registry.dart';
 import '../../ai/segmentation/garment_segmenter.dart';
 import '../../ai/segmentation/litert_segmentation_session.dart';
+import '../../ai/segmentation/person_mask.dart';
 import '../../core/logging/app_logger.dart';
 import '../../core/providers.dart';
 import '../wardrobe/wardrobe_providers.dart';
@@ -68,13 +69,15 @@ GarmentClassifier garmentClassifier(Ref ref) {
   return classifier;
 }
 
-/// The bundled garment segmentation model (FR-05, D-39, D-40). Opened on
-/// first use and released when the provider is disposed.
+/// The bundled garment segmentation model (FR-05, D-39, D-40), with the
+/// person model for worn clothes (D-41). Opened on first use and released when the provider is disposed.
 @Riverpod(keepAlive: true)
 GarmentFinder garmentFinder(Ref ref) {
   final segmenter = GarmentSegmenter(
     open: () async =>
         openSegmentationModel(await ref.read(modelRegistryProvider.future)),
+    openPerson: () async =>
+        openPersonModel(await ref.read(modelRegistryProvider.future)),
   );
   ref.onDispose(segmenter.close);
   return segmenter;

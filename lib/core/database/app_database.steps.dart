@@ -977,8 +977,323 @@ class Shape11 extends i0.VersionedTable {
       columnsByName['value']! as i1.GeneratedColumn<String>;
 }
 
+final class Schema3 extends i0.VersionedSchema {
+  Schema3({required super.database}) : super(version: 3);
+  @override
+  late final List<i1.DatabaseSchemaEntity> entities = [
+    userProfile,
+    clothingItems,
+    clothingItemColors,
+    clothingItemSeasons,
+    clothingImages,
+    clothingAttributes,
+    outfits,
+    outfitItems,
+    outfitFeedback,
+    learnedPreferences,
+    modelInstallations,
+    appSettings,
+    idxClothingItemsStatus,
+    idxClothingItemsCategory,
+    idxClothingItemsSha256,
+    idxClothingImagesItem,
+    idxClothingAttributesItem,
+    idxOutfitsSignature,
+    idxOutfitsCreated,
+    idxOutfitFeedbackOutfit,
+  ];
+  late final Shape0 userProfile = Shape0(
+    source: i0.VersionedTable(
+      entityName: 'user_profile',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_2,
+        _column_3,
+        _column_4,
+        _column_5,
+        _column_6,
+        _column_7,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape12 clothingItems = Shape12(
+    source: i0.VersionedTable(
+      entityName: 'clothing_items',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_8,
+        _column_9,
+        _column_10,
+        _column_11,
+        _column_12,
+        _column_13,
+        _column_14,
+        _column_15,
+        _column_16,
+        _column_17,
+        _column_18,
+        _column_19,
+        _column_60,
+        _column_20,
+        _column_21,
+        _column_6,
+        _column_7,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape2 clothingItemColors = Shape2(
+    source: i0.VersionedTable(
+      entityName: 'clothing_item_colors',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(item_id, color, role)'],
+      columns: [_column_22, _column_23, _column_24],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape3 clothingItemSeasons = Shape3(
+    source: i0.VersionedTable(
+      entityName: 'clothing_item_seasons',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(item_id, season)'],
+      columns: [_column_22, _column_25],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape4 clothingImages = Shape4(
+    source: i0.VersionedTable(
+      entityName: 'clothing_images',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_22,
+        _column_26,
+        _column_27,
+        _column_28,
+        _column_29,
+        _column_30,
+        _column_6,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape5 clothingAttributes = Shape5(
+    source: i0.VersionedTable(
+      entityName: 'clothing_attributes',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_22,
+        _column_31,
+        _column_32,
+        _column_33,
+        _column_34,
+        _column_35,
+        _column_36,
+        _column_37,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape6 outfits = Shape6(
+    source: i0.VersionedTable(
+      entityName: 'outfits',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_38,
+        _column_39,
+        _column_40,
+        _column_41,
+        _column_42,
+        _column_43,
+        _column_44,
+        _column_45,
+        _column_6,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape7 outfitItems = Shape7(
+    source: i0.VersionedTable(
+      entityName: 'outfit_items',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(outfit_id, item_id)'],
+      columns: [_column_46, _column_47, _column_48],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape8 outfitFeedback = Shape8(
+    source: i0.VersionedTable(
+      entityName: 'outfit_feedback',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_46,
+        _column_26,
+        _column_49,
+        _column_50,
+        _column_6,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape9 learnedPreferences = Shape9(
+    source: i0.VersionedTable(
+      entityName: 'learned_preferences',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY("key")'],
+      columns: [_column_51, _column_52, _column_7],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape10 modelInstallations = Shape10(
+    source: i0.VersionedTable(
+      entityName: 'model_installations',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(model_id, version)'],
+      columns: [
+        _column_53,
+        _column_54,
+        _column_27,
+        _column_55,
+        _column_56,
+        _column_57,
+        _column_58,
+        _column_59,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape11 appSettings = Shape11(
+    source: i0.VersionedTable(
+      entityName: 'app_settings',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY("key")'],
+      columns: [_column_51, _column_32],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  final i1.Index idxClothingItemsStatus = i1.Index(
+    'idx_clothing_items_status',
+    'CREATE INDEX idx_clothing_items_status ON clothing_items (status)',
+  );
+  final i1.Index idxClothingItemsCategory = i1.Index(
+    'idx_clothing_items_category',
+    'CREATE INDEX idx_clothing_items_category ON clothing_items (category)',
+  );
+  final i1.Index idxClothingItemsSha256 = i1.Index(
+    'idx_clothing_items_sha256',
+    'CREATE INDEX idx_clothing_items_sha256 ON clothing_items (content_sha256)',
+  );
+  final i1.Index idxClothingImagesItem = i1.Index(
+    'idx_clothing_images_item',
+    'CREATE INDEX idx_clothing_images_item ON clothing_images (item_id)',
+  );
+  final i1.Index idxClothingAttributesItem = i1.Index(
+    'idx_clothing_attributes_item',
+    'CREATE INDEX idx_clothing_attributes_item ON clothing_attributes (item_id)',
+  );
+  final i1.Index idxOutfitsSignature = i1.Index(
+    'idx_outfits_signature',
+    'CREATE INDEX idx_outfits_signature ON outfits (signature)',
+  );
+  final i1.Index idxOutfitsCreated = i1.Index(
+    'idx_outfits_created',
+    'CREATE INDEX idx_outfits_created ON outfits (created_at)',
+  );
+  final i1.Index idxOutfitFeedbackOutfit = i1.Index(
+    'idx_outfit_feedback_outfit',
+    'CREATE INDEX idx_outfit_feedback_outfit ON outfit_feedback (outfit_id)',
+  );
+}
+
+class Shape12 extends i0.VersionedTable {
+  Shape12({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<String> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get category =>
+      columnsByName['category']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get subcategory =>
+      columnsByName['subcategory']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get displayName =>
+      columnsByName['display_name']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get notes =>
+      columnsByName['notes']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get primaryColor =>
+      columnsByName['primary_color']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get pattern =>
+      columnsByName['pattern']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get formality =>
+      columnsByName['formality']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<String> get fit =>
+      columnsByName['fit']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get brand =>
+      columnsByName['brand']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get warmth =>
+      columnsByName['warmth']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<String> get status =>
+      columnsByName['status']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get showCutout =>
+      columnsByName['show_cutout']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get showProduct =>
+      columnsByName['show_product']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<String> get contentSha256 =>
+      columnsByName['content_sha256']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get deletedAt =>
+      columnsByName['deleted_at']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get createdAt =>
+      columnsByName['created_at']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get updatedAt =>
+      columnsByName['updated_at']! as i1.GeneratedColumn<int>;
+}
+
+i1.GeneratedColumn<int> _column_60(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'show_product',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NOT NULL DEFAULT 0 CHECK (show_product IN (0, 1))',
+      defaultValue: const i1.CustomExpression('0'),
+    );
 i0.MigrationStepWithVersion migrationSteps({
   required Future<void> Function(i1.Migrator m, Schema2 schema) from1To2,
+  required Future<void> Function(i1.Migrator m, Schema3 schema) from2To3,
 }) {
   return (currentVersion, database) async {
     switch (currentVersion) {
@@ -987,6 +1302,11 @@ i0.MigrationStepWithVersion migrationSteps({
         final migrator = i1.Migrator(database, schema);
         await from1To2(migrator, schema);
         return 2;
+      case 2:
+        final schema = Schema3(database: database);
+        final migrator = i1.Migrator(database, schema);
+        await from2To3(migrator, schema);
+        return 3;
       default:
         throw ArgumentError.value('Unknown migration from $currentVersion');
     }
@@ -995,6 +1315,7 @@ i0.MigrationStepWithVersion migrationSteps({
 
 i1.OnUpgrade stepByStep({
   required Future<void> Function(i1.Migrator m, Schema2 schema) from1To2,
+  required Future<void> Function(i1.Migrator m, Schema3 schema) from2To3,
 }) => i0.VersionedSchema.stepByStepHelper(
-  step: migrationSteps(from1To2: from1To2),
+  step: migrationSteps(from1To2: from1To2, from2To3: from2To3),
 );

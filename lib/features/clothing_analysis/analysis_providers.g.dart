@@ -214,20 +214,20 @@ final class GarmentClassifierProvider
 
 String _$garmentClassifierHash() => r'786132c016903c38fa66dd73e0259c19d22cb9c9';
 
-/// The bundled garment segmentation model (FR-05, D-39, D-40). Opened on
-/// first use and released when the provider is disposed.
+/// The bundled garment segmentation model (FR-05, D-39, D-40), with the
+/// person model for worn clothes (D-41). Opened on first use and released when the provider is disposed.
 
 @ProviderFor(garmentFinder)
 final garmentFinderProvider = GarmentFinderProvider._();
 
-/// The bundled garment segmentation model (FR-05, D-39, D-40). Opened on
-/// first use and released when the provider is disposed.
+/// The bundled garment segmentation model (FR-05, D-39, D-40), with the
+/// person model for worn clothes (D-41). Opened on first use and released when the provider is disposed.
 
 final class GarmentFinderProvider
     extends $FunctionalProvider<GarmentFinder, GarmentFinder, GarmentFinder>
     with $Provider<GarmentFinder> {
-  /// The bundled garment segmentation model (FR-05, D-39, D-40). Opened on
-  /// first use and released when the provider is disposed.
+  /// The bundled garment segmentation model (FR-05, D-39, D-40), with the
+  /// person model for worn clothes (D-41). Opened on first use and released when the provider is disposed.
   GarmentFinderProvider._()
     : super(
         from: null,
@@ -261,7 +261,7 @@ final class GarmentFinderProvider
   }
 }
 
-String _$garmentFinderHash() => r'5871f954b5742ee7bd5e5eb5d9afa6e62a83ee23';
+String _$garmentFinderHash() => r'cc539caf441ab79b86f6afe262c5bb4f40a79a66';
 
 /// All analyzers available on this device: Tier 0 (colour) and the Tier-1
 /// garment classifier (category, type, pattern). Either can fail without

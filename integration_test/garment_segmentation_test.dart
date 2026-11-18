@@ -1,5 +1,6 @@
-// On-device check of the bundled garment segmentation model (D-40). Runs
-// the real LiteRT runtime and model; nothing is sent over the network.
+// On-device check of the bundled garment and person segmentation models
+// (D-40, D-41). Runs the real LiteRT runtime and models; nothing is sent
+// over the network.
 //
 //   flutter test integration_test/garment_segmentation_test.dart -d <device>
 import 'dart:io';
@@ -7,6 +8,7 @@ import 'dart:io';
 import 'package:ai_stylist/ai/model_registry.dart';
 import 'package:ai_stylist/ai/segmentation/garment_segmenter.dart';
 import 'package:ai_stylist/ai/segmentation/litert_segmentation_session.dart';
+import 'package:ai_stylist/ai/segmentation/person_mask.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image/image.dart' as img;
@@ -40,16 +42,25 @@ void main() {
 
       final openWatch = Stopwatch()..start();
       var openMs = 0;
+      var personOpened = false;
       final segmenter = GarmentSegmenter(
         open: () async {
           final r = await openSegmentationModel(registry);
           openMs = openWatch.elapsedMilliseconds;
           return r;
         },
+        openPerson: () async {
+          final r = await openPersonModel(registry);
+          personOpened = r.isSuccess;
+          return r;
+        },
       );
 
       final first = await segmenter.findGarments(photo.path);
       expect(first, isA<Success<List<FoundGarment>>>(), reason: '$first');
+      // The person model must load with the bundled runtime (no MediaPipe
+      // custom ops, D-41).
+      expect(personOpened, isTrue);
       final latencies = <int>[];
       for (var i = 0; i < 5; i++) {
         final w = Stopwatch()..start();
@@ -73,7 +84,7 @@ void main() {
 
       // ignore: avoid_print
       print(
-        'DEVICE_CHECK_SEG openMs=$openMs '
+        'DEVICE_CHECK_SEG openMs=$openMs personModel=$personOpened '
         'p50Ms=${latencies[latencies.length ~/ 2]} maxMs=${latencies.last} '
         'garments=[$summary]',
       );

@@ -10,12 +10,15 @@ status. REQUIREMENTS FR-09 and §18 require licensing to be approved before any 
 | `efficientnet-lite0-float32` | Runtime test only | Same | Same | 17.72 MB | `6c7ab0a6…c8bde0` | **Spike only, never shipped** |
 | `garment-tier1` (v1.0.0) | Category, type, pattern (Tier 1) | Trained on Fashionpedia (CC BY 4.0) with `training/` on Google Colab; MobileNetV3-Large backbone, Keras ImageNet weights (Apache-2.0) | CC BY 4.0 data, attribution required (P-3 approved 2026-11-16) | 3.36 MB (int8 weights, float activations) | `d562792c…ed8dc397` | **Shipped** (M4, D-38): bundled; category 90.6% / type 85% / pattern 80% top-1 on the Fashionpedia test set; not yet measured on flat-lay photos |
 | `garment-seg` (v1.0.0) | Garment cut-out and separation (FR-05) | Trained on Fashionpedia masks (CC BY 4.0) with `training/garment_segmentation.ipynb`; MobileNetV3-Large backbone, Keras ImageNet weights (Apache-2.0) | CC BY 4.0 data, attribution required (P-3) | 3.84 MB (int8 weights, float activations) | `39224bc4…6dd8aeab19` | **Shipped** (D-39, D-40): bundled; garment-vs-background IoU 0.84 on real photos and 0.97 on synthetic flat-lays, 76% / 87% of garments found; not yet measured on real flat-lays or phones |
+| `person-seg` (v1.0.0) | Clothes on a person, to keep the background out of cut-outs of worn clothes (D-41) | MediaPipe Selfie Multiclass Segmentation 256×256 by Google, `float32/1` from `storage.googleapis.com/mediapipe-models`, unchanged | Apache-2.0 | 16.4 MB (float32) | `c6748b12…6507e0e0` | **Shipped** (D-41): bundled; used only when a person covers ≥5% of the photo |
 | `marqo-fashionsiglip-vision` (candidate) | Optional zero-shot attributes (Tier 2) | huggingface.co/Marqo/marqo-fashionSigLIP | Apache-2.0 (weights). Training-data provenance not fully documented | ~90 MB int8 ONNX | – | **Candidate**: needs conversion and parity checks, plus legal review |
 
 ## Attribution obligations
 
 - **Fashionpedia** (trained `garment-tier1` and `garment-seg`): CC BY 4.0. Credited, with a link to the licence and
   a note of the changes, on the On-device models screen (Settings → On-device models).
+- **MediaPipe Selfie Multiclass Segmentation** (`person-seg`): Apache-2.0, Google. Credited on the
+  On-device models screen; include the licence in the open-source notices.
 - **Marqo-FashionSigLIP** (if shipped or downloaded): Apache-2.0. Include the licence and NOTICE.
 - **LiteRT runtime** (`flutter_litert`, bundled): include the licences of the runtime and its
   native libraries in the open-source notices.

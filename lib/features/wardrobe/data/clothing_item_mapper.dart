@@ -10,13 +10,15 @@ abstract final class ImageKind {
   static const thumbnail = 'THUMBNAIL';
   static const cutout = 'CUTOUT';
   static const cutoutThumbnail = 'CUTOUT_THUMBNAIL';
+  static const product = 'PRODUCT';
+  static const productThumbnail = 'PRODUCT_THUMBNAIL';
 
   /// Kinds that belong to the photo (copied when one photo makes several
   /// items); the rest belong to one garment.
   static const photo = {original, working, thumbnail};
 
   /// Kinds kept for outfit history when a used item is deleted.
-  static const history = {thumbnail, cutoutThumbnail};
+  static const history = {thumbnail, cutoutThumbnail, productThumbnail};
 }
 
 /// Stored values for `clothing_item_colors.role`.
@@ -49,7 +51,14 @@ abstract final class ClothingItemMapper {
       status: ItemStatus.fromCode(row.status),
       createdAt: fromEpochMillisUtc(row.createdAt),
       updatedAt: fromEpochMillisUtc(row.updatedAt),
-      images: _images(images, showCutout: row.showCutout),
+      images: _images(
+        images,
+        view: row.showProduct
+            ? ItemView.product
+            : row.showCutout
+            ? ItemView.cutout
+            : ItemView.photo,
+      ),
       attributes: ClothingAttributes(
         category: category,
         subcategory: subcategory,
@@ -69,7 +78,7 @@ abstract final class ClothingItemMapper {
 
   static ItemImages? _images(
     List<ClothingImageRow> rows, {
-    required bool showCutout,
+    required ItemView view,
   }) {
     String? find(String kind) {
       for (final r in rows) {
@@ -82,19 +91,21 @@ abstract final class ClothingItemMapper {
     final working = find(ImageKind.working);
     final thumbnail = find(ImageKind.thumbnail);
     if (thumbnail == null) return null;
-    final cutoutThumbnail = find(ImageKind.cutoutThumbnail);
+    // History tombstones keep only thumbnails; show what the user saw.
+    ItemPicture? picture(String large, String small) {
+      final thumb = find(small);
+      return thumb == null
+          ? null
+          : ItemPicture(image: find(large) ?? thumb, thumbnail: thumb);
+    }
+
     return ItemImages(
       original: original ?? working ?? thumbnail,
       working: working ?? thumbnail,
       thumbnail: thumbnail,
-      // History tombstones keep only thumbnails; show what the user saw.
-      cutout: cutoutThumbnail == null
-          ? null
-          : ItemCutout(
-              image: find(ImageKind.cutout) ?? cutoutThumbnail,
-              thumbnail: cutoutThumbnail,
-            ),
-      showCutout: showCutout,
+      cutout: picture(ImageKind.cutout, ImageKind.cutoutThumbnail),
+      product: picture(ImageKind.product, ImageKind.productThumbnail),
+      view: view,
     );
   }
 

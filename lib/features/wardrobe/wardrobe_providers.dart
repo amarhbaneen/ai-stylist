@@ -1,9 +1,13 @@
+import 'dart:io';
+
+import 'package:path/path.dart' as p;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:wardrobe_domain/wardrobe_domain.dart';
 
 import '../../core/media/file_hasher.dart';
 import '../../core/media/image_processor.dart';
 import '../../core/media/media_picker.dart';
+import '../../core/media/visual_search.dart';
 import '../../core/providers.dart';
 import 'data/drift_wardrobe_repository.dart';
 
@@ -14,6 +18,14 @@ ImageProcessor imageProcessor(Ref ref) => const NativeImageProcessor();
 
 @Riverpod(keepAlive: true)
 MediaPicker mediaPicker(Ref ref) => ImagePickerMediaPicker();
+
+/// Hands an image to a visual search app the user picks (D-41).
+@Riverpod(keepAlive: true)
+VisualSearch visualSearch(Ref ref) => ShareSheetVisualSearch(
+  tempDir: Directory(
+    p.join(ref.watch(appSupportDirectoryProvider).path, 'visual_search'),
+  ),
+);
 
 @Riverpod(keepAlive: true)
 WardrobeRepository wardrobeRepository(Ref ref) => DriftWardrobeRepository(
@@ -38,8 +50,16 @@ AddGarmentsFromPhoto addGarmentsFromPhoto(Ref ref) =>
     AddGarmentsFromPhoto(ref.watch(wardrobeRepositoryProvider));
 
 @riverpod
-ShowCutout showCutout(Ref ref) =>
-    ShowCutout(ref.watch(wardrobeRepositoryProvider));
+ChooseItemView chooseItemView(Ref ref) =>
+    ChooseItemView(ref.watch(wardrobeRepositoryProvider));
+
+@riverpod
+FlipCutout flipCutout(Ref ref) =>
+    FlipCutout(ref.watch(wardrobeRepositoryProvider));
+
+@riverpod
+ManageProductPhoto manageProductPhoto(Ref ref) =>
+    ManageProductPhoto(ref.watch(wardrobeRepositoryProvider));
 
 @riverpod
 ArchiveClothingItem archiveClothingItem(Ref ref) =>

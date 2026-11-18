@@ -36,6 +36,15 @@ City search uses the bundled GeoNames list (`assets/cities/cities.json`) and sen
 | Verification | Exact size and SHA-256 from the bundled manifest; a mismatch deletes the file. Files are only read as model weights, never executed (D-37). |
 | Failure | The app keeps working; colour analysis is built in and every attribute can be set by hand. |
 
+## Not a network request: Find official photo (D-41)
+
+When the user taps **Find official photo** on an item, the app hands one image to Google Lens
+(Android, if the Google app is installed) or to the app the user picks in the system share
+sheet. The image is the garment cut-out flattened onto white (no face or room), or the photo
+when there is no cut-out. The app makes no request itself; what Lens does with the image is
+under Google's terms. Nothing is handed over without that tap. The chosen product photo comes
+back through the system Photo Picker, not the network.
+
 ## Platform permissions
 
 - Android: `android.permission.INTERNET` (release manifest), used only by the two requests

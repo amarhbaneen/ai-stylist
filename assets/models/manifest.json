@@ -20,6 +20,15 @@
       "labelsAsset": "assets/models/garment-seg.labels.json",
       "sha256": "39224bc4977c8ee5b283131ca0355f897245a91c33295c990604ab6dd8aeab19",
       "license": "CC-BY-4.0 (Fashionpedia annotations)"
+    },
+    {
+      "id": "person-seg",
+      "version": "1.0.0",
+      "task": "person-segmentation",
+      "title": "Clothes on a person",
+      "asset": "assets/models/person-seg.tflite",
+      "sha256": "c6748b1253a99067ef71f7e26ca71096cd449baefa8f101900ea23016507e0e0",
+      "license": "Apache-2.0 (Google MediaPipe Selfie Multiclass Segmentation)"
     }
   ]
 }

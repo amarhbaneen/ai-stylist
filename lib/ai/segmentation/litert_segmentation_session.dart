@@ -13,8 +13,9 @@ const segmentationTask = 'garment-segmentation';
 /// [SegmentationSession] on LiteRT (`flutter_litert`, bundled runtime, no
 /// Play services; DECISIONS D-07). Inference runs on a dedicated isolate.
 ///
-/// The exported model has one float32 input `[1, S, S, 3]` (RGB 0–255) and
-/// one float32 output `[1, S, S, C]` of per-pixel class probabilities.
+/// The model has one float32 input `[1, S, S, 3]` (RGB) and one float32
+/// output `[1, S, S, C]` of per-pixel values: class probabilities for the
+/// garment model, a person probability (C = 1) for the person model.
 final class LiteRtSegmentationSession implements SegmentationSession {
   LiteRtSegmentationSession._(this._interpreter, this._isolate, this._length);
 
@@ -23,10 +24,13 @@ final class LiteRtSegmentationSession implements SegmentationSession {
   final int _length;
   var _closed = false;
 
-  /// Loads verified model bytes and checks the tensors against [labels].
+  /// Loads verified model bytes and checks the tensors are `[1, size,
+  /// size, 3]` in and `[1, size, size, channels]` out.
   static Future<Result<LiteRtSegmentationSession>> open(
-    Uint8List modelBytes,
-    SegmentationLabels labels, {
+    Uint8List modelBytes, {
+    required int size,
+    required int channels,
+    String debugName = 'GarmentSegmenter',
     int threads = 2,
   }) async {
     final Interpreter interpreter;
@@ -41,8 +45,8 @@ final class LiteRtSegmentationSession implements SegmentationSession {
       );
     }
 
-    final s = labels.inputSize;
-    final c = labels.classes.length;
+    final s = size;
+    final c = channels;
     final input = interpreter.getInputTensors();
     final output = interpreter.getOutputTensors();
     final ok =
@@ -55,14 +59,14 @@ final class LiteRtSegmentationSession implements SegmentationSession {
     if (!ok) {
       interpreter.close();
       return const Failure(
-        ModelCorruptFailure('Model tensors do not match the label table'),
+        ModelCorruptFailure('Model tensors do not have the expected shape'),
       );
     }
 
     try {
       final isolate = await IsolateInterpreter.create(
         address: interpreter.address,
-        debugName: 'GarmentSegmenter',
+        debugName: debugName,
       );
       return Success(
         LiteRtSegmentationSession._(interpreter, isolate, s * s * c),
@@ -133,7 +137,11 @@ Future<Result<(SegmentationSession, SegmentationLabels)>> openSegmentationModel(
     case Failure(:final failure):
       return Failure(failure);
     case Success(value: final bytes):
-      return switch (await LiteRtSegmentationSession.open(bytes, labels)) {
+      return switch (await LiteRtSegmentationSession.open(
+        bytes,
+        size: labels.inputSize,
+        channels: labels.classes.length,
+      )) {
         Success(value: final session) => Success((session, labels)),
         Failure(:final failure) => Failure(failure),
       };

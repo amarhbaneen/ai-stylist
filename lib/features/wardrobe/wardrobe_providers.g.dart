@@ -91,6 +91,52 @@ final class MediaPickerProvider
 
 String _$mediaPickerHash() => r'466b1b352a6c5691c5406eb47f5b8e0577f112bc';
 
+/// Hands an image to a visual search app the user picks (D-41).
+
+@ProviderFor(visualSearch)
+final visualSearchProvider = VisualSearchProvider._();
+
+/// Hands an image to a visual search app the user picks (D-41).
+
+final class VisualSearchProvider
+    extends $FunctionalProvider<VisualSearch, VisualSearch, VisualSearch>
+    with $Provider<VisualSearch> {
+  /// Hands an image to a visual search app the user picks (D-41).
+  VisualSearchProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'visualSearchProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$visualSearchHash();
+
+  @$internal
+  @override
+  $ProviderElement<VisualSearch> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  VisualSearch create(Ref ref) {
+    return visualSearch(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(VisualSearch value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<VisualSearch>(value),
+    );
+  }
+}
+
+String _$visualSearchHash() => r'4315fbe732fb1e11af35d2aa62f772baf3bdca2c';
+
 @ProviderFor(wardrobeRepository)
 final wardrobeRepositoryProvider = WardrobeRepositoryProvider._();
 
@@ -281,46 +327,135 @@ final class AddGarmentsFromPhotoProvider
 String _$addGarmentsFromPhotoHash() =>
     r'4872fb6920c50f6ed8ef1edb405d45773fb39e68';
 
-@ProviderFor(showCutout)
-final showCutoutProvider = ShowCutoutProvider._();
+@ProviderFor(chooseItemView)
+final chooseItemViewProvider = ChooseItemViewProvider._();
 
-final class ShowCutoutProvider
-    extends $FunctionalProvider<ShowCutout, ShowCutout, ShowCutout>
-    with $Provider<ShowCutout> {
-  ShowCutoutProvider._()
+final class ChooseItemViewProvider
+    extends $FunctionalProvider<ChooseItemView, ChooseItemView, ChooseItemView>
+    with $Provider<ChooseItemView> {
+  ChooseItemViewProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
-        name: r'showCutoutProvider',
+        name: r'chooseItemViewProvider',
         isAutoDispose: true,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
 
   @override
-  String debugGetCreateSourceHash() => _$showCutoutHash();
+  String debugGetCreateSourceHash() => _$chooseItemViewHash();
 
   @$internal
   @override
-  $ProviderElement<ShowCutout> $createElement($ProviderPointer pointer) =>
+  $ProviderElement<ChooseItemView> $createElement($ProviderPointer pointer) =>
       $ProviderElement(pointer);
 
   @override
-  ShowCutout create(Ref ref) {
-    return showCutout(ref);
+  ChooseItemView create(Ref ref) {
+    return chooseItemView(ref);
   }
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(ShowCutout value) {
+  Override overrideWithValue(ChooseItemView value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<ShowCutout>(value),
+      providerOverride: $SyncValueProvider<ChooseItemView>(value),
     );
   }
 }
 
-String _$showCutoutHash() => r'31a11c2547b20ae12dc57362d023a122a97b9114';
+String _$chooseItemViewHash() => r'fd02a44eef4a68bf54525ff74fc3c94825bd1dae';
+
+@ProviderFor(flipCutout)
+final flipCutoutProvider = FlipCutoutProvider._();
+
+final class FlipCutoutProvider
+    extends $FunctionalProvider<FlipCutout, FlipCutout, FlipCutout>
+    with $Provider<FlipCutout> {
+  FlipCutoutProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'flipCutoutProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$flipCutoutHash();
+
+  @$internal
+  @override
+  $ProviderElement<FlipCutout> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  FlipCutout create(Ref ref) {
+    return flipCutout(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(FlipCutout value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<FlipCutout>(value),
+    );
+  }
+}
+
+String _$flipCutoutHash() => r'a9d062ae859327df503d9dc74105f597416b08d9';
+
+@ProviderFor(manageProductPhoto)
+final manageProductPhotoProvider = ManageProductPhotoProvider._();
+
+final class ManageProductPhotoProvider
+    extends
+        $FunctionalProvider<
+          ManageProductPhoto,
+          ManageProductPhoto,
+          ManageProductPhoto
+        >
+    with $Provider<ManageProductPhoto> {
+  ManageProductPhotoProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'manageProductPhotoProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$manageProductPhotoHash();
+
+  @$internal
+  @override
+  $ProviderElement<ManageProductPhoto> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  ManageProductPhoto create(Ref ref) {
+    return manageProductPhoto(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(ManageProductPhoto value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<ManageProductPhoto>(value),
+    );
+  }
+}
+
+String _$manageProductPhotoHash() =>
+    r'f1519b946d0d20beeb197bc48b7a1afd4a9ce553';
 
 @ProviderFor(archiveClothingItem)
 final archiveClothingItemProvider = ArchiveClothingItemProvider._();

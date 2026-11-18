@@ -66,6 +66,10 @@ class ClothingItems extends Table {
   /// FR-05). The original photo is always kept.
   BoolColumn get showCutout => boolean().withDefault(const Constant(false))();
 
+  /// Show the product photo the user chose (schema v3, D-41). Takes
+  /// precedence over [showCutout]; both false shows the photo.
+  BoolColumn get showProduct => boolean().withDefault(const Constant(false))();
+
   /// SHA-256 of the original image bytes, used for duplicate detection.
   /// Items made from one photo with several garments share it (D-39).
   TextColumn get contentSha256 => text().nullable()();

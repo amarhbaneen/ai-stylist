@@ -46,9 +46,21 @@ abstract interface class WardrobeRepository {
   /// Replaces an earlier cut-out. The original photo is never changed.
   Future<Result<ClothingItem>> saveCutout(String id, CutoutImages cutout);
 
-  /// Chooses between the cut-out and the original photo. Fails with
-  /// `ValidationFailure` when [show] is true and there is no cut-out.
-  Future<Result<ClothingItem>> setShowCutout(String id, {required bool show});
+  /// Mirrors the cut-out left to right (for front-camera selfies) and
+  /// shows it. Fails with `ValidationFailure` when there is no cut-out.
+  Future<Result<ClothingItem>> flipCutout(String id);
+
+  /// Stores a product photo the user chose (D-41), as downscaled JPEG
+  /// copies of the image at [sourcePath], and shows it. Replaces an earlier
+  /// product photo. Fails like [importImage] for unreadable images.
+  Future<Result<ClothingItem>> saveProductPhoto(String id, String sourcePath);
+
+  /// Deletes the product photo, if any, and shows the cut-out or photo.
+  Future<Result<ClothingItem>> removeProductPhoto(String id);
+
+  /// Chooses which image is shown. Fails with `ValidationFailure` when the
+  /// item has no such image.
+  Future<Result<ClothingItem>> setView(String id, ItemView view);
 
   /// Creates a new DRAFT item from the same photo as [sourceId], for a photo
   /// with several garments (D-39). The new item gets its own copies of the

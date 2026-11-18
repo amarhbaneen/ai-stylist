@@ -30,6 +30,7 @@ final class TestApp {
     this.processor,
     this.analyzer,
     this.garments,
+    this.search,
     this.network,
     this.container,
   );
@@ -44,6 +45,9 @@ final class TestApp {
 
   /// Scripted background removal (the real model needs isolates).
   final FakeGarmentFinder garments;
+
+  /// Records images handed to a visual search app (no share sheet).
+  final FakeVisualSearch search;
 
   /// Every HTTP request the app makes. Tests never reach the real network.
   final FakeNetwork network;
@@ -63,6 +67,7 @@ final class TestApp {
     final processor = FakeImageProcessor();
     final analyzer = FakeClothingAnalyzer();
     final garments = FakeGarmentFinder();
+    final search = FakeVisualSearch();
     final network = FakeNetwork();
     final container = ProviderContainer(
       overrides: [
@@ -78,6 +83,7 @@ final class TestApp {
         engineRunnerProvider.overrideWithValue(runEngineInline),
         clothingAnalyzerProvider.overrideWithValue(analyzer),
         garmentFinderProvider.overrideWithValue(garments),
+        visualSearchProvider.overrideWithValue(search),
         httpClientProvider.overrideWithValue(MockClient(network.handle)),
         // A tiny list instead of the 700 KB bundled asset.
         cityDirectoryProvider.overrideWithValue(
@@ -92,6 +98,7 @@ final class TestApp {
       processor,
       analyzer,
       garments,
+      search,
       network,
       container,
     );

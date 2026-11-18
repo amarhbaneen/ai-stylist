@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:ai_stylist/ai/segmentation/garment_segmenter.dart';
 import 'package:ai_stylist/core/media/image_processor.dart';
 import 'package:ai_stylist/core/media/media_picker.dart';
+import 'package:ai_stylist/core/media/visual_search.dart';
 import 'package:ai_stylist/core/storage/file_store.dart';
 import 'package:wardrobe_domain/wardrobe_domain.dart';
 
@@ -117,6 +118,18 @@ final class FakeGarmentFinder implements GarmentFinder {
 
   @override
   Future<Result<List<FoundGarment>>> findGarments(String imagePath) async {
+    paths.add(imagePath);
+    return result;
+  }
+}
+
+/// Records the images handed to a visual search app (D-41).
+final class FakeVisualSearch implements VisualSearch {
+  Result<void> result = const Success(null);
+  final paths = <String>[];
+
+  @override
+  Future<Result<void>> search(String imagePath) async {
     paths.add(imagePath);
     return result;
   }

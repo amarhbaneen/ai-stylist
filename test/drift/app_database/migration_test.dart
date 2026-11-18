@@ -9,6 +9,7 @@ import 'generated/schema.dart';
 
 import 'generated/schema_v1.dart' as v1;
 import 'generated/schema_v2.dart' as v2;
+import 'generated/schema_v3.dart' as v3;
 
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -89,6 +90,42 @@ void main() {
             relativePath: image.relativePath,
             byteSize: image.byteSize,
             createdAt: image.createdAt,
+          ),
+        ]);
+      },
+    );
+  });
+
+  // v3 only adds `clothing_items.show_product`: the cut-out choice stays.
+  test('v2 to v3 keeps the cut-out choice, product photo off', () async {
+    await verifier.testWithDataIntegrity(
+      oldVersion: 2,
+      newVersion: 3,
+      createOld: v2.DatabaseAtV2.new,
+      createNew: v3.DatabaseAtV3.new,
+      openTestedDatabase: AppDatabase.new,
+      createItems: (batch, oldDb) {
+        batch.insertAll(oldDb.clothingItems, [
+          const v2.ClothingItemsData(
+            id: 'item-1',
+            category: 'TOP',
+            status: 'ACTIVE',
+            showCutout: 1,
+            createdAt: 1700000000000,
+            updatedAt: 1700000000001,
+          ),
+        ]);
+      },
+      validateItems: (newDb) async {
+        expect(await newDb.select(newDb.clothingItems).get(), [
+          const v3.ClothingItemsData(
+            id: 'item-1',
+            category: 'TOP',
+            status: 'ACTIVE',
+            showCutout: 1,
+            showProduct: 0,
+            createdAt: 1700000000000,
+            updatedAt: 1700000000001,
           ),
         ]);
       },
