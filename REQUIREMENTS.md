@@ -207,6 +207,11 @@ uncertain.
     incorrect.
 -   Do not make background removal a P0 dependency unless reliable
     models are verified for both platforms.
+-   Owner change 2026-11-18 (DECISIONS D-41): on an explicit tap of
+    "Find official photo", the app may hand the garment cut-out (or the
+    photo when there is no cut-out) to Google Lens or a visual search app
+    the user picks, so they can choose the official product photo. The
+    app itself sends nothing over the network; this is the only sharing.
 
 ### FR-06 Outfit generation
 

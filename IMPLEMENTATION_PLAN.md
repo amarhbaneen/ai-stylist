@@ -141,7 +141,9 @@ model, schema validation, thresholds, golden images.
 Segmentation (FR-05) only after the classifier works, and only if a licence-clean model is
 verified. Otherwise defer. Done 2026-11-17: `garment-seg` trained on Fashionpedia masks and
 bundled, with cut-outs, a switch back to the original, and several items from one photo
-(D-39, D-40); real-photo and phone checks still open.
+(D-39, D-40); real-photo and phone checks still open. 2026-11-18: person-aware cut-out,
+Flip, and official product photo through Google Lens (D-41, owner-approved exception to the
+no-sharing non-goal).
 
 ### M5: Phase 5 — Outfit engine (REQ M4) ✅ Android verified 2026-11-16 (Home daily suggestion still a placeholder; see README)
 `packages/outfit_engine` with templates (§4), hard filters, the six scorers, weight

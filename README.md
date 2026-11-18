@@ -60,6 +60,11 @@ device.
     the photo is added as before. About 0.7 s per photo on the emulator
     (`flutter test integration_test/garment_segmentation_test.dart -d <device>`). See DECISIONS
     D-39 and D-40.
+  - Worn clothes and official photos (D-41): a second built-in model (`person-seg`, MediaPipe,
+    Apache-2.0, 16 MB) keeps only what the person wears, so the chair or room behind them is
+    not cut out with the garment. **Flip** fixes mirrored selfies. **Find official photo**
+    hands the cut-out (never the face or room) to Google Lens; save the matching product photo
+    and tap **Use official photo** to show it instead. The app itself uploads nothing.
   - Verified on the emulator offline: a new green shirt photo had Green pre-filled.
 - **M6 (feedback and personalisation):** complete for Android; merged into `main`.
   - Like, dislike (with optional reasons and a note) and save on every outfit.
