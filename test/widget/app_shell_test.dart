@@ -30,7 +30,7 @@ void main() {
     await tapAndSettle(tester, find.byIcon(Icons.checkroom_outlined).last);
     expect(find.text('Your wardrobe is empty'), findsOneWidget);
 
-    await tapAndSettle(tester, find.byIcon(Icons.auto_awesome_outlined));
+    await tapAndSettle(tester, find.byIcon(Icons.style_outlined));
     expect(find.text('Occasion'), findsOneWidget);
 
     await tapAndSettle(tester, find.byIcon(Icons.favorite_border));

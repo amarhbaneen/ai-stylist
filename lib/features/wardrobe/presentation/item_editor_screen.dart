@@ -144,7 +144,7 @@ class _ItemEditorScreenState extends ConsumerState<ItemEditorScreen> {
       ),
       _ => Scaffold(
         appBar: AppBar(title: Text(title)),
-        body: const Center(child: CircularProgressIndicator()),
+        body: const LoadingState(),
       ),
     };
   }

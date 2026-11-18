@@ -2,6 +2,9 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart'
+    show LicenseEntryWithLineBreaks, LicenseRegistry;
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:path_provider/path_provider.dart';
@@ -20,6 +23,7 @@ import 'app.dart';
 /// Nothing here touches the network: the app starts fully offline.
 Future<void> bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
+  _registerFontLicenses();
 
   FlutterError.onError = (details) {
     AppLogger.error(
@@ -90,4 +94,18 @@ Future<void> bootstrap() async {
       child: const AiStylistApp(),
     ),
   );
+}
+
+/// Lists the bundled fonts' SIL OFL licences on the licences page.
+void _registerFontLicenses() {
+  LicenseRegistry.addLicense(() async* {
+    for (final (family, file) in const [
+      ('Geist', 'assets/fonts/Geist-OFL.txt'),
+      ('Instrument Serif', 'assets/fonts/InstrumentSerif-OFL.txt'),
+    ]) {
+      yield LicenseEntryWithLineBreaks([
+        family,
+      ], await rootBundle.loadString(file));
+    }
+  });
 }

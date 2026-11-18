@@ -4,7 +4,9 @@ import 'package:wardrobe_domain/wardrobe_domain.dart';
 
 import '../../../ai/download/model_download_manager.dart';
 import '../../../ai/model_registry.dart';
+import '../../../core/theme/tokens.dart';
 import '../../../shared/taxonomy_labels.dart';
+import '../../../shared/widgets/empty_state.dart';
 import '../analysis_providers.dart';
 import '../model_downloads.dart';
 
@@ -20,7 +22,7 @@ class ModelManagerScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('On-device models')),
       body: switch (registry) {
         AsyncData(:final value) => ListView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(Space.page),
           children: [
             const Text(
               'Models run only on this phone; your photos never leave the '
@@ -42,10 +44,15 @@ class ModelManagerScreen extends ConsumerWidget {
             ],
           ],
         ),
-        AsyncError() => const Center(
-          child: Text('Model information could not be loaded.'),
+        AsyncError(:final error) => ErrorState(
+          title: "Couldn't read the model list",
+          error: error,
+          fallback:
+              'The list of on-device models is part of the app and could '
+              'not be read. Reinstalling the app restores it.',
+          onRetry: () => ref.invalidate(modelRegistryProvider),
         ),
-        _ => const Center(child: CircularProgressIndicator()),
+        _ => const LoadingState(),
       },
     );
   }

@@ -61,12 +61,13 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                   title: _title(context, value[i].saved),
                 ),
               ),
-              AsyncError() => const EmptyState(
-                icon: Icons.error_outline,
-                title: 'Could not load your outfits',
-                message: 'Please try again.',
+              AsyncError(:final error) => ErrorState(
+                title: 'Your outfits did not load',
+                error: error,
+                fallback: 'Your saved outfits are safe on this device.',
+                onRetry: () => ref.invalidate(outfitHistoryProvider),
               ),
-              _ => const Center(child: CircularProgressIndicator()),
+              _ => const LoadingState(),
             },
           ),
         ],

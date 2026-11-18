@@ -73,6 +73,7 @@ void main() {
     expect(find.text('White tee'), findsOneWidget);
     expect(find.text('Navy chinos'), findsOneWidget);
     expect(find.text('White sneakers'), findsOneWidget);
+    await scrollTo(tester, find.textContaining('Weather was not included'));
     expect(find.textContaining('Weather was not included'), findsOneWidget);
     await app.dispose(tester);
   });

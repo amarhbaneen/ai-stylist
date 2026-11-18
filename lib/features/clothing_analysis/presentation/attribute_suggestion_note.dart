@@ -43,7 +43,7 @@ class AttributeSuggestionNote<T> extends StatelessWidget {
 
     final (icon, color, text) = switch ((level, showingSuggestion)) {
       (SuggestionLevel.prefill, true) => (
-        Icons.auto_awesome,
+        Icons.center_focus_strong_outlined,
         scheme.primary,
         'Suggested from the photo (${_pct(s.confidence)}).',
       ),
@@ -58,7 +58,7 @@ class AttributeSuggestionNote<T> extends StatelessWidget {
         'Not sure about the $noun. Possible:',
       ),
       (_, false) => (
-        Icons.auto_awesome,
+        Icons.center_focus_strong_outlined,
         scheme.outline,
         'The photo suggested:',
       ),

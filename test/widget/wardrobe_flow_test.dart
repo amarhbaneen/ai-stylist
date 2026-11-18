@@ -100,7 +100,7 @@ void main() {
     await tapAndSettle(tester, find.text('Add'));
     await tapAndSettle(tester, find.text('Take a photo'));
 
-    expect(find.textContaining('Permission was denied'), findsOneWidget);
+    expect(find.textContaining('Access was turned off'), findsOneWidget);
     expect(find.text('Add'), findsOneWidget);
     expect(await allItems(tester, app), isEmpty);
     await app.dispose(tester);
@@ -120,7 +120,7 @@ void main() {
     await openWardrobe(tester);
 
     await pickFromGallery(tester);
-    await pumpUntil(tester, find.textContaining('could not be used'));
+    await pumpUntil(tester, find.textContaining("couldn't be opened"));
     expect(await allItems(tester, app), isEmpty);
     await app.dispose(tester);
   });

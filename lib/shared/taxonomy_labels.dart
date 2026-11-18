@@ -167,19 +167,31 @@ abstract final class Labels {
 /// User-facing explanation for a failure. Technical detail stays in the log.
 String failureMessage(AppFailure failure) => switch (failure) {
   PermissionDeniedFailure() =>
-    'Permission was denied. You can allow access in your device settings, '
-        'or choose the other option.',
-  UnsupportedImageFailure() => 'That photo could not be used. Try another one.',
+    'Access was turned off for this app. Allow it in your phone settings, '
+        'or use the other option.',
+  UnsupportedImageFailure() =>
+    "That image couldn't be opened. Try a JPEG, PNG or HEIC photo.",
   DuplicateItemFailure() => 'This photo is already in your wardrobe.',
   InsufficientStorageFailure() =>
-    'Your device is out of space. Free some space and try again.',
+    'Your phone is out of space, so nothing was saved. Free some space '
+        'and try again.',
   ValidationFailure(:final message) => message,
-  NotFoundFailure() => 'That item no longer exists.',
+  NotFoundFailure() => 'That item no longer exists. It may have been deleted.',
   CancelledFailure() => 'Cancelled.',
-  StorageFailure() ||
-  ModelUnavailableFailure() ||
-  ModelCorruptFailure() ||
-  InferenceFailure() ||
-  NetworkFailure() ||
-  ArchiveValidationFailure() => 'Something went wrong. Please try again.',
+  StorageFailure() =>
+    "Couldn't read or write the app's storage. Try again; if it keeps "
+        'happening, restart the app.',
+  ModelUnavailableFailure() =>
+    "The on-device model isn't available, so nothing was suggested. You "
+        'can fill in the details yourself.',
+  ModelCorruptFailure() =>
+    'The on-device model file is damaged, so nothing was suggested. '
+        'Reinstalling the app restores it; you can fill in the details '
+        'yourself meanwhile.',
+  InferenceFailure() =>
+    "Couldn't analyse this photo. You can fill in the details yourself.",
+  NetworkFailure() =>
+    "Couldn't reach the internet. Check your connection and try again.",
+  ArchiveValidationFailure() =>
+    "This backup file isn't valid or is damaged, so nothing was imported.",
 };

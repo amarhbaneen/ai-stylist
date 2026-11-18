@@ -53,6 +53,7 @@ dependencies:
   # M3 spike verified; 4.2.0 was published the day this was added.
   flutter_litert: '>=4.1.1 <4.2.0'
   share_plus: 13.3.1
+  flutter_secure_storage: 11.2.0
 
 dev_dependencies:
   flutter_test:
@@ -75,3 +76,21 @@ flutter:
     # Offline city list for live weather (GeoNames, CC BY 4.0;
     # tools/build_cities.ps1).
     - assets/cities/
+    # Bundled fonts (SIL OFL 1.1, licences next to them; DECISIONS D-42).
+    # Geist weights are static instances of the variable font.
+    - assets/fonts/
+
+  fonts:
+    - family: InstrumentSerif
+      fonts:
+        - asset: assets/fonts/InstrumentSerif-Regular.ttf
+        - asset: assets/fonts/InstrumentSerif-Italic.ttf
+          style: italic
+    - family: Geist
+      fonts:
+        - asset: assets/fonts/Geist-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Geist-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Geist-SemiBold.ttf
+          weight: 600

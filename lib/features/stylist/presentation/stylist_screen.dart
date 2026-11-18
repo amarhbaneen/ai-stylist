@@ -60,7 +60,7 @@ class _StylistScreenState extends ConsumerState<StylistScreen> {
           const SizedBox(height: 24),
           FilledButton.icon(
             onPressed: loading ? null : _generate,
-            icon: const Icon(Icons.auto_awesome),
+            icon: const Icon(Icons.style_outlined),
             label: const Text('Suggest outfits'),
           ),
           const SizedBox(height: 16),
@@ -68,9 +68,8 @@ class _StylistScreenState extends ConsumerState<StylistScreen> {
             key: _resultsKey,
             child: switch (results) {
               null => const SizedBox.shrink(),
-              AsyncLoading() => const Padding(
-                padding: EdgeInsets.all(32),
-                child: Center(child: CircularProgressIndicator()),
+              AsyncLoading() => const LoadingState(
+                label: 'Putting outfits together from your wardrobe',
               ),
               AsyncError(:final error) => _Message(
                 icon: Icons.error_outline,

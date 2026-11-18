@@ -32,12 +32,13 @@ class OutfitDetailsScreen extends ConsumerWidget {
           title: 'Outfit not found',
           message: 'It may have been removed.',
         ),
-        AsyncError() => const EmptyState(
-          icon: Icons.error_outline,
-          title: 'Could not open this outfit',
-          message: 'Please go back and try again.',
+        AsyncError(:final error) => ErrorState(
+          title: 'This outfit did not open',
+          error: error,
+          fallback: 'Go back and open it again.',
+          onRetry: () => ref.invalidate(savedOutfitProvider(outfitId)),
         ),
-        _ => const Center(child: CircularProgressIndicator()),
+        _ => const LoadingState(),
       },
     );
   }

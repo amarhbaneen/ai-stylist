@@ -30,10 +30,7 @@ class ItemDetailsScreen extends ConsumerWidget {
         title: 'Could not open this item',
         message: 'Please go back and try again.',
       ),
-      _ => Scaffold(
-        appBar: AppBar(),
-        body: const Center(child: CircularProgressIndicator()),
-      ),
+      _ => Scaffold(appBar: AppBar(), body: const LoadingState()),
     };
   }
 }

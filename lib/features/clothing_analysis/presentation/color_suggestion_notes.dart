@@ -57,7 +57,11 @@ class PrimaryColorNote extends StatelessWidget {
 
     final line = switch ((level, showingSuggestion)) {
       (SuggestionLevel.prefill, true) => _Line(
-        icon: Icon(Icons.auto_awesome, size: 18, color: scheme.primary),
+        icon: Icon(
+          Icons.center_focus_strong_outlined,
+          size: 18,
+          color: scheme.primary,
+        ),
         text:
             'Suggested from the photo (${_pct(s.confidence)}). '
             'Tap another colour to change it.',
@@ -73,7 +77,11 @@ class PrimaryColorNote extends StatelessWidget {
         text: 'Not sure about the colour. Possible:',
       ),
       (_, false) => _Line(
-        icon: Icon(Icons.auto_awesome, size: 18, color: scheme.outline),
+        icon: Icon(
+          Icons.center_focus_strong_outlined,
+          size: 18,
+          color: scheme.outline,
+        ),
         text: 'The photo suggested:',
       ),
     };
@@ -118,7 +126,7 @@ class SecondaryColorNote extends StatelessWidget {
       children: [
         _Line(
           icon: Icon(
-            Icons.auto_awesome,
+            Icons.center_focus_strong_outlined,
             size: 18,
             color: Theme.of(context).colorScheme.outline,
           ),
