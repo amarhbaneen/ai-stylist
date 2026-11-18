@@ -264,7 +264,7 @@ final class OfficialPhotoSuggestionsProvider
 }
 
 String _$officialPhotoSuggestionsHash() =>
-    r'b8f99d44bb66e3a4555818213d263074ee3fe3fb';
+    r'd53694125e8ef979fbf92c8e08cab13ad73e2792';
 
 /// Official-photo suggestions for the cut-out at [imagePath] of item
 /// [itemId]. Computed once while the item is on screen; "search again"

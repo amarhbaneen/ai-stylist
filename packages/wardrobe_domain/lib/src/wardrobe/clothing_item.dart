@@ -38,6 +38,7 @@ final class ItemImages {
     required this.working,
     required this.thumbnail,
     this.cutout,
+    this.cutoutRaw,
     this.product,
     this.view = ItemView.photo,
   });
@@ -54,6 +55,10 @@ final class ItemImages {
   /// Background-removed version (transparent PNGs), if one was made. The
   /// original photo is always kept, so the user can switch back (D-39).
   final ItemPicture? cutout;
+
+  /// The cut-out before studio polish (D-44), when [cutout] was polished.
+  /// Analysis reads it, so polish never changes detected attributes.
+  final ItemPicture? cutoutRaw;
 
   /// A product photo the user chose (JPEGs), if any (D-41).
   final ItemPicture? product;
@@ -83,6 +88,12 @@ final class ItemImages {
     ItemView.photo => thumbnail,
   };
 
+  /// The small image to analyse: as shown, except that a polished cut-out
+  /// is analysed from its unpolished copy (D-44).
+  String get analysisThumbnail => shown == ItemView.cutout
+      ? (cutoutRaw ?? cutout!).thumbnail
+      : displayThumbnail;
+
   /// Whether [v] can be shown.
   bool has(ItemView v) => switch (v) {
     ItemView.photo => true,
@@ -99,6 +110,8 @@ final class CutoutImages {
     required this.thumbnail,
     required this.width,
     required this.height,
+    this.rawImage,
+    this.rawThumbnail,
   });
 
   /// PNG with transparency.
@@ -110,6 +123,14 @@ final class CutoutImages {
   /// Size of [image] in pixels.
   final int width;
   final int height;
+
+  /// The cut-out before studio polish (PNGs), when [image] was polished
+  /// (D-44). Kept so analysis reads real, unpolished pixels.
+  final Uint8List? rawImage;
+  final Uint8List? rawThumbnail;
+
+  /// Whether this cut-out was polished (and carries its raw copy).
+  bool get isPolished => rawImage != null && rawThumbnail != null;
 }
 
 /// A garment in the user's wardrobe.

@@ -10,6 +10,10 @@ abstract final class ImageKind {
   static const thumbnail = 'THUMBNAIL';
   static const cutout = 'CUTOUT';
   static const cutoutThumbnail = 'CUTOUT_THUMBNAIL';
+
+  /// The cut-out before studio polish, for analysis (D-44).
+  static const cutoutRaw = 'CUTOUT_RAW';
+  static const cutoutRawThumbnail = 'CUTOUT_RAW_THUMBNAIL';
   static const product = 'PRODUCT';
   static const productThumbnail = 'PRODUCT_THUMBNAIL';
 
@@ -104,6 +108,7 @@ abstract final class ClothingItemMapper {
       working: working ?? thumbnail,
       thumbnail: thumbnail,
       cutout: picture(ImageKind.cutout, ImageKind.cutoutThumbnail),
+      cutoutRaw: picture(ImageKind.cutoutRaw, ImageKind.cutoutRawThumbnail),
       product: picture(ImageKind.product, ImageKind.productThumbnail),
       view: view,
     );

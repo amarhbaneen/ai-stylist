@@ -630,6 +630,50 @@ permission is used. Search is local and accent-insensitive.
   photos, and the Android key restriction were not tested end to end. All of it is covered by
   unit and widget tests with a fake HTTP client.
 
+## D-44 Studio polish for cut-outs, on device. Accepted 2026-11-18 (owner)
+- **Why.** The owner wants cut-outs to look like shop product photos, for free and fully on
+  the phone (no cloud AI, P-7 unchanged; brief in `docs/tasks/STUDIO_PHOTO.md`). Polish uses
+  only the garment's own pixels: it never invents detail.
+- **Pipeline** (`lib/ai/studio/`, pure Dart, no Flutter, isolate-safe), run inside `cutOut()`
+  right after the cut-out is rendered:
+  1. Mask clean-up: closing with a radius of ~1% of the long edge, then transparent pixels
+     enclosed by the closed garment become garment if their hole is at most 2% of the garment
+     area. Larger holes are left (they may be real). Closing can bridge a narrow concave gap
+     (between a sleeve and the body) and fill it; the 2% cap limits that.
+  2. Those pixels get colour by push-pull diffusion from the garment around them.
+  3. Defringe: each semi-transparent edge pixel within 8 px of the opaque interior takes the
+     nearest opaque colour (alpha kept), which removes background tint; then a 3 × 3 feather
+     of the edge band only.
+  4. Straighten: principal axis from the mask's second moments; rotated only for a tilt of
+     2°–15° and only if the shape is elongated enough ((λ1−λ2)/(λ1+λ2) ≥ 0.08).
+  5. Light: levels p2→p98 on luma plus a gray-world white balance pulled 30% toward neutral
+     and kept within ±8%, applied at the largest strength (bisection) that keeps the mean
+     CIE76 ΔE of garment pixels ≤ 6 and every sampled pixel ≤ 15. Tested on dark, bright,
+     white-on-white and saturated garments.
+  6. Canvas: transparent **4:5 portrait**, garment at 85% of the limiting side, ≤1024 px. 4:5
+     matches the item photo frame (D-42) and most shop product shots, so it fills the frame
+     without letterboxing. The D-42 backdrop and traced shadow still apply when shown.
+- **Storage: both files.** A polished cut-out is stored as `CUTOUT`/`CUTOUT_THUMBNAIL` (what is
+  shown) plus its unpolished copy as `CUTOUT_RAW`/`CUTOUT_RAW_THUMBNAIL`. Image kinds are text,
+  so there is no schema change. Analysis reads `ItemImages.analysisThumbnail`, which is the raw
+  copy when the cut-out is shown, so polish cannot change detected colours or types. Flip
+  mirrors all four files; replacing a cut-out replaces all four. Polishing at display time was
+  rejected: it would repeat ~0.3–0.8 s of work on every view and in every grid tile.
+- **Setting.** Style preferences → Cut-outs → **Studio polish**, on by default (row absent =
+  on). It applies to cut-outs made from then on; existing items keep what they were saved
+  with. Off = the plain cut-out, as before. The original photo is never changed; if polish
+  throws or finds no garment, the plain cut-out is used.
+- **Speed (Android emulator, API 37, x86_64, profile build, two-garment synthetic photo).**
+  Segmentation and cut-outs without polish: p50 595 ms. With polish: p50 2.1 s, so about
+  0.75 s per garment. Polish of one 740 × 690 cut-out on the desktop VM: ~260 ms (PNG
+  encoding ~26 ms, so the steps themselves dominate). On the owner's selfie (debug build) the
+  whole step took 3.5 s. Running the mask steps at reduced resolution is the obvious
+  optimisation (next ticket).
+- **Result on the owner's selfie.** Centred on the 4:5 canvas, smoother edges, a small tilt
+  corrected, light evened. The chair mesh above one shoulder remains: both models label it as
+  clothing, so it is opaque garment as far as polish is concerned (only a model that knows the
+  garment's shape could remove it; see the inpainting spike).
+
 ## D-26 Spikes live in `spikes/`, outside the product build. Accepted (M3)
 Each spike is a standalone Flutter app with its own pubspec (exact version pins) and is excluded
 from the root analyzer. Downloaded model binaries are git-ignored and fetched by a script that

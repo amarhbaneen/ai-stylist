@@ -8,6 +8,7 @@ import '../../../shared/taxonomy_labels.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../favorites/presentation/learned_preferences_section.dart';
 import '../../official_photo/presentation/official_photo_settings_section.dart';
+import '../../wardrobe/presentation/studio_polish_section.dart';
 import '../../weather/presentation/live_weather_settings_section.dart';
 import '../profile_providers.dart';
 import 'preferences_form.dart';
@@ -110,6 +111,7 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
             ),
             const LearnedPreferencesSection(),
             const LiveWeatherSettingsSection(),
+            const StudioPolishSection(),
             const OfficialPhotoSettingsSection(),
             const Divider(height: 40),
             ListTile(

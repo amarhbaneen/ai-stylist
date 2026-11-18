@@ -65,6 +65,12 @@ device.
     not cut out with the garment. **Flip** fixes mirrored selfies. **Find official photo**
     hands the cut-out (never the face or room) to Google Lens; save the matching product photo
     and tap **Use official photo** to show it instead. The app itself uploads nothing.
+  - Studio polish (D-44, on by default): new cut-outs are cleaned up on the phone to look
+    like a shop photo: small holes filled from the colours around them, background tint
+    removed from the edges, a slight tilt straightened, light evened within a fixed colour
+    limit, and the garment centred on a 4:5 canvas. Only real pixels are used, and analysis
+    reads the unpolished copy, so detected colours and types do not change. About 0.75 s per
+    garment on the emulator. Turn it off in Style preferences → Cut-outs.
   - Automatic official photo (D-43, opt-in): turn on **Find official photos automatically**
     in Style preferences and add your own Google Cloud API key (Cloud Vision API enabled;
     first 1,000 searches a month are free). After the background is removed, the app sends

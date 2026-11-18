@@ -278,6 +278,36 @@ void main() {
       expect(session.inputs.single, hasLength(4 * 4 * 3));
     });
 
+    test('with studio polish, the cut-out is polished and keeps its raw '
+        'copy', () async {
+      final session = _FakeSession(
+        _probs([1, 1, 3, 3, 1, 1, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0]),
+      );
+      final s = GarmentSegmenter(
+        open: () async => Success((session, _labels())),
+        studioPolish: () async => true,
+      );
+      final found = (await s.findGarments(photoPath)).valueOrNull!;
+      for (final g in found) {
+        expect(g.cutout.isPolished, isTrue);
+        final polished = img.decodePng(g.cutout.image)!;
+        expect(polished.width / polished.height, closeTo(4 / 5, 0.02));
+        expect(img.decodePng(g.cutout.rawImage!), isNotNull);
+      }
+    });
+
+    test('without studio polish, the cut-out is as before', () async {
+      final session = _FakeSession(
+        _probs([1, 1, 3, 3, 1, 1, 3, 3, 0, 0, 0, 0, 0, 0, 0, 0]),
+      );
+      final s = GarmentSegmenter(
+        open: () async => Success((session, _labels())),
+        studioPolish: () async => false,
+      );
+      final found = (await s.findGarments(photoPath)).valueOrNull!;
+      expect(found.every((g) => !g.cutout.isPolished), isTrue);
+    });
+
     test('a model that cannot open is a typed failure', () async {
       final s = GarmentSegmenter(
         open: () async => const Failure(ModelUnavailableFailure('missing')),

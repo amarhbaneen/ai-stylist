@@ -261,7 +261,7 @@ final class GarmentFinderProvider
   }
 }
 
-String _$garmentFinderHash() => r'cc539caf441ab79b86f6afe262c5bb4f40a79a66';
+String _$garmentFinderHash() => r'd4f89c6b4ae9005161de6d92a0cd4641df27e8c3';
 
 /// All analyzers available on this device: Tier 0 (colour) and the Tier-1
 /// garment classifier (category, type, pattern). Either can fail without
@@ -412,7 +412,7 @@ String _$confirmAnalysisHash() => r'54d3fea21f367878b6a5c40b700224071058248a';
 
 /// Suggestions for one item: cached if analysed before, otherwise computed
 /// off the UI thread from the thumbnail being shown (the cut-out when the
-/// background was removed). Errors surface as `AsyncError`;
+/// background was removed; its unpolished copy when polished, D-44). Errors surface as `AsyncError`;
 /// the review screen then simply offers manual entry.
 
 @ProviderFor(clothingAnalysis)
@@ -420,7 +420,7 @@ final clothingAnalysisProvider = ClothingAnalysisFamily._();
 
 /// Suggestions for one item: cached if analysed before, otherwise computed
 /// off the UI thread from the thumbnail being shown (the cut-out when the
-/// background was removed). Errors surface as `AsyncError`;
+/// background was removed; its unpolished copy when polished, D-44). Errors surface as `AsyncError`;
 /// the review screen then simply offers manual entry.
 
 final class ClothingAnalysisProvider
@@ -433,7 +433,7 @@ final class ClothingAnalysisProvider
     with $FutureModifier<ClothingAnalysis>, $FutureProvider<ClothingAnalysis> {
   /// Suggestions for one item: cached if analysed before, otherwise computed
   /// off the UI thread from the thumbnail being shown (the cut-out when the
-  /// background was removed). Errors surface as `AsyncError`;
+  /// background was removed; its unpolished copy when polished, D-44). Errors surface as `AsyncError`;
   /// the review screen then simply offers manual entry.
   ClothingAnalysisProvider._({
     required ClothingAnalysisFamily super.from,
@@ -479,11 +479,11 @@ final class ClothingAnalysisProvider
   }
 }
 
-String _$clothingAnalysisHash() => r'bc129bcdb934d33f3b06239f326536a5922df5c9';
+String _$clothingAnalysisHash() => r'6efa9594315acf2c097a3eabae8ce1862384cba5';
 
 /// Suggestions for one item: cached if analysed before, otherwise computed
 /// off the UI thread from the thumbnail being shown (the cut-out when the
-/// background was removed). Errors surface as `AsyncError`;
+/// background was removed; its unpolished copy when polished, D-44). Errors surface as `AsyncError`;
 /// the review screen then simply offers manual entry.
 
 final class ClothingAnalysisFamily extends $Family
@@ -499,7 +499,7 @@ final class ClothingAnalysisFamily extends $Family
 
   /// Suggestions for one item: cached if analysed before, otherwise computed
   /// off the UI thread from the thumbnail being shown (the cut-out when the
-  /// background was removed). Errors surface as `AsyncError`;
+  /// background was removed; its unpolished copy when polished, D-44). Errors surface as `AsyncError`;
   /// the review screen then simply offers manual entry.
 
   ClothingAnalysisProvider call(String itemId) =>

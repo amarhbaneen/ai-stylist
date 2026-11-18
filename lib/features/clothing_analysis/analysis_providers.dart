@@ -78,6 +78,10 @@ GarmentFinder garmentFinder(Ref ref) {
         openSegmentationModel(await ref.read(modelRegistryProvider.future)),
     openPerson: () async =>
         openPersonModel(await ref.read(modelRegistryProvider.future)),
+    studioPolish: () async =>
+        (await ref.read(studioPolishSettingsProvider).isEnabled())
+            .valueOrNull ??
+        true,
   );
   ref.onDispose(segmenter.close);
   return segmenter;
@@ -109,13 +113,13 @@ Duration? _noRetry(int retryCount, Object error) => null;
 
 /// Suggestions for one item: cached if analysed before, otherwise computed
 /// off the UI thread from the thumbnail being shown (the cut-out when the
-/// background was removed). Errors surface as `AsyncError`;
+/// background was removed; its unpolished copy when polished, D-44). Errors surface as `AsyncError`;
 /// the review screen then simply offers manual entry.
 @Riverpod(retry: _noRetry)
 Future<ClothingAnalysis> clothingAnalysis(Ref ref, String itemId) async {
   final item = (await ref.read(wardrobeRepositoryProvider).getItem(itemId));
   final thumbnail = switch (item) {
-    Success(:final value) => value.images?.displayThumbnail,
+    Success(:final value) => value.images?.analysisThumbnail,
     Failure(:final failure) => throw failure,
   };
   if (thumbnail == null) {

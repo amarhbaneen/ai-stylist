@@ -10,6 +10,7 @@ import '../../core/media/media_picker.dart';
 import '../../core/media/visual_search.dart';
 import '../../core/providers.dart';
 import 'data/drift_wardrobe_repository.dart';
+import 'data/studio_polish_settings.dart';
 
 part 'wardrobe_providers.g.dart';
 
@@ -103,3 +104,24 @@ Stream<List<ClothingItem>> wardrobeItems(Ref ref) {
 @riverpod
 Stream<ClothingItem?> clothingItem(Ref ref, String id) =>
     ref.watch(wardrobeRepositoryProvider).watchItem(id);
+
+@Riverpod(keepAlive: true)
+StudioPolishSettings studioPolishSettings(Ref ref) =>
+    StudioPolishSettings(ref.watch(appDatabaseProvider));
+
+/// Whether new cut-outs get the studio polish (D-44); on by default.
+@riverpod
+class StudioPolishEnabled extends _$StudioPolishEnabled {
+  @override
+  Future<bool> build() async =>
+      (await ref.watch(studioPolishSettingsProvider).isEnabled()).valueOrNull ??
+      true;
+
+  Future<Result<void>> set({required bool enabled}) async {
+    final r = await ref
+        .read(studioPolishSettingsProvider)
+        .setEnabled(enabled: enabled);
+    ref.invalidateSelf();
+    return r;
+  }
+}

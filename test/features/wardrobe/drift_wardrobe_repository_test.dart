@@ -422,6 +422,70 @@ void main() {
       height: 40,
     );
 
+    test('a polished cut-out keeps its raw copy for analysis', () async {
+      final item = await importOk('a.jpg');
+      final polished = CutoutImages(
+        image: Uint8List.fromList([1]),
+        thumbnail: Uint8List.fromList([2]),
+        width: 4,
+        height: 5,
+        rawImage: Uint8List.fromList([3]),
+        rawThumbnail: Uint8List.fromList([4]),
+      );
+
+      final saved = (await repo.saveCutout(item.id, polished)).valueOrNull!;
+
+      final images = saved.images!;
+      expect(images.display, images.cutout!.image);
+      expect(images.cutoutRaw!.image, endsWith('_raw.png'));
+      expect(images.analysisThumbnail, images.cutoutRaw!.thumbnail);
+      expect((await files.readBytes(images.analysisThumbnail)).valueOrNull, [
+        4,
+      ]);
+      expect(await storedFiles(), hasLength(7));
+
+      // A plain cut-out replaces all four files.
+      final plain = (await repo.saveCutout(item.id, cutout(9))).valueOrNull!;
+      expect(plain.images!.cutoutRaw, isNull);
+      expect(plain.images!.analysisThumbnail, plain.images!.cutout!.thumbnail);
+      expect(await storedFiles(), hasLength(5));
+    });
+
+    test('flip mirrors the raw copy too', () async {
+      final item = await importOk('a.jpg');
+      Uint8List png(int red) => img.encodePng(
+        img.Image(width: 2, height: 1, numChannels: 4)
+          ..setPixelRgba(0, 0, red, 0, 0, 255)
+          ..setPixelRgba(1, 0, 0, 0, 0, 0),
+      );
+      await repo.saveCutout(
+        item.id,
+        CutoutImages(
+          image: png(200),
+          thumbnail: png(200),
+          width: 2,
+          height: 1,
+          rawImage: png(100),
+          rawThumbnail: png(100),
+        ),
+      );
+
+      final flipped = (await repo.flipCutout(item.id)).valueOrNull!;
+
+      for (final path in [
+        flipped.images!.cutout!.image,
+        flipped.images!.cutoutRaw!.image,
+        flipped.images!.cutoutRaw!.thumbnail,
+      ]) {
+        final image = img.decodePng(
+          (await files.readBytes(path)).valueOrNull!,
+        )!;
+        expect(image.getPixel(0, 0).a, 0, reason: path);
+        expect(image.getPixel(1, 0).a, 255, reason: path);
+      }
+      expect(await storedFiles(), hasLength(7));
+    });
+
     test('saveCutout stores both images and shows the cut-out', () async {
       final item = await importOk('a.jpg');
 

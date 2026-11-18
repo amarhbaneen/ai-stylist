@@ -1,6 +1,6 @@
 // On-device check of the bundled garment and person segmentation models
-// (D-40, D-41). Runs the real LiteRT runtime and models; nothing is sent
-// over the network.
+// (D-40, D-41) and the studio polish (D-44). Runs the real LiteRT runtime
+// and models; nothing is sent over the network.
 //
 //   flutter test integration_test/garment_segmentation_test.dart -d <device>
 import 'dart:io';
@@ -89,6 +89,34 @@ void main() {
         'garments=[$summary]',
       );
       await segmenter.close();
+
+      // Studio polish (D-44): same photo, polish on, timed the same way.
+      final polishing = GarmentSegmenter(
+        open: () => openSegmentationModel(registry),
+        openPerson: () => openPersonModel(registry),
+        studioPolish: () async => true,
+      );
+      final polished = await polishing.findGarments(photo.path);
+      expect(
+        (polished as Success<List<FoundGarment>>).value.every(
+          (g) => g.cutout.isPolished,
+        ),
+        isTrue,
+      );
+      final polishLatencies = <int>[];
+      for (var i = 0; i < 5; i++) {
+        final w = Stopwatch()..start();
+        await polishing.findGarments(photo.path);
+        polishLatencies.add(w.elapsedMilliseconds);
+      }
+      polishLatencies.sort();
+      // ignore: avoid_print
+      print(
+        'DEVICE_CHECK_STUDIO '
+        'p50Ms=${polishLatencies[polishLatencies.length ~/ 2]} '
+        'maxMs=${polishLatencies.last}',
+      );
+      await polishing.close();
       await dir.delete(recursive: true);
     });
   });

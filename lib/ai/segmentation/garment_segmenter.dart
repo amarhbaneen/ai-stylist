@@ -8,6 +8,7 @@ import 'package:wardrobe_domain/wardrobe_domain.dart';
 
 import '../garment/garment_classifier.dart'
     show UnsupportedImageException, preprocess;
+import '../studio/studio_polish.dart';
 import 'cutout_renderer.dart';
 import 'garment_regions.dart';
 import 'person_mask.dart';
@@ -63,10 +64,13 @@ abstract interface class GarmentFinder {
 /// - Never throws. On any failure the caller keeps the original photo, so
 ///   adding an item is never blocked.
 final class GarmentSegmenter implements GarmentFinder {
-  GarmentSegmenter({required this._open, this._openPerson});
+  GarmentSegmenter({required this._open, this._openPerson, this._studioPolish});
 
   final SegmentationSessionOpener _open;
   final PersonModelOpener? _openPerson;
+
+  /// Whether to polish cut-outs (the user's setting, read per photo).
+  final Future<bool> Function()? _studioPolish;
 
   Future<Result<(SegmentationSession, SegmentationLabels)>>? _opening;
   Future<Result<PersonModel>>? _openingPerson;
@@ -106,9 +110,12 @@ final class GarmentSegmenter implements GarmentFinder {
     }
 
     final masked = await _withPerson(imagePath, rgb, probabilities, labels);
+    final polish = await _studioPolish?.call() ?? false;
     try {
       return Success(
-        await Isolate.run(() => cutOut(imagePath, masked, labels)),
+        await Isolate.run(
+          () => cutOut(imagePath, masked, labels, polish: polish),
+        ),
       );
     } on Exception catch (e) {
       return Failure(
@@ -179,22 +186,43 @@ final class GarmentSegmenter implements GarmentFinder {
 }
 
 /// Regions → cut-outs for the photo at [imagePath] (runs on an isolate).
+/// With [polish], each cut-out also goes through the studio polish (D-44)
+/// and keeps its raw copy; if polish fails, the plain cut-out is used.
 List<FoundGarment> cutOut(
   String imagePath,
   Float32List probabilities,
-  SegmentationLabels labels,
-) {
+  SegmentationLabels labels, {
+  bool polish = false,
+}) {
   final regions = findRegions(probabilities, labels);
   if (regions.isEmpty) return const [];
   final photo = img.decodeImage(File(imagePath).readAsBytesSync());
   if (photo == null) throw UnsupportedImageException(imagePath);
-  return [
-    for (final r in regions)
-      if (renderCutout(photo, r) case final cutout?)
-        FoundGarment(
-          category: r.category,
-          areaShare: r.areaShare,
-          cutout: cutout,
-        ),
-  ];
+  final found = <FoundGarment>[];
+  for (final r in regions) {
+    final raw = renderCutoutImage(photo, r);
+    if (raw == null) continue;
+    final polished = polish ? _tryPolish(raw) : null;
+    found.add(
+      FoundGarment(
+        category: r.category,
+        areaShare: r.areaShare,
+        cutout: polished == null
+            ? encodeCutout(raw)
+            : encodeCutout(polished, raw: raw),
+      ),
+    );
+  }
+  return found;
+}
+
+/// Studio polish, or `null` if it fails for any reason: polish is optional
+/// and must never block the cut-out.
+img.Image? _tryPolish(img.Image raw) {
+  try {
+    return polishCutout(raw);
+  } on Object {
+    // Malformed or extreme input; the raw cut-out is used instead.
+    return null;
+  }
 }

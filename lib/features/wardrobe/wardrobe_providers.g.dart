@@ -789,3 +789,102 @@ final class ClothingItemFamily extends $Family
   @override
   String toString() => r'clothingItemProvider';
 }
+
+@ProviderFor(studioPolishSettings)
+final studioPolishSettingsProvider = StudioPolishSettingsProvider._();
+
+final class StudioPolishSettingsProvider
+    extends
+        $FunctionalProvider<
+          StudioPolishSettings,
+          StudioPolishSettings,
+          StudioPolishSettings
+        >
+    with $Provider<StudioPolishSettings> {
+  StudioPolishSettingsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'studioPolishSettingsProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$studioPolishSettingsHash();
+
+  @$internal
+  @override
+  $ProviderElement<StudioPolishSettings> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  StudioPolishSettings create(Ref ref) {
+    return studioPolishSettings(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(StudioPolishSettings value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<StudioPolishSettings>(value),
+    );
+  }
+}
+
+String _$studioPolishSettingsHash() =>
+    r'cbd295434ab206eb43f8cb8d0350bc1a0ae19fa8';
+
+/// Whether new cut-outs get the studio polish (D-44); on by default.
+
+@ProviderFor(StudioPolishEnabled)
+final studioPolishEnabledProvider = StudioPolishEnabledProvider._();
+
+/// Whether new cut-outs get the studio polish (D-44); on by default.
+final class StudioPolishEnabledProvider
+    extends $AsyncNotifierProvider<StudioPolishEnabled, bool> {
+  /// Whether new cut-outs get the studio polish (D-44); on by default.
+  StudioPolishEnabledProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'studioPolishEnabledProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$studioPolishEnabledHash();
+
+  @$internal
+  @override
+  StudioPolishEnabled create() => StudioPolishEnabled();
+}
+
+String _$studioPolishEnabledHash() =>
+    r'8956d1a7fa50cfaccf90857a69edc7f3cbb88dd1';
+
+/// Whether new cut-outs get the studio polish (D-44); on by default.
+
+abstract class _$StudioPolishEnabled extends $AsyncNotifier<bool> {
+  FutureOr<bool> build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<bool>, bool>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<bool>, bool>,
+              AsyncValue<bool>,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}

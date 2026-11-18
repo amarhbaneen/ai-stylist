@@ -5,6 +5,18 @@ import 'package:wardrobe_domain/wardrobe_domain.dart';
 
 import 'garment_regions.dart';
 
+/// Renders and encodes a garment's cut-out (see [renderCutoutImage] and
+/// [encodeCutout]). Returns `null` when the mask is empty at photo size.
+CutoutImages? renderCutout(
+  img.Image photo,
+  GarmentRegion region, {
+  int thumbnailEdge = 320,
+  double margin = 0.03,
+}) {
+  final cut = renderCutoutImage(photo, region, margin: margin);
+  return cut == null ? null : encodeCutout(cut, thumbnailEdge: thumbnailEdge);
+}
+
 /// Renders a garment's cut-out from the photo and its soft mask (pure;
 /// tested directly). Runs on a background isolate.
 ///
@@ -12,10 +24,9 @@ import 'garment_regions.dart';
 /// ramp, so edges are soft rather than blocky. The result is cropped to
 /// the garment with a small margin; pixels outside it are transparent.
 /// Returns `null` when the mask is empty at photo size.
-CutoutImages? renderCutout(
+img.Image? renderCutoutImage(
   img.Image photo,
   GarmentRegion region, {
-  int thumbnailEdge = 320,
   double margin = 0.03,
 }) {
   final w = photo.width, h = photo.height;
@@ -57,8 +68,30 @@ CutoutImages? renderCutout(
       ..a = a;
   }
 
-  final scale = thumbnailEdge / math.max(cut.width, cut.height);
-  final thumb = scale >= 1
+  return cut;
+}
+
+/// Encodes [cut] (and its thumbnail) as transparent PNGs. With [raw], the
+/// cut-out was polished and [raw] is the unpolished one, kept for analysis
+/// (D-44).
+CutoutImages encodeCutout(
+  img.Image cut, {
+  img.Image? raw,
+  int thumbnailEdge = 320,
+}) => CutoutImages(
+  image: img.encodePng(cut),
+  thumbnail: img.encodePng(_thumbnail(cut, thumbnailEdge)),
+  width: cut.width,
+  height: cut.height,
+  rawImage: raw == null ? null : img.encodePng(raw),
+  rawThumbnail: raw == null
+      ? null
+      : img.encodePng(_thumbnail(raw, thumbnailEdge)),
+);
+
+img.Image _thumbnail(img.Image cut, int edge) {
+  final scale = edge / math.max(cut.width, cut.height);
+  return scale >= 1
       ? cut
       : img.copyResize(
           cut,
@@ -66,12 +99,6 @@ CutoutImages? renderCutout(
           height: math.max(1, (cut.height * scale).round()),
           interpolation: img.Interpolation.average,
         );
-  return CutoutImages(
-    image: img.encodePng(cut),
-    thumbnail: img.encodePng(thumb),
-    width: cut.width,
-    height: cut.height,
-  );
 }
 
 /// Mask values below [_rampLow] are transparent and above [_rampHigh] fully

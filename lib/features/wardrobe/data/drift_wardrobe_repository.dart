@@ -311,25 +311,42 @@ final class DriftWardrobeRepository implements WardrobeRepository {
   // ---------------------------------------------------------------- pictures
 
   @override
-  Future<Result<ClothingItem>> saveCutout(String id, CutoutImages cutout) =>
-      _replacePicture(
-        id,
-        view: ItemView.cutout,
-        image: _NewFile(
-          '$imagesDir/cutouts/${_ids.newId()}',
-          '.png',
+  Future<Result<ClothingItem>> saveCutout(String id, CutoutImages cutout) {
+    final stem = '$imagesDir/cutouts/${_ids.newId()}';
+    return _replacePicture(
+      id,
+      view: ItemView.cutout,
+      files: [
+        _NewFile(
+          '$stem.png',
+          ImageKind.cutout,
           cutout.image,
           width: cutout.width,
           height: cutout.height,
         ),
-        thumbnail: cutout.thumbnail,
-      );
+        _NewFile(
+          '${stem}_thumb.png',
+          ImageKind.cutoutThumbnail,
+          cutout.thumbnail,
+        ),
+        if (cutout.isPolished) ...[
+          _NewFile('${stem}_raw.png', ImageKind.cutoutRaw, cutout.rawImage!),
+          _NewFile(
+            '${stem}_raw_thumb.png',
+            ImageKind.cutoutRawThumbnail,
+            cutout.rawThumbnail!,
+          ),
+        ],
+      ],
+    );
+  }
 
   @override
   Future<Result<ClothingItem>> flipCutout(String id) async {
     final ItemPicture? cutout;
+    final ClothingItem? existing;
     try {
-      final existing = await _load(id);
+      existing = await _load(id);
       if (existing == null) return Failure(NotFoundFailure('No item $id'));
       cutout = existing.images?.cutout;
     } on Exception catch (e) {
@@ -338,14 +355,19 @@ final class DriftWardrobeRepository implements WardrobeRepository {
     if (cutout == null) {
       return const Failure(ValidationFailure('This item has no cut-out'));
     }
-    final image = await _files.readBytes(cutout.image);
-    if (image case Failure(:final failure)) return Failure(failure);
-    final thumb = await _files.readBytes(cutout.thumbnail);
-    if (thumb case Failure(:final failure)) return Failure(failure);
-    final pngs = [
-      (image as Success<Uint8List>).value,
-      (thumb as Success<Uint8List>).value,
+    // The raw copy (D-44) is flipped too, so analysis sees the same garment.
+    final raw = existing.images?.cutoutRaw;
+    final paths = [
+      cutout.image,
+      cutout.thumbnail,
+      if (raw != null) ...[raw.image, raw.thumbnail],
     ];
+    final pngs = <Uint8List>[];
+    for (final path in paths) {
+      final bytes = await _files.readBytes(path);
+      if (bytes case Failure(:final failure)) return Failure(failure);
+      pngs.add((bytes as Success<Uint8List>).value);
+    }
     final List<Uint8List>? flipped;
     try {
       flipped = await Isolate.run(() => _flipPngs(pngs));
@@ -359,11 +381,22 @@ final class DriftWardrobeRepository implements WardrobeRepository {
         UnsupportedImageFailure('The cut-out could not be read'),
       );
     }
+    final stem = '$imagesDir/cutouts/${_ids.newId()}';
     return _replacePicture(
       id,
       view: ItemView.cutout,
-      image: _NewFile('$imagesDir/cutouts/${_ids.newId()}', '.png', flipped[0]),
-      thumbnail: flipped[1],
+      files: [
+        _NewFile('$stem.png', ImageKind.cutout, flipped[0]),
+        _NewFile('${stem}_thumb.png', ImageKind.cutoutThumbnail, flipped[1]),
+        if (flipped.length == 4) ...[
+          _NewFile('${stem}_raw.png', ImageKind.cutoutRaw, flipped[2]),
+          _NewFile(
+            '${stem}_raw_thumb.png',
+            ImageKind.cutoutRawThumbnail,
+            flipped[3],
+          ),
+        ],
+      ],
     );
   }
 
@@ -390,11 +423,14 @@ final class DriftWardrobeRepository implements WardrobeRepository {
         UnsupportedImageFailure('This image could not be opened'),
       );
     }
+    final stem = '$imagesDir/products/${_ids.newId()}';
     return _replacePicture(
       id,
       view: ItemView.product,
-      image: _NewFile('$imagesDir/products/${_ids.newId()}', '.jpg', large),
-      thumbnail: small,
+      files: [
+        _NewFile('$stem.jpg', ImageKind.product, large),
+        _NewFile('${stem}_thumb.jpg', ImageKind.productThumbnail, small),
+      ],
     );
   }
 
@@ -434,25 +470,24 @@ final class DriftWardrobeRepository implements WardrobeRepository {
     }
   }
 
-  static const _cutoutKinds = {ImageKind.cutout, ImageKind.cutoutThumbnail};
+  static const _cutoutKinds = {
+    ImageKind.cutout,
+    ImageKind.cutoutThumbnail,
+    ImageKind.cutoutRaw,
+    ImageKind.cutoutRawThumbnail,
+  };
   static const _productKinds = {ImageKind.product, ImageKind.productThumbnail};
 
   /// Writes a new cut-out or product photo (fresh file names, so image
-  /// caches never show a replaced file), swaps the rows in one
-  /// transaction, shows it, then deletes the old files. On failure nothing
-  /// changes.
+  /// caches never show a replaced file), swaps all rows of that picture in
+  /// one transaction, shows it, then deletes the old files. On failure
+  /// nothing changes.
   Future<Result<ClothingItem>> _replacePicture(
     String id, {
     required ItemView view,
-    required _NewFile image,
-    required Uint8List thumbnail,
+    required List<_NewFile> files,
   }) async {
-    final isCutout = view == ItemView.cutout;
-    final kinds = isCutout ? _cutoutKinds : _productKinds;
-    final largeKind = isCutout ? ImageKind.cutout : ImageKind.product;
-    final smallKind = isCutout
-        ? ImageKind.cutoutThumbnail
-        : ImageKind.productThumbnail;
+    final kinds = view == ItemView.cutout ? _cutoutKinds : _productKinds;
     final List<ClothingImageRow> previous;
     try {
       if (await _load(id) == null) return Failure(NotFoundFailure('No $id'));
@@ -461,51 +496,38 @@ final class DriftWardrobeRepository implements WardrobeRepository {
       return Failure(StorageFailure('Could not read item $id', cause: e));
     }
 
-    final imagePath = '${image.stem}${image.extension}';
-    final thumbPath = '${image.stem}_thumb${image.extension}';
     final written = <String>[];
     Future<Result<ClothingItem>> fail(AppFailure failure) async {
       await _deleteFiles(written);
       return Failure(failure);
     }
 
-    final savedImage = await _files.writeBytes(imagePath, image.bytes);
-    if (savedImage case Failure(:final failure)) return fail(failure);
-    written.add(imagePath);
-    final savedThumb = await _files.writeBytes(thumbPath, thumbnail);
-    if (savedThumb case Failure(:final failure)) return fail(failure);
-    written.add(thumbPath);
+    for (final f in files) {
+      final saved = await _files.writeBytes(f.path, f.bytes);
+      if (saved case Failure(:final failure)) return fail(failure);
+      written.add(f.path);
+    }
 
     final now = toEpochMillisUtc(_clock.nowUtc());
     try {
       await _db.transaction(() async {
         await _deleteRows(previous);
-        await _db
-            .into(_db.clothingImages)
-            .insert(
-              ClothingImagesCompanion.insert(
-                id: _ids.newId(),
-                itemId: id,
-                kind: largeKind,
-                relativePath: imagePath,
-                width: Value(image.width),
-                height: Value(image.height),
-                byteSize: Value(image.bytes.length),
-                createdAt: now,
-              ),
-            );
-        await _db
-            .into(_db.clothingImages)
-            .insert(
-              ClothingImagesCompanion.insert(
-                id: _ids.newId(),
-                itemId: id,
-                kind: smallKind,
-                relativePath: thumbPath,
-                byteSize: Value(thumbnail.length),
-                createdAt: now,
-              ),
-            );
+        for (final f in files) {
+          await _db
+              .into(_db.clothingImages)
+              .insert(
+                ClothingImagesCompanion.insert(
+                  id: _ids.newId(),
+                  itemId: id,
+                  kind: f.kind,
+                  relativePath: f.path,
+                  width: Value(f.width),
+                  height: Value(f.height),
+                  byteSize: Value(f.bytes.length),
+                  createdAt: now,
+                ),
+              );
+        }
         await _touch(id, now, view);
       });
     } on Exception catch (e) {
@@ -739,19 +761,14 @@ final class DriftWardrobeRepository implements WardrobeRepository {
   }
 }
 
-/// A picture's large file, before it is written.
+/// One image file of a picture, before it is written.
 final class _NewFile {
-  const _NewFile(
-    this.stem,
-    this.extension,
-    this.bytes, {
-    this.width,
-    this.height,
-  });
+  const _NewFile(this.path, this.kind, this.bytes, {this.width, this.height});
 
-  /// Path without extension; the thumbnail adds `_thumb`.
-  final String stem;
-  final String extension;
+  final String path;
+
+  /// [ImageKind] of its row.
+  final String kind;
   final Uint8List bytes;
   final int? width;
   final int? height;
