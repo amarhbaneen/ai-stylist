@@ -1,0 +1,31 @@
+name: inpaint_spike
+description: "Inpainting spike (D-44 follow-up): fills garment areas hidden by an arm or phone. Not part of the product."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.14.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # Exact pins: spike measurements must be reproducible.
+  flutter_litert: 4.1.2
+  image: 4.13.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    # Candidate models: downloaded and SHA-256-checked by
+    # tool/fetch_models.ps1, never committed.
+    - assets/models/
+    # Test photos: local only, never committed (they show real people and
+    # brand product photos).
+    - assets/images/
