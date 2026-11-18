@@ -4,12 +4,13 @@ import 'package:wardrobe_domain/wardrobe_domain.dart';
 
 import '../../../core/media/media_picker.dart';
 import '../../../core/providers.dart';
+import '../../../core/theme/tokens.dart';
 import '../../../shared/taxonomy_labels.dart';
 import '../../../shared/widgets/item_thumbnail.dart';
+import '../../../shared/widgets/motion.dart';
+import '../../official_photo/official_photo_providers.dart';
+import '../../official_photo/presentation/official_photo_suggestion.dart';
 import '../wardrobe_providers.dart';
-
-/// Product-style backdrop for cut-outs and product photos.
-const _studioBackground = Color(0xFFF4F4F2);
 
 /// The item's large image, a switch between the images it has (photo,
 /// cut-out, product photo), and the actions on them (FR-05, D-39, D-41):
@@ -98,6 +99,8 @@ class _ItemPhotoState extends ConsumerState<ItemPhoto> {
       );
     }
     final shown = images.shown;
+    final autoSearch =
+        ref.watch(officialPhotoStateProvider).value?.enabled ?? false;
     final views = [
       for (final v in [ItemView.cutout, ItemView.product, ItemView.photo])
         if (images.has(v)) v,
@@ -105,16 +108,26 @@ class _ItemPhotoState extends ConsumerState<ItemPhoto> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _Frame(
-          studio: shown != ItemView.photo,
-          child: StoredImage(
-            relativePath: images.display,
-            fit: BoxFit.contain,
-            semanticLabel: widget.semanticLabel,
+        Hero(
+          tag: itemPhotoHeroTag(widget.item.id),
+          child: _Frame(
+            studio: shown != ItemView.photo,
+            white: shown == ItemView.product,
+            // Cross-fade when switching between photo, cut-out and
+            // official photo.
+            child: StateSwitcher(
+              child: StoredImage(
+                key: ValueKey(images.display),
+                relativePath: images.display,
+                fit: BoxFit.contain,
+                cutoutShadow: shown == ItemView.cutout,
+                semanticLabel: widget.semanticLabel,
+              ),
+            ),
           ),
         ),
         if (views.length > 1) ...[
-          const SizedBox(height: 8),
+          const SizedBox(height: Space.md),
           Center(
             child: SegmentedButton<ItemView>(
               segments: [for (final v in views) _segment(v)],
@@ -124,10 +137,10 @@ class _ItemPhotoState extends ConsumerState<ItemPhoto> {
             ),
           ),
         ],
-        const SizedBox(height: 4),
+        const SizedBox(height: Space.xs),
         Wrap(
           alignment: WrapAlignment.center,
-          spacing: 4,
+          spacing: Space.xs,
           children: [
             if (shown == ItemView.cutout)
               TextButton.icon(
@@ -135,11 +148,13 @@ class _ItemPhotoState extends ConsumerState<ItemPhoto> {
                 icon: const Icon(Icons.flip),
                 label: const Text('Flip'),
               ),
-            TextButton.icon(
-              onPressed: _busy ? null : () => _find(images),
-              icon: const Icon(Icons.image_search),
-              label: const Text('Find official photo'),
-            ),
+            // With automatic search on, Lens is not needed.
+            if (!autoSearch)
+              TextButton.icon(
+                onPressed: _busy ? null : () => _find(images),
+                icon: const Icon(Icons.image_search),
+                label: const Text('Find official photo'),
+              ),
             TextButton.icon(
               onPressed: _busy ? null : _useOfficial,
               icon: const Icon(Icons.add_photo_alternate_outlined),
@@ -157,6 +172,11 @@ class _ItemPhotoState extends ConsumerState<ItemPhoto> {
               ),
           ],
         ),
+        if (images.cutout case final cutout? when images.product == null)
+          OfficialPhotoSuggestion(
+            itemId: widget.item.id,
+            cutoutPath: cutout.image,
+          ),
       ],
     );
   }
@@ -180,24 +200,30 @@ class _ItemPhotoState extends ConsumerState<ItemPhoto> {
   };
 }
 
-/// Rounded 4:3 frame; [studio] uses a light product-style backdrop with
-/// some padding.
+/// Portrait 4:5 frame, like a shop photo; [studio] adds padding around
+/// cut-outs and product photos.
 class _Frame extends StatelessWidget {
-  const _Frame({required this.studio, required this.child});
+  const _Frame({required this.studio, required this.child, this.white = false});
 
   final bool studio;
+
+  /// Product photos usually have a white background; match it.
+  final bool white;
   final Widget child;
 
   @override
   Widget build(BuildContext context) => ClipRRect(
-    borderRadius: BorderRadius.circular(12),
+    borderRadius: Radii.all,
     child: ColoredBox(
-      color: studio
-          ? _studioBackground
-          : Theme.of(context).colorScheme.surfaceContainerHighest,
+      color: white
+          ? Theme.of(context).colorScheme.surfaceContainerLowest
+          : Theme.of(context).colorScheme.surfaceContainerHigh,
       child: AspectRatio(
-        aspectRatio: 4 / 3,
-        child: Padding(padding: EdgeInsets.all(studio ? 16 : 0), child: child),
+        aspectRatio: 4 / 5,
+        child: Padding(
+          padding: EdgeInsets.all(studio ? Space.xl : 0),
+          child: child,
+        ),
       ),
     ),
   );

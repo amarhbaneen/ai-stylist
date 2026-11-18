@@ -6,6 +6,7 @@ import 'package:ai_stylist/core/media/image_processor.dart';
 import 'package:ai_stylist/core/media/media_picker.dart';
 import 'package:ai_stylist/core/media/visual_search.dart';
 import 'package:ai_stylist/core/storage/file_store.dart';
+import 'package:ai_stylist/features/official_photo/data/official_photo_settings_store.dart';
 import 'package:wardrobe_domain/wardrobe_domain.dart';
 
 final class FixedClock implements Clock {
@@ -121,6 +122,18 @@ final class FakeGarmentFinder implements GarmentFinder {
     paths.add(imagePath);
     return result;
   }
+}
+
+/// In-memory secret store (the real one needs the platform keystore).
+final class FakeSecretStore implements SecretStore {
+  final values = <String, String>{};
+
+  @override
+  Future<String?> read(String key) async => values[key];
+
+  @override
+  Future<void> write(String key, String? value) async =>
+      value == null ? values.remove(key) : values[key] = value;
 }
 
 /// Records the images handed to a visual search app (D-41).

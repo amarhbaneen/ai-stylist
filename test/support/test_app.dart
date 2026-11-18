@@ -4,6 +4,7 @@ import 'package:ai_stylist/app/app.dart';
 import 'package:ai_stylist/core/database/app_database.dart';
 import 'package:ai_stylist/core/providers.dart';
 import 'package:ai_stylist/features/clothing_analysis/analysis_providers.dart';
+import 'package:ai_stylist/features/official_photo/official_photo_providers.dart';
 import 'package:ai_stylist/features/profile/profile_providers.dart';
 import 'package:ai_stylist/features/stylist/stylist_providers.dart';
 import 'package:ai_stylist/features/wardrobe/wardrobe_providers.dart';
@@ -12,6 +13,7 @@ import 'package:ai_stylist/features/weather/weather_providers.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -58,6 +60,7 @@ final class TestApp {
   static Future<TestApp> create(
     WidgetTester tester, {
     bool onboardingComplete = true,
+    List<Override> extraOverrides = const [],
   }) async {
     final tmp = (await tester.runAsync(
       () => Directory.systemTemp.createTemp('ai_stylist_widget'),
@@ -68,6 +71,7 @@ final class TestApp {
     final analyzer = FakeClothingAnalyzer();
     final garments = FakeGarmentFinder();
     final search = FakeVisualSearch();
+    final secrets = FakeSecretStore();
     final network = FakeNetwork();
     final container = ProviderContainer(
       overrides: [
@@ -84,11 +88,13 @@ final class TestApp {
         clothingAnalyzerProvider.overrideWithValue(analyzer),
         garmentFinderProvider.overrideWithValue(garments),
         visualSearchProvider.overrideWithValue(search),
+        secretStoreProvider.overrideWithValue(secrets),
         httpClientProvider.overrideWithValue(MockClient(network.handle)),
         // A tiny list instead of the 700 KB bundled asset.
         cityDirectoryProvider.overrideWithValue(
           AssetCityDirectory(() async => testCitiesJson),
         ),
+        ...extraOverrides,
       ],
     );
     return TestApp._(

@@ -5,7 +5,9 @@ import 'package:wardrobe_domain/wardrobe_domain.dart';
 
 import '../../../app/routes.dart';
 import '../../../shared/taxonomy_labels.dart';
+import '../../../shared/widgets/empty_state.dart';
 import '../../favorites/presentation/learned_preferences_section.dart';
+import '../../official_photo/presentation/official_photo_settings_section.dart';
 import '../../weather/presentation/live_weather_settings_section.dart';
 import '../profile_providers.dart';
 import 'preferences_form.dart';
@@ -108,6 +110,7 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
             ),
             const LearnedPreferencesSection(),
             const LiveWeatherSettingsSection(),
+            const OfficialPhotoSettingsSection(),
             const Divider(height: 40),
             ListTile(
               contentPadding: EdgeInsets.zero,
@@ -119,10 +122,13 @@ class _PreferencesScreenState extends ConsumerState<PreferencesScreen> {
             ),
           ],
         ),
-        AsyncError() => const Center(
-          child: Text('Your preferences could not be loaded.'),
+        AsyncError(:final error) => ErrorState(
+          title: 'Your preferences did not load',
+          error: error,
+          fallback: 'Nothing was changed. Try again, or restart the app.',
+          onRetry: () => ref.invalidate(styleProfileProvider),
         ),
-        _ => const Center(child: CircularProgressIndicator()),
+        _ => const LoadingState(),
       },
     );
   }
